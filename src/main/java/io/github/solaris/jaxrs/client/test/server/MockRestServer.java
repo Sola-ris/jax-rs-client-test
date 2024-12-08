@@ -2,7 +2,7 @@ package io.github.solaris.jaxrs.client.test.server;
 
 import java.time.Duration;
 
-import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.core.Configurable;
 
 import io.github.solaris.jaxrs.client.test.manager.RequestExpectationManager;
 import io.github.solaris.jaxrs.client.test.request.ExpectedCount;
@@ -16,8 +16,8 @@ public final class MockRestServer {
         this.expectationManager = expectationManager;
     }
 
-    public static MockRestServerBuilder bindTo(ClientBuilder clientBuilder) {
-        return new MockRestServerBuilder(clientBuilder);
+    public static MockRestServerBuilder bindTo(Configurable<?> configurable) {
+        return new MockRestServerBuilder(configurable);
     }
 
     public ResponseActions expect(RequestMatcher requestMatcher) {

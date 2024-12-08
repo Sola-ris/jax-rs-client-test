@@ -1,19 +1,18 @@
 package io.github.solaris.jaxrs.client.test.server;
 
-import jakarta.ws.rs.client.ClientBuilder;
-import jakarta.ws.rs.core.Configuration;
+import jakarta.ws.rs.core.Configurable;
 
 import io.github.solaris.jaxrs.client.test.manager.OrderedRequestExpectationManager;
 import io.github.solaris.jaxrs.client.test.manager.RequestExpectationManager;
 import io.github.solaris.jaxrs.client.test.manager.UnorderedRequestExpectationManager;
 
 public class MockRestServerBuilder {
-    private final ClientBuilder clientBuilder;
+    private final Configurable<?> configurable;
 
     private boolean ignoreRequestOrder;
 
-    MockRestServerBuilder(ClientBuilder clientBuilder) {
-        this.clientBuilder = clientBuilder;
+    MockRestServerBuilder(Configurable<?> configurable) {
+        this.configurable = configurable;
     }
 
     private RequestExpectationManager getExpectationManager() {
@@ -31,18 +30,10 @@ public class MockRestServerBuilder {
 
     public MockRestServer build() {
         RequestExpectationManager expectationManager = getExpectationManager();
-        Configuration configuration = clientBuilder.getConfiguration();
-        if (configuration.isRegistered(MockResponseFilter.class)) {
-            configuration.getInstances()
-                .stream()
-                .filter(MockResponseFilter.class::isInstance)
-                .map(MockResponseFilter.class::cast)
-                .findFirst()
-                .orElseThrow()
-                .setExpectationManager(expectationManager);
-        } else {
-            clientBuilder.register(new MockResponseFilter(expectationManager), Integer.MAX_VALUE);
+        if (!configurable.getConfiguration().isRegistered(MockResponseFilter.class)) {
+            configurable.register(MockResponseFilter.class, Integer.MAX_VALUE);
         }
+        configurable.property(RequestExpectationManager.class.getName(), expectationManager);
 
         return new MockRestServer(expectationManager);
     }

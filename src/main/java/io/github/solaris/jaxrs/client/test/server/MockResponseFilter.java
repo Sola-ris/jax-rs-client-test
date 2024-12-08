@@ -7,21 +7,15 @@ import jakarta.ws.rs.client.ClientRequestFilter;
 
 import io.github.solaris.jaxrs.client.test.manager.RequestExpectationManager;
 
-class MockResponseFilter implements ClientRequestFilter {
-    private RequestExpectationManager expectationManager;
-
-    public MockResponseFilter(RequestExpectationManager expectationManager) {
-        this.expectationManager = expectationManager;
-    }
+public class MockResponseFilter implements ClientRequestFilter {
 
     @Override
     public void filter(ClientRequestContext requestContext) throws IOException {
-        requestContext.abortWith(
-            expectationManager.validateRequest(requestContext)
-        );
-    }
-
-    public void setExpectationManager(RequestExpectationManager expectationManager) {
-        this.expectationManager = expectationManager;
+        Object property = requestContext.getConfiguration().getProperty(RequestExpectationManager.class.getName());
+        if (property instanceof RequestExpectationManager expectationManager) {
+            requestContext.abortWith(
+                expectationManager.validateRequest(requestContext)
+            );
+        }
     }
 }
