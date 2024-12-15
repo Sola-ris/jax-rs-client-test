@@ -61,9 +61,13 @@ public final class RequestMatchers {
         };
     }
 
+    public static EntityRequestMatchers entity() {
+        return new EntityRequestMatchers();
+    }
+
     private static MultivaluedMap<String, String> getQueryParams(URI uri) {
         return Arrays.stream(uri.getQuery().split("&"))
-            .map(query ->  URLDecoder.decode(query, UTF_8))
+            .map(query -> URLDecoder.decode(query, UTF_8))
             .map(query -> query.split("="))
             .collect(MultivaluedHashMap::new, (map, query) -> map.add(query[0], query[1]), MultivaluedMap::putAll);
     }

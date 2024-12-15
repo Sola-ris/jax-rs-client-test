@@ -22,22 +22,27 @@ import jakarta.ws.rs.core.MultivaluedHashMap;
 import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.Response;
 
-public record MockClientRequestContext(String method, URI uri, MultivaluedMap<String, String> stringHeaders) implements ClientRequestContext {
+public record MockClientRequestContext(
+    String method, URI uri, MultivaluedMap<String, String> stringHeaders, MediaType mediaType) implements ClientRequestContext {
 
     public MockClientRequestContext(MultivaluedMap<String, String> stringHeaders) {
-        this(null, null, stringHeaders);
+        this(null, null, stringHeaders, null);
     }
 
     public MockClientRequestContext(URI uri) {
-        this(null, uri, new MultivaluedHashMap<>());
+        this(null, uri, new MultivaluedHashMap<>(), null);
     }
 
     public MockClientRequestContext(String method) {
-        this(method, null, new MultivaluedHashMap<>());
+        this(method, null, new MultivaluedHashMap<>(), null);
     }
 
     public MockClientRequestContext(String method, String uri) {
-        this(method, URI.create(uri), new MultivaluedHashMap<>());
+        this(method, URI.create(uri), new MultivaluedHashMap<>(), null);
+    }
+
+    public MockClientRequestContext(MediaType mediaType) {
+        this(null, null, null, mediaType);
     }
 
     //<editor-fold desc="Interface methods">
@@ -108,7 +113,7 @@ public record MockClientRequestContext(String method, URI uri, MultivaluedMap<St
 
     @Override
     public MediaType getMediaType() {
-        return null;
+        return mediaType;
     }
 
     @Override
