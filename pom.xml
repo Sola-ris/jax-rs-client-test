@@ -61,6 +61,18 @@
             <version>3.1.9</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.inject</groupId>
+            <artifactId>jersey-hk2</artifactId>
+            <version>3.1.9</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.incubator</groupId>
+            <artifactId>jersey-injectless-client</artifactId>
+            <version>3.1.9</version>
+            <scope>test</scope>
+        </dependency>
 
         <dependency>
             <groupId>org.jboss.resteasy</groupId>

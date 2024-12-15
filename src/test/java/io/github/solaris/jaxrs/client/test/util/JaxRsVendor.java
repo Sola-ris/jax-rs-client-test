@@ -6,13 +6,22 @@ import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.ext.RuntimeDelegate;
 
 import org.glassfish.jersey.client.JerseyClientBuilder;
+import org.glassfish.jersey.inject.hk2.Hk2InjectionManagerFactory;
+import org.glassfish.jersey.inject.injectless.NonInjectionManagerFactory;
+import org.glassfish.jersey.internal.inject.InjectionManagerFactory;
 import org.jboss.resteasy.client.jaxrs.internal.ResteasyClientBuilderImpl;
 import org.jboss.resteasy.core.providerfactory.ResteasyProviderFactoryImpl;
 
 public enum JaxRsVendor {
     JERSEY(
         org.glassfish.jersey.internal.RuntimeDelegateImpl.class,
-        JerseyClientBuilder.class
+        JerseyClientBuilder.class,
+        NonInjectionManagerFactory.class
+    ),
+    JERSEY_HK2(
+        org.glassfish.jersey.internal.RuntimeDelegateImpl.class,
+        JerseyClientBuilder.class,
+        Hk2InjectionManagerFactory.class
     ),
     RESTEASY(
         ResteasyProviderFactoryImpl.class,
@@ -31,12 +40,21 @@ public enum JaxRsVendor {
 
     private final Class<? extends RuntimeDelegate> runtimeDelegateClass;
     private final Class<? extends ClientBuilder> clientBuilderClass;
+    private final Class<? extends InjectionManagerFactory> injectionManagerFactoryClass;
     private final VendorClassLoader vendorClassLoader;
 
-
     JaxRsVendor(Class<? extends RuntimeDelegate> runtimeDelegateClass, Class<? extends ClientBuilder> clientBuilderClass) {
+        this(runtimeDelegateClass, clientBuilderClass, null);
+    }
+
+    JaxRsVendor(
+        Class<? extends RuntimeDelegate> runtimeDelegateClass,
+        Class<? extends ClientBuilder> clientBuilderClass,
+        Class<? extends InjectionManagerFactory> injectionManagerFactoryClass
+    ) {
         this.runtimeDelegateClass = runtimeDelegateClass;
         this.clientBuilderClass = clientBuilderClass;
+        this.injectionManagerFactoryClass = injectionManagerFactoryClass;
 
         this.vendorClassLoader = new VendorClassLoader(this);
     }
@@ -47,6 +65,10 @@ public enum JaxRsVendor {
 
     Class<? extends RuntimeDelegate> getRuntimeDelegateClass() {
         return runtimeDelegateClass;
+    }
+
+    public Class<? extends InjectionManagerFactory> getInjectionManagerFactoryClass() {
+        return injectionManagerFactoryClass;
     }
 
     public ClassLoader getVendorClassLoader() {

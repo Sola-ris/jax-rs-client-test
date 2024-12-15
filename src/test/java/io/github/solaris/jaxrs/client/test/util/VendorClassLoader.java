@@ -13,6 +13,7 @@ class VendorClassLoader extends ClassLoader {
 
     private Path runtimeDelegatePath;
     private Path clientBuilderPath;
+    private Path injectionManagerFactoryPath;
 
     VendorClassLoader(JaxRsVendor vendor) {
         super(vendor.name(), VendorClassLoader.class.getClassLoader());
@@ -24,6 +25,7 @@ class VendorClassLoader extends ClassLoader {
         return switch (name) {
             case "META-INF/services/jakarta.ws.rs.ext.RuntimeDelegate" -> getRuntimeDelegateService();
             case "META-INF/services/jakarta.ws.rs.client.ClientBuilder" -> getClientBuilderService();
+            case "META-INF/services/org.glassfish.jersey.internal.inject.InjectionManagerFactory" -> getInjectionManagerFactoryService();
             default -> super.getResources(name);
         };
     }
@@ -52,5 +54,18 @@ class VendorClassLoader extends ClassLoader {
         clientBuilderPath.toFile().deleteOnExit();
 
         return Collections.enumeration(List.of(clientBuilderPath.toUri().toURL()));
+    }
+
+    private Enumeration<URL> getInjectionManagerFactoryService() throws IOException {
+        if (injectionManagerFactoryPath != null) {
+            return Collections.enumeration(List.of(injectionManagerFactoryPath.toUri().toURL()));
+        }
+
+        injectionManagerFactoryPath = Files.createTempFile(vendor.getInjectionManagerFactoryClass().getName(), "");
+        Files.writeString(injectionManagerFactoryPath, vendor.getInjectionManagerFactoryClass().getName() + System.lineSeparator());
+
+        injectionManagerFactoryPath.toFile().deleteOnExit();
+
+        return Collections.enumeration(List.of(injectionManagerFactoryPath.toUri().toURL()));
     }
 }
