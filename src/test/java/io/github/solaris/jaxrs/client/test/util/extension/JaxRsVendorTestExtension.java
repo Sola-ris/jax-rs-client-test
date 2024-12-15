@@ -1,11 +1,14 @@
 package io.github.solaris.jaxrs.client.test.util.extension;
 
 import static io.github.solaris.jaxrs.client.test.util.JaxRsVendor.CXF;
+import static io.github.solaris.jaxrs.client.test.util.JaxRsVendor.JERSEY;
+import static io.github.solaris.jaxrs.client.test.util.JaxRsVendor.RESTEASY_REACTIVE;
 
 import java.lang.reflect.Method;
 
 import jakarta.ws.rs.ext.RuntimeDelegate;
 
+import io.github.solaris.jaxrs.client.test.util.EntityConverterAssert;
 import io.github.solaris.jaxrs.client.test.util.FilterExceptionAssert;
 import io.github.solaris.jaxrs.client.test.util.FilterExceptionAssert.CxfFilterExceptionAssert;
 import io.github.solaris.jaxrs.client.test.util.FilterExceptionAssert.DefaultFilterExceptionAssert;
@@ -41,14 +44,22 @@ class JaxRsVendorTestExtension implements InvocationInterceptor, ParameterResolv
 
     @Override
     public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
-        return FilterExceptionAssert.class.isAssignableFrom(parameterContext.getParameter().getType());
+        return FilterExceptionAssert.class.isAssignableFrom(parameterContext.getParameter().getType())
+            || EntityConverterAssert.class.isAssignableFrom(parameterContext.getParameter().getType());
     }
 
     @Override
     public Object resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
-        if (vendor == CXF) {
-            return new CxfFilterExceptionAssert();
+        if (FilterExceptionAssert.class.isAssignableFrom(parameterContext.getParameter().getType())) {
+            if (vendor == CXF) {
+                return new CxfFilterExceptionAssert();
+            }
+            return new DefaultFilterExceptionAssert();
         }
-        return new DefaultFilterExceptionAssert();
+
+        if (vendor == JERSEY || vendor == RESTEASY_REACTIVE) {
+            return new EntityConverterAssert.ClientEntityConverterAssert();
+        }
+        return new EntityConverterAssert.ProvidersEntityConverterAssert();
     }
 }
