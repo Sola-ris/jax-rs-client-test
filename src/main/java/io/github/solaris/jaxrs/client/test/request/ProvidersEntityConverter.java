@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
+import jakarta.ws.rs.ProcessingException;
 import jakarta.ws.rs.client.ClientRequestContext;
 import jakarta.ws.rs.core.GenericType;
 import jakarta.ws.rs.ext.MessageBodyReader;
@@ -45,7 +46,7 @@ public final class ProvidersEntityConverter extends EntityConverter {
         );
 
         if (writer == null) {
-            throw new IllegalStateException("Unable to obtain MessageBodyWriter for type=" + type + " and genericType=" + genericType);
+            throw new ProcessingException("Unable to obtain MessageBodyWriter for type=" + type + " and genericType=" + genericType);
         }
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -67,7 +68,7 @@ public final class ProvidersEntityConverter extends EntityConverter {
         );
 
         if (reader == null) {
-            throw new IllegalStateException("Unable to obtain MessageBodyReader for type=" + type + " and genericType=" + genericType);
+            throw new ProcessingException("Unable to obtain MessageBodyReader for type=" + type + " and genericType=" + genericType);
         }
 
         ByteArrayInputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray());

@@ -37,12 +37,12 @@ public abstract sealed class EntityConverterAssert {
 
         @Override
         public RequestMatcher typeAsserter(Object expectedEntity, int times) {
-            return asserter(expectedEntity, times, ((converter, requestContext) -> converter.convertEntity(requestContext, String.class)));
+            return asserter(expectedEntity, times, (converter, requestContext) -> converter.convertEntity(requestContext, String.class));
         }
 
         @Override
         public RequestMatcher genericTypeAsserter(Object expectedEntity, int times) {
-            return asserter(expectedEntity, times, ((converter, requestContext) -> converter.convertEntity(requestContext, GENERIC_TYPE)));
+            return asserter(expectedEntity, times, (converter, requestContext) -> converter.convertEntity(requestContext, GENERIC_TYPE));
         }
 
         @Override
@@ -127,9 +127,8 @@ public abstract sealed class EntityConverterAssert {
 
         @Override
         public void assertConversionFailure(ThrowingCallable throwingCallable) {
-            new FilterExceptionAssert.DefaultFilterExceptionAssert()
-                .assertThatThrownBy(throwingCallable)
-                .isInstanceOf(IllegalStateException.class)
+            assertThatThrownBy(throwingCallable)
+                .isInstanceOf(ProcessingException.class)
                 .hasMessageMatching("^Unable to obtain MessageBody(Reader|Writer) for type=class.+? and genericType=.*$");
         }
 
