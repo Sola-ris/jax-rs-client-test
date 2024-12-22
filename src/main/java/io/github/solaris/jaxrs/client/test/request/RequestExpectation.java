@@ -24,7 +24,7 @@ public class RequestExpectation implements RequestMatcher, ResponseActions, Resp
     }
 
     @Override
-    public void match(ClientRequestContext request) {
+    public void match(ClientRequestContext request) throws IOException {
         for (RequestMatcher matcher : matchers) {
             matcher.match(request);
         }

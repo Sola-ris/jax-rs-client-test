@@ -1,5 +1,7 @@
 package io.github.solaris.jaxrs.client.test.manager;
 
+import java.io.IOException;
+
 import jakarta.ws.rs.client.ClientRequestContext;
 
 import io.github.solaris.jaxrs.client.test.request.RequestExpectation;
@@ -13,7 +15,7 @@ public class UnorderedRequestExpectationManager extends RequestExpectationManage
     }
 
     @Override
-    protected RequestExpectation matchRequest(ClientRequestContext requestContext) {
+    protected RequestExpectation matchRequest(ClientRequestContext requestContext) throws IOException {
         RequestExpectation expectation = expectationGroup.findExpectation(requestContext);
         if (expectation == null) {
             throw createUnexpectedRequestError(requestContext);

@@ -1,5 +1,6 @@
 package io.github.solaris.jaxrs.client.test.request;
 
+import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.Objects;
 
@@ -16,9 +17,9 @@ public abstract sealed class EntityConverter permits ClientEntityConverter, Prov
         throw new IllegalStateException("Unable to obtain EntityConverter from RequestContext.");
     }
 
-    public abstract <T> T convertEntity(ClientRequestContext requestContext, Class<T> type);
+    public abstract <T> T convertEntity(ClientRequestContext requestContext, Class<T> type) throws IOException;
 
-    public abstract <T> T convertEntity(ClientRequestContext requestContext, GenericType<T> genericType);
+    public abstract <T> T convertEntity(ClientRequestContext requestContext, GenericType<T> genericType) throws IOException;
 
     static boolean canShortCircuit(ClientRequestContext requestContext, Class<?> type, Type genericType) {
         if (genericType == null) {

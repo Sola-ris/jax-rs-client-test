@@ -40,7 +40,8 @@ public final class ClientEntityConverter extends EntityConverter {
 
     private Response convertEntity(ClientRequestContext requestContext) {
         try (Client client = ClientBuilder.newClient()) {
-            return client.register(ROUND_TRIP_FILTER).target(LOCALHOST)
+            return client.register(ROUND_TRIP_FILTER)
+                .target(LOCALHOST)
                 .request(requestContext.getMediaType())
                 .post(Entity.entity(requestContext.getEntity(), requestContext.getMediaType()));
         }

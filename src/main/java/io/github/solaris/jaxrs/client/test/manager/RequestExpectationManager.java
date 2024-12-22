@@ -30,7 +30,7 @@ public abstract class RequestExpectationManager {
 
     protected abstract void expectationsDeclared();
 
-    protected abstract RequestExpectation matchRequest(ClientRequestContext requestContext);
+    protected abstract RequestExpectation matchRequest(ClientRequestContext requestContext) throws IOException;
 
     protected List<RequestExpectation> getExpectations() {
         return expectations;
@@ -143,7 +143,7 @@ public abstract class RequestExpectationManager {
     protected static class RequestExpectationGroup {
         private final Set<RequestExpectation> expectations = new HashSet<>();
 
-        public RequestExpectation findExpectation(ClientRequestContext requestContext) {
+        public RequestExpectation findExpectation(ClientRequestContext requestContext) throws IOException {
             for (RequestExpectation expectation : expectations) {
                 try {
                     expectation.match(requestContext);

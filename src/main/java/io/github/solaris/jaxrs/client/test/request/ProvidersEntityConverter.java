@@ -3,7 +3,6 @@ package io.github.solaris.jaxrs.client.test.request;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
@@ -22,18 +21,18 @@ public final class ProvidersEntityConverter extends EntityConverter {
     }
 
     @Override
-    public <T> T convertEntity(ClientRequestContext requestContext, Class<T> type) {
+    public <T> T convertEntity(ClientRequestContext requestContext, Class<T> type) throws IOException {
         return convertEntity(requestContext, type, null);
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public <T> T convertEntity(ClientRequestContext requestContext, GenericType<T> genericType) {
+    public <T> T convertEntity(ClientRequestContext requestContext, GenericType<T> genericType) throws IOException {
         return convertEntity(requestContext, (Class<T>) genericType.getRawType(), genericType.getType());
     }
 
     @SuppressWarnings("unchecked")
-    private <T> T convertEntity(ClientRequestContext requestContext, Class<T> type, Type genericType) {
+    private <T> T convertEntity(ClientRequestContext requestContext, Class<T> type, Type genericType) throws IOException {
         if (canShortCircuit(requestContext, type, genericType)) {
             return (T) requestContext.getEntity();
         }
@@ -50,19 +49,15 @@ public final class ProvidersEntityConverter extends EntityConverter {
         }
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        try {
-            writer.writeTo(
-                requestContext.getEntity(),
-                requestContext.getEntityClass(),
-                requestContext.getEntityType(),
-                requestContext.getEntityAnnotations(),
-                requestContext.getMediaType(),
-                requestContext.getHeaders(),
-                outputStream
-            );
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
+        writer.writeTo(
+            requestContext.getEntity(),
+            requestContext.getEntityClass(),
+            requestContext.getEntityType(),
+            requestContext.getEntityAnnotations(),
+            requestContext.getMediaType(),
+            requestContext.getHeaders(),
+            outputStream
+        );
 
         MessageBodyReader<T> reader = providers.getMessageBodyReader(
             type,
@@ -76,17 +71,13 @@ public final class ProvidersEntityConverter extends EntityConverter {
         }
 
         ByteArrayInputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray());
-        try {
-            return reader.readFrom(
-                type,
-                genericType,
-                ANNOTATIONS,
-                requestContext.getMediaType(),
-                requestContext.getStringHeaders(),
-                inputStream
-            );
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
+        return reader.readFrom(
+            type,
+            genericType,
+            ANNOTATIONS,
+            requestContext.getMediaType(),
+            requestContext.getStringHeaders(),
+            inputStream
+        );
     }
 }

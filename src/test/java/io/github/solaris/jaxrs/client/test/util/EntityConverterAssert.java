@@ -5,8 +5,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
-import java.util.function.BiFunction;
 
 import jakarta.ws.rs.ProcessingException;
 import jakarta.ws.rs.client.Client;
@@ -51,7 +51,7 @@ public abstract sealed class EntityConverterAssert {
         }
 
         private <T> RequestMatcher asserter(
-            Object expectedEntity, int times, BiFunction<EntityConverter, ClientRequestContext, T> conversionFunction) {
+            Object expectedEntity, int times, ThrowingBiFunction<EntityConverter, ClientRequestContext, T> conversionFunction) {
             return request -> {
                 Client client = ClientBuilder.newClient();
                 try (MockedStatic<ClientBuilder> builderMock = Mockito.mockStatic(ClientBuilder.class)) {
@@ -146,5 +146,10 @@ public abstract sealed class EntityConverterAssert {
                 throw new IllegalStateException(e);
             }
         }
+    }
+
+    @FunctionalInterface
+    private interface ThrowingBiFunction<T, U, R> {
+        R apply(T t, U u) throws IOException;
     }
 }
