@@ -1,7 +1,5 @@
 package io.github.solaris.jaxrs.client.test.response;
 
-import java.lang.ref.Cleaner;
-
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.client.ClientRequestContext;
@@ -9,14 +7,14 @@ import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.client.Invocation;
 import jakarta.ws.rs.core.Response;
 
-public class ExecutingResponseCreator implements ResponseCreator {
-    private static final Cleaner CLEANER = Cleaner.create();
+import io.github.solaris.jaxrs.client.test.internal.ClientCleaner;
 
+public class ExecutingResponseCreator implements ResponseCreator {
     private final Client client;
 
     public ExecutingResponseCreator() {
         this.client = ClientBuilder.newClient();
-        CLEANER.register(this, closeClient(client));
+        ClientCleaner.register(this, client);
     }
 
     public ExecutingResponseCreator(Client client) {
@@ -32,9 +30,5 @@ public class ExecutingResponseCreator implements ResponseCreator {
             return invocationBuilder.method(request.getMethod(), Entity.entity(request.getEntity(), request.getMediaType()));
         }
         return invocationBuilder.method(request.getMethod());
-    }
-
-    private static Runnable closeClient(Client client) {
-        return client::close;
     }
 }
