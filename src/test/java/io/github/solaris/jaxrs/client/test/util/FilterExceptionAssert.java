@@ -22,7 +22,7 @@ public sealed interface FilterExceptionAssert {
                 }
                 return assertThat(t)
                     .isInstanceOf(ProcessingException.class)
-                    .rootCause();
+                    .cause();
             }
 
             throw new AssertionError("Expected callable to throw an exception");
@@ -34,7 +34,7 @@ public sealed interface FilterExceptionAssert {
         public AbstractThrowableAssert<?, ? extends Throwable> assertThatThrownBy(ThrowingCallable throwingCallable) {
             return Assertions.assertThatThrownBy(throwingCallable)
                 .isInstanceOf(ProcessingException.class)
-                .rootCause();
+                .cause();
         }
     }
 }

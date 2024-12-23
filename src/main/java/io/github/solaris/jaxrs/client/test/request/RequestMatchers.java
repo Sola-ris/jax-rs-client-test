@@ -66,6 +66,10 @@ public final class RequestMatchers {
         return new EntityRequestMatchers();
     }
 
+    public static JsonPathRequestMatchers jsonPath(String expression, Object... args) {
+        return new JsonPathRequestMatchers(expression, args);
+    }
+
     private static MultivaluedMap<String, String> getQueryParams(URI uri) {
         return Arrays.stream(uri.getQuery().split("&"))
             .map(query -> URLDecoder.decode(query, UTF_8))

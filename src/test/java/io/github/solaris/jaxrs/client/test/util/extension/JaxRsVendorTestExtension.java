@@ -8,7 +8,12 @@ import java.lang.reflect.Method;
 
 import jakarta.ws.rs.ext.RuntimeDelegate;
 
+import io.github.solaris.jaxrs.client.test.util.ConfiguredClientSupplier;
+import io.github.solaris.jaxrs.client.test.util.ConfiguredClientSupplier.CxfClientSupplier;
+import io.github.solaris.jaxrs.client.test.util.ConfiguredClientSupplier.DefaultClientSupplier;
 import io.github.solaris.jaxrs.client.test.util.EntityConverterAssert;
+import io.github.solaris.jaxrs.client.test.util.EntityConverterAssert.ClientEntityConverterAssert;
+import io.github.solaris.jaxrs.client.test.util.EntityConverterAssert.ProvidersEntityConverterAssert;
 import io.github.solaris.jaxrs.client.test.util.FilterExceptionAssert;
 import io.github.solaris.jaxrs.client.test.util.FilterExceptionAssert.CxfFilterExceptionAssert;
 import io.github.solaris.jaxrs.client.test.util.FilterExceptionAssert.DefaultFilterExceptionAssert;
@@ -45,7 +50,8 @@ class JaxRsVendorTestExtension implements InvocationInterceptor, ParameterResolv
     @Override
     public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
         return FilterExceptionAssert.class.isAssignableFrom(parameterContext.getParameter().getType())
-            || EntityConverterAssert.class.isAssignableFrom(parameterContext.getParameter().getType());
+            || EntityConverterAssert.class.isAssignableFrom(parameterContext.getParameter().getType())
+            || ConfiguredClientSupplier.class.isAssignableFrom(parameterContext.getParameter().getType());
     }
 
     @Override
@@ -55,11 +61,18 @@ class JaxRsVendorTestExtension implements InvocationInterceptor, ParameterResolv
                 return new CxfFilterExceptionAssert();
             }
             return new DefaultFilterExceptionAssert();
+        } else if (EntityConverterAssert.class.isAssignableFrom(parameterContext.getParameter().getType())) {
+            if (vendor == JERSEY || vendor == RESTEASY_REACTIVE) {
+                return new ClientEntityConverterAssert();
+            }
+            return new ProvidersEntityConverterAssert();
+        } else if (ConfiguredClientSupplier.class.isAssignableFrom(parameterContext.getParameter().getType())) {
+            if (vendor == CXF) {
+                return new CxfClientSupplier();
+            }
+            return new DefaultClientSupplier();
+        } else {
+            throw new ParameterResolutionException("Unexpected Parameter of type " + parameterContext.getParameter().getType());
         }
-
-        if (vendor == JERSEY || vendor == RESTEASY_REACTIVE) {
-            return new EntityConverterAssert.ClientEntityConverterAssert();
-        }
-        return new EntityConverterAssert.ProvidersEntityConverterAssert();
     }
 }
