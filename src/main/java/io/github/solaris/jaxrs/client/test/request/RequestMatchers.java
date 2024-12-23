@@ -1,12 +1,13 @@
 package io.github.solaris.jaxrs.client.test.request;
 
+import static io.github.solaris.jaxrs.client.test.internal.Assertions.assertEqual;
+import static io.github.solaris.jaxrs.client.test.internal.Assertions.fail;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import java.net.URI;
 import java.net.URLDecoder;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 import jakarta.ws.rs.core.MultivaluedHashMap;
 import jakarta.ws.rs.core.MultivaluedMap;
@@ -56,7 +57,7 @@ public final class RequestMatchers {
         return request -> {
             List<Object> headerValues = request.getHeaders().get(name);
             if (headerValues != null) {
-                throw new AssertionError("Expected header <" + name + "> to not exist, but it exists with values: " + headerValues);
+                fail("Expected header <" + name + "> to not exist, but it exists with values: " + headerValues);
             }
         };
     }
@@ -72,20 +73,14 @@ public final class RequestMatchers {
             .collect(MultivaluedHashMap::new, (map, query) -> map.add(query[0], query[1]), MultivaluedMap::putAll);
     }
 
-    private static void assertEqual(String message, Object expected, Object actual) {
-        if (!Objects.equals(expected, actual)) {
-            throw new AssertionError(message + " Expected: <" + expected + "> but was: <" + actual + ">");
-        }
-    }
-
     private static void assertCount(String valueType, String name, MultivaluedMap<String, String> map, int count) {
         List<String> values = map.get(name);
         String message = "Expected " + valueType + " <" + name + ">";
         if (values == null) {
-            throw new AssertionError(message + " to exist but was null");
+            fail(message + " to exist but was null");
         }
         if (count > values.size()) {
-            throw new AssertionError(message + " to have at least <" + count + "> values but found " + values);
+            fail(message + " to have at least <" + count + "> values but found " + values);
         }
     }
 }

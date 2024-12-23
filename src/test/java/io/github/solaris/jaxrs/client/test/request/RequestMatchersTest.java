@@ -33,7 +33,7 @@ class RequestMatchersTest {
     void testMethod_noMatch() {
         assertThatThrownBy(() -> RequestMatchers.method(HEAD).match(new MockClientRequestContext(PATCH)))
             .isInstanceOf(AssertionError.class)
-            .hasMessage("Unexpected Method. Expected: <%s> but was: <%s>", HEAD, PATCH);
+            .hasMessage("Unexpected Method. expected: <%s> but was: <%s>", HEAD, PATCH);
     }
 
     @Test
@@ -46,7 +46,7 @@ class RequestMatchersTest {
     void testRequestTo_string_noMatch() {
         assertThatThrownBy(() -> RequestMatchers.requestTo("local.host").match(new MockClientRequestContext(URI.create("remote.host"))))
             .isInstanceOf(AssertionError.class)
-            .hasMessage("Unexpected Request. Expected: <local.host> but was: <remote.host>");
+            .hasMessage("Unexpected Request. expected: <local.host> but was: <remote.host>");
     }
 
     @Test
@@ -59,7 +59,7 @@ class RequestMatchersTest {
     void testRequestTo_uri_noMatch() {
         assertThatThrownBy(() -> RequestMatchers.requestTo(URI.create("local.host")).match(new MockClientRequestContext(URI.create("remote.host"))))
             .isInstanceOf(AssertionError.class)
-            .hasMessage("Unexpected Request. Expected: <local.host> but was: <remote.host>");
+            .hasMessage("Unexpected Request. expected: <local.host> but was: <remote.host>");
     }
 
     @Test
@@ -90,7 +90,7 @@ class RequestMatchersTest {
         URI uri = URI.create("local.host?greeting=hello");
         assertThatThrownBy(() -> RequestMatchers.queryParam("greeting", "salutations").match(new MockClientRequestContext(uri)))
             .isInstanceOf(AssertionError.class)
-            .hasMessage("QueryParam [greeting] Expected: <salutations> but was: <hello>");
+            .hasMessage("QueryParam [greeting] expected: <salutations> but was: <hello>");
     }
 
     @Test
@@ -119,7 +119,7 @@ class RequestMatchersTest {
 
         assertThatThrownBy(() -> RequestMatchers.header(ACCEPT, APPLICATION_XML).match(new MockClientRequestContext(headers)))
             .isInstanceOf(AssertionError.class)
-            .hasMessage("Request header [%s] Expected: <%s> but was: <%s>", ACCEPT, APPLICATION_XML, APPLICATION_JSON);
+            .hasMessage("Request header [%s] expected: <%s> but was: <%s>", ACCEPT, APPLICATION_XML, APPLICATION_JSON);
     }
 
     @Test

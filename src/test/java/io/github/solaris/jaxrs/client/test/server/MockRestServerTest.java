@@ -76,7 +76,7 @@ public class MockRestServerTest {
             try (Client client = builder.build()) {
                 filterExceptionAssert.assertThatThrownBy(() -> client.target("/goodbye").request().get())
                     .isInstanceOf(AssertionError.class)
-                    .hasMessageEndingWith("Unexpected Request. Expected: </hello> but was: </goodbye>");
+                    .hasMessageEndingWith("Unexpected Request. expected: </hello> but was: </goodbye>");
             }
         }
 
@@ -345,7 +345,7 @@ public class MockRestServerTest {
             try (client) {
                 filterExceptionAssert.assertThatThrownBy(() -> client.target("/goodbye").request().get())
                     .isInstanceOf(AssertionError.class)
-                    .hasMessageEndingWith("Unexpected Request. Expected: </hello> but was: </goodbye>");
+                    .hasMessageEndingWith("Unexpected Request. expected: </hello> but was: </goodbye>");
             }
         }
 
@@ -588,7 +588,7 @@ public class MockRestServerTest {
             try (client) {
                 filterExceptionAssert.assertThatThrownBy(() -> target.path("/goodbye").request().get())
                     .isInstanceOf(AssertionError.class)
-                    .hasMessageEndingWith("Unexpected Request. Expected: </hello> but was: </goodbye>");
+                    .hasMessageEndingWith("Unexpected Request. expected: </hello> but was: </goodbye>");
             }
         }
 

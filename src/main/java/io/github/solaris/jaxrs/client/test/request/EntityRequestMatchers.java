@@ -1,8 +1,10 @@
 package io.github.solaris.jaxrs.client.test.request;
 
+import static io.github.solaris.jaxrs.client.test.internal.Assertions.assertEqual;
+import static io.github.solaris.jaxrs.client.test.internal.Assertions.assertTrue;
+
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import jakarta.ws.rs.core.Form;
 import jakarta.ws.rs.core.MediaType;
@@ -61,17 +63,5 @@ public final class EntityRequestMatchers {
                 assertTrue("Expected " + values + " to be a subset of " + actualMap.get(name), actualMap.get(name).containsAll(values));
             }
         };
-    }
-
-    private static void assertEqual(String message, Object expected, Object actual) {
-        if (!Objects.equals(expected, actual)) {
-            throw new AssertionError(message + " expected: <" + expected + "> but was: <" + actual + ">");
-        }
-    }
-
-    private static void assertTrue(String message, boolean condition) {
-        if (!condition) {
-            throw new AssertionError(message);
-        }
     }
 }

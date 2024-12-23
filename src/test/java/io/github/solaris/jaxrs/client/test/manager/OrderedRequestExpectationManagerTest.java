@@ -147,7 +147,7 @@ class OrderedRequestExpectationManagerTest {
 
         assertThatThrownBy(() -> manager.validateRequest(new MockClientRequestContext(POST, "/goodbye")).close())
             .isInstanceOf(AssertionError.class)
-            .hasMessage("Unexpected Request. Expected: </hello> but was: </goodbye>");
+            .hasMessage("Unexpected Request. expected: </hello> but was: </goodbye>");
     }
 
     @Test
