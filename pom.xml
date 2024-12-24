@@ -60,6 +60,40 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- Quarkus -->
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-junit5</artifactId>
+            <version>3.17.5</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-arc</artifactId>
+            <version>3.17.5</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Required by Quarkus, pinned to prevent being downgraded  -->
+        <dependency>
+            <groupId>io.smallrye.common</groupId>
+            <artifactId>smallrye-common-net</artifactId>
+            <version>2.9.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.smallrye</groupId>
+            <artifactId>jandex</artifactId>
+            <version>3.2.3</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.logmanager</groupId>
+            <artifactId>jboss-logmanager</artifactId>
+            <version>3.1.1.Final</version>
+            <scope>test</scope>
+        </dependency>
+
         <!-- JAX-RS Vendors-->
         <dependency>
             <groupId>org.glassfish.jersey.core</groupId>
@@ -113,14 +147,8 @@
         </dependency>
 
         <dependency>
-            <groupId>io.quarkus.resteasy.reactive</groupId>
-            <artifactId>resteasy-reactive-client</artifactId>
-            <version>3.17.5</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.quarkus.resteasy.reactive</groupId>
-            <artifactId>resteasy-reactive</artifactId>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-rest-client-jackson</artifactId>
             <version>3.17.5</version>
             <scope>test</scope>
         </dependency>
@@ -181,6 +209,10 @@
                     <failIfNoTests>true</failIfNoTests>
                     <argLine>-Duser.language=en @{argLine}</argLine>
                     <redirectTestOutputToFile>true</redirectTestOutputToFile>
+                    <systemPropertyVariables>
+                        <quarkus.native.builder-image>commandline</quarkus.native.builder-image>
+                        <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
+                    </systemPropertyVariables>
                     <consoleOutputReporter implementation="org.apache.maven.plugin.surefire.extensions.junit5.JUnit5ConsoleOutputReporter">
                         <usePhrasedFileName>false</usePhrasedFileName>
                     </consoleOutputReporter>

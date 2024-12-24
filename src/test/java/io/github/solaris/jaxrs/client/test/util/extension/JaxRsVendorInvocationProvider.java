@@ -1,5 +1,6 @@
 package io.github.solaris.jaxrs.client.test.util.extension;
 
+import static io.github.solaris.jaxrs.client.test.util.JaxRsVendor.RESTEASY_REACTIVE;
 import static io.github.solaris.jaxrs.client.test.util.JaxRsVendor.VENDORS;
 import static java.util.Collections.singletonList;
 
@@ -28,6 +29,7 @@ class JaxRsVendorInvocationProvider implements TestTemplateInvocationContextProv
             .skipFor());
         return VENDORS.stream()
             .filter(vendor -> !skipFor.contains(vendor))
+            .filter(vendor -> !(vendor == RESTEASY_REACTIVE && AnnotationSupport.isAnnotated(context.getRequiredTestClass(), RunInQuarkus.class)))
             .map(vendor -> new TestTemplateInvocationContext() {
                 @Override
                 public String getDisplayName(int invocationIndex) {

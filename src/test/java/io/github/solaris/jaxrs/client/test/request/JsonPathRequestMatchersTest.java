@@ -1,7 +1,6 @@
 package io.github.solaris.jaxrs.client.test.request;
 
 import static io.github.solaris.jaxrs.client.test.response.MockResponseCreators.withSuccess;
-import static io.github.solaris.jaxrs.client.test.util.JaxRsVendor.RESTEASY_REACTIVE;
 import static org.assertj.core.api.Assertions.assertThatCode;
 
 import java.util.List;
@@ -15,14 +14,16 @@ import io.github.solaris.jaxrs.client.test.server.MockRestServer;
 import io.github.solaris.jaxrs.client.test.util.ConfiguredClientSupplier;
 import io.github.solaris.jaxrs.client.test.util.FilterExceptionAssert;
 import io.github.solaris.jaxrs.client.test.util.extension.JaxRsVendorTest;
+import io.github.solaris.jaxrs.client.test.util.extension.RunInQuarkus;
 import net.minidev.json.JSONArray;
 
+@RunInQuarkus
 class JsonPathRequestMatchersTest {
     private static final String DEFINITE_PATH = "$.something";
     private static final String INDEFINITE_PATH = "$.something[*]";
     private static final String NON_EXISTENT_PATH = "$.somethingElse";
 
-    @JaxRsVendorTest(skipFor = RESTEASY_REACTIVE)
+    @JaxRsVendorTest
     void testValue(ConfiguredClientSupplier clientSupplier) {
         Client client = clientSupplier.get();
         MockRestServer server = MockRestServer.bindTo(client).build();
@@ -38,7 +39,7 @@ class JsonPathRequestMatchersTest {
         }).doesNotThrowAnyException();
     }
 
-    @JaxRsVendorTest(skipFor = RESTEASY_REACTIVE)
+    @JaxRsVendorTest
     void testValue_indefinitePath(ConfiguredClientSupplier clientSupplier) {
         Client client = clientSupplier.get();
         MockRestServer server = MockRestServer.bindTo(client).build();
@@ -54,7 +55,7 @@ class JsonPathRequestMatchersTest {
         }).doesNotThrowAnyException();
     }
 
-    @JaxRsVendorTest(skipFor = RESTEASY_REACTIVE)
+    @JaxRsVendorTest
     void testValue_typeConversion(ConfiguredClientSupplier clientSupplier) {
         Client client = clientSupplier.get();
         MockRestServer server = MockRestServer.bindTo(client).build();
@@ -70,7 +71,7 @@ class JsonPathRequestMatchersTest {
         }).doesNotThrowAnyException();
     }
 
-    @JaxRsVendorTest(skipFor = RESTEASY_REACTIVE)
+    @JaxRsVendorTest
     void testValue_noMatch(ConfiguredClientSupplier clientSupplier, FilterExceptionAssert filterExceptionAssert) {
         Client client = clientSupplier.get();
         MockRestServer server = MockRestServer.bindTo(client).build();
@@ -86,7 +87,7 @@ class JsonPathRequestMatchersTest {
         }
     }
 
-    @JaxRsVendorTest(skipFor = RESTEASY_REACTIVE)
+    @JaxRsVendorTest
     void testValue_noMatch_emptyList(ConfiguredClientSupplier clientSupplier, FilterExceptionAssert filterExceptionAssert) {
         Client client = clientSupplier.get();
         MockRestServer server = MockRestServer.bindTo(client).build();
@@ -102,7 +103,7 @@ class JsonPathRequestMatchersTest {
         }
     }
 
-    @JaxRsVendorTest(skipFor = RESTEASY_REACTIVE)
+    @JaxRsVendorTest
     void testValue_noMatch_multipleValues(ConfiguredClientSupplier clientSupplier, FilterExceptionAssert filterExceptionAssert) {
         Client client = clientSupplier.get();
         MockRestServer server = MockRestServer.bindTo(client).build();
@@ -119,7 +120,7 @@ class JsonPathRequestMatchersTest {
         }
     }
 
-    @JaxRsVendorTest(skipFor = RESTEASY_REACTIVE)
+    @JaxRsVendorTest
     void testValue_noMatch_incompatibleTypes(ConfiguredClientSupplier clientSupplier, FilterExceptionAssert filterExceptionAssert) {
         Client client = clientSupplier.get();
         MockRestServer server = MockRestServer.bindTo(client).build();
@@ -136,7 +137,7 @@ class JsonPathRequestMatchersTest {
         }
     }
 
-    @JaxRsVendorTest(skipFor = RESTEASY_REACTIVE)
+    @JaxRsVendorTest
     void testExists(ConfiguredClientSupplier clientSupplier) {
         Client client = clientSupplier.get();
         MockRestServer server = MockRestServer.bindTo(client).build();
@@ -152,7 +153,7 @@ class JsonPathRequestMatchersTest {
         }).doesNotThrowAnyException();
     }
 
-    @JaxRsVendorTest(skipFor = RESTEASY_REACTIVE)
+    @JaxRsVendorTest
     void testExists_doesNot(ConfiguredClientSupplier clientSupplier, FilterExceptionAssert filterExceptionAssert) {
         Client client = clientSupplier.get();
         MockRestServer server = MockRestServer.bindTo(client).build();
@@ -168,7 +169,7 @@ class JsonPathRequestMatchersTest {
         }
     }
 
-    @JaxRsVendorTest(skipFor = RESTEASY_REACTIVE)
+    @JaxRsVendorTest
     void testExists_doesNot_nullValue(ConfiguredClientSupplier clientSupplier, FilterExceptionAssert filterExceptionAssert) {
         Client client = clientSupplier.get();
         MockRestServer server = MockRestServer.bindTo(client).build();
@@ -184,7 +185,7 @@ class JsonPathRequestMatchersTest {
         }
     }
 
-    @JaxRsVendorTest(skipFor = RESTEASY_REACTIVE)
+    @JaxRsVendorTest
     void testExists_doesNot_indefinitePath(ConfiguredClientSupplier clientSupplier, FilterExceptionAssert filterExceptionAssert) {
         Client client = clientSupplier.get();
         MockRestServer server = MockRestServer.bindTo(client).build();
@@ -200,7 +201,7 @@ class JsonPathRequestMatchersTest {
         }
     }
 
-    @JaxRsVendorTest(skipFor = RESTEASY_REACTIVE)
+    @JaxRsVendorTest
     void testDoesNotExist(ConfiguredClientSupplier clientSupplier) {
         Client client = clientSupplier.get();
         MockRestServer server = MockRestServer.bindTo(client).build();
@@ -216,7 +217,7 @@ class JsonPathRequestMatchersTest {
         }).doesNotThrowAnyException();
     }
 
-    @JaxRsVendorTest(skipFor = RESTEASY_REACTIVE)
+    @JaxRsVendorTest
     void testDoesNotExist_nullValue(ConfiguredClientSupplier clientSupplier) {
         Client client = clientSupplier.get();
         MockRestServer server = MockRestServer.bindTo(client).build();
@@ -232,7 +233,7 @@ class JsonPathRequestMatchersTest {
         }).doesNotThrowAnyException();
     }
 
-    @JaxRsVendorTest(skipFor = RESTEASY_REACTIVE)
+    @JaxRsVendorTest
     void testDoesNotExist_does_definitePath(ConfiguredClientSupplier clientSupplier, FilterExceptionAssert filterExceptionAssert) {
         Client client = clientSupplier.get();
         MockRestServer server = MockRestServer.bindTo(client).build();
@@ -248,7 +249,7 @@ class JsonPathRequestMatchersTest {
         }
     }
 
-    @JaxRsVendorTest(skipFor = RESTEASY_REACTIVE)
+    @JaxRsVendorTest
     void testDoesNotExist_does_indefinitePath(ConfiguredClientSupplier clientSupplier, FilterExceptionAssert filterExceptionAssert) {
         Client client = clientSupplier.get();
         MockRestServer server = MockRestServer.bindTo(client).build();
@@ -265,7 +266,7 @@ class JsonPathRequestMatchersTest {
         }
     }
 
-    @JaxRsVendorTest(skipFor = RESTEASY_REACTIVE)
+    @JaxRsVendorTest
     void testHasJsonPath(ConfiguredClientSupplier clientSupplier) {
         Client client = clientSupplier.get();
         MockRestServer server = MockRestServer.bindTo(client).build();
@@ -281,7 +282,7 @@ class JsonPathRequestMatchersTest {
         }).doesNotThrowAnyException();
     }
 
-    @JaxRsVendorTest(skipFor = RESTEASY_REACTIVE)
+    @JaxRsVendorTest
     void testHasJsonPath_nullValue(ConfiguredClientSupplier clientSupplier) {
         Client client = clientSupplier.get();
         MockRestServer server = MockRestServer.bindTo(client).build();
@@ -297,7 +298,7 @@ class JsonPathRequestMatchersTest {
         }).doesNotThrowAnyException();
     }
 
-    @JaxRsVendorTest(skipFor = RESTEASY_REACTIVE)
+    @JaxRsVendorTest
     void testHasJsonPath_indefinitePath(ConfiguredClientSupplier clientSupplier) {
         Client client = clientSupplier.get();
         MockRestServer server = MockRestServer.bindTo(client).build();
@@ -313,7 +314,7 @@ class JsonPathRequestMatchersTest {
         }).doesNotThrowAnyException();
     }
 
-    @JaxRsVendorTest(skipFor = RESTEASY_REACTIVE)
+    @JaxRsVendorTest
     void testHasJsonPath_doesNot(ConfiguredClientSupplier clientSupplier, FilterExceptionAssert filterExceptionAssert) {
         Client client = clientSupplier.get();
         MockRestServer server = MockRestServer.bindTo(client).build();
@@ -329,7 +330,7 @@ class JsonPathRequestMatchersTest {
         }
     }
 
-    @JaxRsVendorTest(skipFor = RESTEASY_REACTIVE)
+    @JaxRsVendorTest
     void testHasJsonPath_doesNot_indefinitePath(ConfiguredClientSupplier clientSupplier, FilterExceptionAssert filterExceptionAssert) {
         Client client = clientSupplier.get();
         MockRestServer server = MockRestServer.bindTo(client).build();
@@ -345,7 +346,7 @@ class JsonPathRequestMatchersTest {
         }
     }
 
-    @JaxRsVendorTest(skipFor = RESTEASY_REACTIVE)
+    @JaxRsVendorTest
     void testDoesNotHaveJsonPath(ConfiguredClientSupplier clientSupplier) {
         Client client = clientSupplier.get();
         MockRestServer server = MockRestServer.bindTo(client).build();
@@ -361,7 +362,7 @@ class JsonPathRequestMatchersTest {
         }).doesNotThrowAnyException();
     }
 
-    @JaxRsVendorTest(skipFor = RESTEASY_REACTIVE)
+    @JaxRsVendorTest
     void testDoesNotHaveJsonPath_indefinitePath(ConfiguredClientSupplier clientSupplier) {
         Client client = clientSupplier.get();
         MockRestServer server = MockRestServer.bindTo(client).build();
@@ -377,7 +378,7 @@ class JsonPathRequestMatchersTest {
         }).doesNotThrowAnyException();
     }
 
-    @JaxRsVendorTest(skipFor = RESTEASY_REACTIVE)
+    @JaxRsVendorTest
     void testDoesNotHaveJsonPath_does(ConfiguredClientSupplier clientSupplier, FilterExceptionAssert filterExceptionAssert) {
         Client client = clientSupplier.get();
         MockRestServer server = MockRestServer.bindTo(client).build();
@@ -393,7 +394,7 @@ class JsonPathRequestMatchersTest {
         }
     }
 
-    @JaxRsVendorTest(skipFor = RESTEASY_REACTIVE)
+    @JaxRsVendorTest
     void testDoesNotHaveJsonPath_does_indefinitePath(ConfiguredClientSupplier clientSupplier, FilterExceptionAssert filterExceptionAssert) {
         Client client = clientSupplier.get();
         MockRestServer server = MockRestServer.bindTo(client).build();
@@ -410,7 +411,7 @@ class JsonPathRequestMatchersTest {
         }
     }
 
-    @JaxRsVendorTest(skipFor = RESTEASY_REACTIVE)
+    @JaxRsVendorTest
     void testIsString(ConfiguredClientSupplier clientSupplier) {
         Client client = clientSupplier.get();
         MockRestServer server = MockRestServer.bindTo(client).build();
@@ -426,7 +427,7 @@ class JsonPathRequestMatchersTest {
         }).doesNotThrowAnyException();
     }
 
-    @JaxRsVendorTest(skipFor = RESTEASY_REACTIVE)
+    @JaxRsVendorTest
     void testIsString_isNot(ConfiguredClientSupplier clientSupplier, FilterExceptionAssert filterExceptionAssert) {
         Client client = clientSupplier.get();
         MockRestServer server = MockRestServer.bindTo(client).build();
@@ -442,7 +443,7 @@ class JsonPathRequestMatchersTest {
         }
     }
 
-    @JaxRsVendorTest(skipFor = RESTEASY_REACTIVE)
+    @JaxRsVendorTest
     void testIsBoolean(ConfiguredClientSupplier clientSupplier) {
         Client client = clientSupplier.get();
         MockRestServer server = MockRestServer.bindTo(client).build();
@@ -458,7 +459,7 @@ class JsonPathRequestMatchersTest {
         }).doesNotThrowAnyException();
     }
 
-    @JaxRsVendorTest(skipFor = RESTEASY_REACTIVE)
+    @JaxRsVendorTest
     void testIsBoolean_isNot(ConfiguredClientSupplier clientSupplier, FilterExceptionAssert filterExceptionAssert) {
         Client client = clientSupplier.get();
         MockRestServer server = MockRestServer.bindTo(client).build();
@@ -474,7 +475,7 @@ class JsonPathRequestMatchersTest {
         }
     }
 
-    @JaxRsVendorTest(skipFor = RESTEASY_REACTIVE)
+    @JaxRsVendorTest
     void testIsNumber(ConfiguredClientSupplier clientSupplier) {
         Client client = clientSupplier.get();
         MockRestServer server = MockRestServer.bindTo(client).build();
@@ -490,7 +491,7 @@ class JsonPathRequestMatchersTest {
         }).doesNotThrowAnyException();
     }
 
-    @JaxRsVendorTest(skipFor = RESTEASY_REACTIVE)
+    @JaxRsVendorTest
     void testIsNumber_isNot(ConfiguredClientSupplier clientSupplier, FilterExceptionAssert filterExceptionAssert) {
         Client client = clientSupplier.get();
         MockRestServer server = MockRestServer.bindTo(client).build();
@@ -506,7 +507,7 @@ class JsonPathRequestMatchersTest {
         }
     }
 
-    @JaxRsVendorTest(skipFor = RESTEASY_REACTIVE)
+    @JaxRsVendorTest
     void testIsArray(ConfiguredClientSupplier clientSupplier) {
         Client client = clientSupplier.get();
         MockRestServer server = MockRestServer.bindTo(client).build();
@@ -522,7 +523,7 @@ class JsonPathRequestMatchersTest {
         }).doesNotThrowAnyException();
     }
 
-    @JaxRsVendorTest(skipFor = RESTEASY_REACTIVE)
+    @JaxRsVendorTest
     void testIsArray_isNot(ConfiguredClientSupplier clientSupplier, FilterExceptionAssert filterExceptionAssert) {
         Client client = clientSupplier.get();
         MockRestServer server = MockRestServer.bindTo(client).build();
@@ -538,7 +539,7 @@ class JsonPathRequestMatchersTest {
         }
     }
 
-    @JaxRsVendorTest(skipFor = RESTEASY_REACTIVE)
+    @JaxRsVendorTest
     void testIsMap(ConfiguredClientSupplier clientSupplier) {
         Client client = clientSupplier.get();
         MockRestServer server = MockRestServer.bindTo(client).build();
@@ -554,7 +555,7 @@ class JsonPathRequestMatchersTest {
         }).doesNotThrowAnyException();
     }
 
-    @JaxRsVendorTest(skipFor = RESTEASY_REACTIVE)
+    @JaxRsVendorTest
     void testIsMap_isNot(ConfiguredClientSupplier clientSupplier, FilterExceptionAssert filterExceptionAssert) {
         Client client = clientSupplier.get();
         MockRestServer server = MockRestServer.bindTo(client).build();
@@ -570,7 +571,7 @@ class JsonPathRequestMatchersTest {
         }
     }
 
-    @JaxRsVendorTest(skipFor = RESTEASY_REACTIVE)
+    @JaxRsVendorTest
     void testInvalidJson(ConfiguredClientSupplier clientSupplier, FilterExceptionAssert filterExceptionAssert) {
         Client client = clientSupplier.get();
         MockRestServer server = MockRestServer.bindTo(client).build();
