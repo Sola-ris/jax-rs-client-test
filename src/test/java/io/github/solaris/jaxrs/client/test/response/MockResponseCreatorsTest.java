@@ -66,8 +66,12 @@ class MockResponseCreatorsTest {
 
     @JaxRsVendorTest
     void testCreated() {
-        try (Response response = MockResponseCreators.withCreated(URI.create("local.host")).createResponse(null)) {
-            assertThat(response.getStatusInfo().toEnum()).isEqualTo(CREATED);
+        URI location = URI.create("local.host");
+        try (Response response = MockResponseCreators.withCreated(location).createResponse(null)) {
+            assertThat(response).satisfies(
+                r -> assertThat(r.getStatusInfo().toEnum()).isEqualTo(CREATED),
+                r -> assertThat(r.getLocation()).isEqualTo(location)
+            );
         }
     }
 

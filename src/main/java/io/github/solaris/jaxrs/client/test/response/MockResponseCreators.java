@@ -38,7 +38,7 @@ public final class MockResponseCreators {
     }
 
     public static MockResponseCreator withCreated(URI location) {
-        return new MockResponseCreator(CREATED).header(LOCATION, location.toASCIIString());
+        return new MockResponseCreator(CREATED).header(LOCATION, location);
     }
 
     public static MockResponseCreator withAccepted() {
@@ -74,7 +74,7 @@ public final class MockResponseCreators {
     }
 
     public static MockResponseCreator withTooManyRequests(int retryAfter) {
-        return new MockResponseCreator(TOO_MANY_REQUESTS).header(RETRY_AFTER, Integer.toString(retryAfter));
+        return new MockResponseCreator(TOO_MANY_REQUESTS).header(RETRY_AFTER, retryAfter);
     }
 
     public static MockResponseCreator withInternalServerError() {
