@@ -8,6 +8,9 @@ import java.net.URI;
 import java.net.URLDecoder;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+
+import javax.xml.xpath.XPathExpressionException;
 
 import jakarta.ws.rs.core.MultivaluedHashMap;
 import jakarta.ws.rs.core.MultivaluedMap;
@@ -68,6 +71,14 @@ public final class RequestMatchers {
 
     public static JsonPathRequestMatchers jsonPath(String expression, Object... args) {
         return new JsonPathRequestMatchers(expression, args);
+    }
+
+    public static XpathRequestMatchers xpath(String expression, Object... args) throws XPathExpressionException {
+        return new XpathRequestMatchers(expression, null, args);
+    }
+
+    public static XpathRequestMatchers xpath(String expression, Map<String, String> namespaces, Object... args) throws XPathExpressionException {
+        return new XpathRequestMatchers(expression, namespaces, args);
     }
 
     private static MultivaluedMap<String, String> getQueryParams(URI uri) {
