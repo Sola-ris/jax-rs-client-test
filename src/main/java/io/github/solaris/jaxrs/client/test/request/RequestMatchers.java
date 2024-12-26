@@ -1,7 +1,6 @@
 package io.github.solaris.jaxrs.client.test.request;
 
 import static io.github.solaris.jaxrs.client.test.internal.Assertions.assertEqual;
-import static io.github.solaris.jaxrs.client.test.internal.Assertions.fail;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import java.net.URI;
@@ -60,7 +59,7 @@ public final class RequestMatchers {
         return request -> {
             List<Object> headerValues = request.getHeaders().get(name);
             if (headerValues != null) {
-                fail("Expected header <" + name + "> to not exist, but it exists with values: " + headerValues);
+                throw new AssertionError("Expected header <" + name + "> to not exist, but it exists with values: " + headerValues);
             }
         };
     }
@@ -92,10 +91,10 @@ public final class RequestMatchers {
         List<String> values = map.get(name);
         String message = "Expected " + valueType + " <" + name + ">";
         if (values == null) {
-            fail(message + " to exist but was null");
+            throw new AssertionError(message + " to exist but was null");
         }
         if (count > values.size()) {
-            fail(message + " to have at least <" + count + "> values but found " + values);
+            throw new AssertionError(message + " to have at least <" + count + "> values but found " + values);
         }
     }
 }

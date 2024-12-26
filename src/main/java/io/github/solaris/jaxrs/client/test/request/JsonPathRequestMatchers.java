@@ -2,7 +2,6 @@ package io.github.solaris.jaxrs.client.test.request;
 
 import static io.github.solaris.jaxrs.client.test.internal.Assertions.assertEqual;
 import static io.github.solaris.jaxrs.client.test.internal.Assertions.assertTrue;
-import static io.github.solaris.jaxrs.client.test.internal.Assertions.fail;
 
 import java.io.IOException;
 import java.util.List;
@@ -28,11 +27,11 @@ public class JsonPathRequestMatchers {
             Object value = evaluate(jsonString);
             if (value instanceof List<?> valueList && !(expectedValue instanceof List<?>)) {
                 if (valueList.isEmpty()) {
-                    fail("Found no value matching " + expectedValue + " at JSON path \"" + expression + "\"");
+                    throw new AssertionError("Found no value matching " + expectedValue + " at JSON path \"" + expression + "\"");
                 }
 
                 if (valueList.size() > 1) {
-                    fail("Found list of values " + valueList + " instead of the expected single value " + expectedValue);
+                    throw new AssertionError("Found list of values " + valueList + " instead of the expected single value " + expectedValue);
                 }
 
                 value = valueList.get(0);
@@ -94,7 +93,8 @@ public class JsonPathRequestMatchers {
             if (!jsonPath.isDefinite() && value instanceof List<?> list) {
                 assertTrue(createFailureMessage("no values", value), list.isEmpty());
             } else {
-                fail(createFailureMessage("no value", value));
+                String message = createFailureMessage("no value", value);
+                throw new AssertionError(message);
             }
         };
     }
@@ -138,10 +138,10 @@ public class JsonPathRequestMatchers {
         Object value = evaluate(jsonString);
         String message = "Found no value for JSON path \"" + expression + "\"";
         if (value == null) {
-            fail(message);
+            throw new AssertionError(message);
         }
         if (!jsonPath.isDefinite() && value instanceof List<?> list && list.isEmpty()) {
-            fail(message);
+            throw new AssertionError(message);
         }
 
         return value;
