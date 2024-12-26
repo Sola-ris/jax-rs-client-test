@@ -218,6 +218,23 @@ class JsonPathRequestMatchersTest {
     }
 
     @JaxRsVendorTest
+    void testDoesNotExist_indefinitePath(ConfiguredClientSupplier clientSupplier) {
+        Client client = clientSupplier.get();
+        MockRestServer server = MockRestServer.bindTo(client).build();
+
+        server.expect(RequestMatchers.jsonPath(INDEFINITE_PATH).doesNotExist()).andRespond(withSuccess());
+
+        Dto dto = new Dto(List.of());
+
+        assertThatCode(() -> {
+            try (client) {
+                client.target("/hello").request().post(Entity.json(dto)).close();
+            }
+        }).doesNotThrowAnyException();
+    }
+
+
+    @JaxRsVendorTest
     void testDoesNotExist_nullValue(ConfiguredClientSupplier clientSupplier) {
         Client client = clientSupplier.get();
         MockRestServer server = MockRestServer.bindTo(client).build();
