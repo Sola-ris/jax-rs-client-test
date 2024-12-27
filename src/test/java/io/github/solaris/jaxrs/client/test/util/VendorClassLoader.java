@@ -13,6 +13,7 @@ class VendorClassLoader extends ClassLoader {
 
     private Path runtimeDelegatePath;
     private Path clientBuilderPath;
+    private Path restClientBuilderResolverPath;
     private Path injectionManagerFactoryPath;
 
     VendorClassLoader(JaxRsVendor vendor) {
@@ -25,6 +26,7 @@ class VendorClassLoader extends ClassLoader {
         return switch (name) {
             case "META-INF/services/jakarta.ws.rs.ext.RuntimeDelegate" -> getRuntimeDelegateService();
             case "META-INF/services/jakarta.ws.rs.client.ClientBuilder" -> getClientBuilderService();
+            case "META-INF/services/org.eclipse.microprofile.rest.client.spi.RestClientBuilderResolver" -> getRestClientBuilderResolverService();
             case "META-INF/services/org.glassfish.jersey.internal.inject.InjectionManagerFactory" -> getInjectionManagerFactoryService();
             default -> super.getResources(name);
         };
@@ -54,6 +56,19 @@ class VendorClassLoader extends ClassLoader {
         clientBuilderPath.toFile().deleteOnExit();
 
         return Collections.enumeration(List.of(clientBuilderPath.toUri().toURL()));
+    }
+
+    private Enumeration<URL> getRestClientBuilderResolverService() throws IOException {
+        if (restClientBuilderResolverPath != null) {
+            return Collections.enumeration(List.of(restClientBuilderResolverPath.toUri().toURL()));
+        }
+
+        restClientBuilderResolverPath = Files.createTempFile(vendor.getRestClientBuilderResolverClass().getName(), "");
+        Files.writeString(restClientBuilderResolverPath, vendor.getRestClientBuilderResolverClass().getName() + System.lineSeparator());
+
+        restClientBuilderResolverPath.toFile().deleteOnExit();
+
+        return Collections.enumeration(List.of(restClientBuilderResolverPath.toUri().toURL()));
     }
 
     private Enumeration<URL> getInjectionManagerFactoryService() throws IOException {

@@ -8,6 +8,8 @@ import java.lang.reflect.Method;
 
 import jakarta.ws.rs.ext.RuntimeDelegate;
 
+import org.eclipse.microprofile.rest.client.spi.RestClientBuilderResolver;
+
 import io.github.solaris.jaxrs.client.test.util.ConfiguredClientSupplier;
 import io.github.solaris.jaxrs.client.test.util.ConfiguredClientSupplier.CxfClientSupplier;
 import io.github.solaris.jaxrs.client.test.util.ConfiguredClientSupplier.DefaultClientSupplier;
@@ -39,6 +41,7 @@ class JaxRsVendorTestExtension implements InvocationInterceptor, ParameterResolv
         ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
         try {
             RuntimeDelegate.setInstance(null);
+            RestClientBuilderResolver.setInstance(null);
             Thread.currentThread().setContextClassLoader(vendor.getVendorClassLoader());
 
             invocation.proceed();

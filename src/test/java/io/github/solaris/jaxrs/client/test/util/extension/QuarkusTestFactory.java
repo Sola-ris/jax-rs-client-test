@@ -12,6 +12,8 @@ import java.util.stream.Stream;
 
 import jakarta.ws.rs.ext.RuntimeDelegate;
 
+import org.eclipse.microprofile.rest.client.spi.RestClientBuilderResolver;
+
 import io.github.solaris.jaxrs.client.test.util.ConfiguredClientSupplier;
 import io.github.solaris.jaxrs.client.test.util.ConfiguredClientSupplier.DefaultClientSupplier;
 import io.github.solaris.jaxrs.client.test.util.FilterExceptionAssert;
@@ -33,6 +35,7 @@ public abstract class QuarkusTestFactory {
                 ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
                 try {
                     RuntimeDelegate.setInstance(null);
+                    RestClientBuilderResolver.setInstance(null);
                     Thread.currentThread().setContextClassLoader(RESTEASY_REACTIVE.getVendorClassLoader());
                     ReflectionSupport.invokeMethod(method, getTestInstance(), getArgs(method));
                 } finally {
