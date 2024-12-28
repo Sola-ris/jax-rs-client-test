@@ -20,12 +20,11 @@ import io.github.solaris.jaxrs.client.test.request.ExpectedCount;
 import io.github.solaris.jaxrs.client.test.request.RequestExpectation;
 import io.github.solaris.jaxrs.client.test.request.RequestMatcher;
 import io.github.solaris.jaxrs.client.test.response.ResponseActions;
+import org.jspecify.annotations.Nullable;
 
 public abstract class RequestExpectationManager {
     private final List<RequestExpectation> expectations = new ArrayList<>();
-
     private final List<ClientRequestContext> requests = new ArrayList<>();
-
     private final Map<ClientRequestContext, Throwable> failedRequests = new LinkedHashMap<>();
 
     protected abstract void expectationsDeclared();
@@ -143,6 +142,7 @@ public abstract class RequestExpectationManager {
     protected static class RequestExpectationGroup {
         private final Set<RequestExpectation> expectations = new HashSet<>();
 
+        @Nullable
         public RequestExpectation findExpectation(ClientRequestContext requestContext) throws IOException {
             for (RequestExpectation expectation : expectations) {
                 try {

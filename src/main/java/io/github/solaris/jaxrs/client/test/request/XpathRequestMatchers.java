@@ -26,6 +26,7 @@ import javax.xml.xpath.XPathFactory;
 
 import jakarta.ws.rs.client.ClientRequestContext;
 
+import org.jspecify.annotations.Nullable;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -36,13 +37,13 @@ public class XpathRequestMatchers {
     private final XPathExpression xPathExpression;
     private final boolean namespaceAware;
 
-    XpathRequestMatchers(String expression, Map<String, String> namespaces, Object... args) throws XPathExpressionException {
+    XpathRequestMatchers(String expression, @Nullable Map<String, String> namespaces, Object... args) throws XPathExpressionException {
         this.expression = expression.formatted(args);
         this.xPathExpression = compile(this.expression, namespaces);
         this.namespaceAware = !(namespaces == null || namespaces.isEmpty());
     }
 
-    private static XPathExpression compile(String expression, Map<String, String> namespaces) throws XPathExpressionException {
+    private static XPathExpression compile(String expression, @Nullable Map<String, String> namespaces) throws XPathExpressionException {
         SimpleNamespaceContext namespaceContext = new SimpleNamespaceContext();
         namespaceContext.setBindings(namespaces != null ? namespaces : Collections.emptyMap());
         XPath xPath = XPathFactory.newInstance().newXPath();
@@ -50,6 +51,7 @@ public class XpathRequestMatchers {
         return xPath.compile(expression);
     }
 
+    @Nullable
     @SuppressWarnings("unchecked")
     private <T> T evaluate(ClientRequestContext requestContext, Class<T> targetType) throws Exception {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();

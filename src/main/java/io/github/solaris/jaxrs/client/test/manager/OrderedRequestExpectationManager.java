@@ -6,10 +6,12 @@ import java.util.Iterator;
 import jakarta.ws.rs.client.ClientRequestContext;
 
 import io.github.solaris.jaxrs.client.test.request.RequestExpectation;
+import org.jspecify.annotations.Nullable;
 
 public class OrderedRequestExpectationManager extends RequestExpectationManager {
     private final RequestExpectationGroup expectationGroup = new RequestExpectationGroup();
 
+    @Nullable
     private Iterator<RequestExpectation> expectationIterator;
 
     @Override

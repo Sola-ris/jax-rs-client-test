@@ -25,6 +25,8 @@ import jakarta.ws.rs.core.Response.Status;
 import jakarta.ws.rs.core.Response.Status.Family;
 import jakarta.ws.rs.core.Response.StatusType;
 
+import org.jspecify.annotations.Nullable;
+
 public final class MockResponseCreators {
     private MockResponseCreators() {}
 
@@ -32,7 +34,7 @@ public final class MockResponseCreators {
         return new MockResponseCreator(OK);
     }
 
-    public static MockResponseCreator withSuccess(Object entity, MediaType mediaType) {
+    public static MockResponseCreator withSuccess(Object entity, @Nullable MediaType mediaType) {
         MockResponseCreator responseCreator = new MockResponseCreator(OK).entity(entity);
         return mediaType == null ? responseCreator : responseCreator.mediaType(mediaType);
     }

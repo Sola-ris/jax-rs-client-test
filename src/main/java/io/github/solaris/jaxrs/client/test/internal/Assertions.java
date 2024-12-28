@@ -2,10 +2,12 @@ package io.github.solaris.jaxrs.client.test.internal;
 
 import java.util.Objects;
 
+import org.jspecify.annotations.Nullable;
+
 public class Assertions {
     private Assertions() {}
 
-    public static void assertEqual(String message, Object expected, Object actual) {
+    public static void assertEqual(String message, @Nullable Object expected, @Nullable Object actual) {
         if (!Objects.equals(expected, actual)) {
             throw new AssertionError(message + " expected: <" + expected + "> but was: <" + actual + ">");
         }

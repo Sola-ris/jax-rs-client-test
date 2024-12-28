@@ -11,10 +11,12 @@ import io.github.solaris.jaxrs.client.test.manager.RequestExpectationManager;
 import io.github.solaris.jaxrs.client.test.request.ClientEntityConverter;
 import io.github.solaris.jaxrs.client.test.request.EntityConverter;
 import io.github.solaris.jaxrs.client.test.request.ProvidersEntityConverter;
+import org.jspecify.annotations.Nullable;
 
 public class MockResponseFilter implements ClientRequestFilter {
 
     @Context
+    @Nullable
     private Providers providers;
 
     @Override

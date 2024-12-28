@@ -9,10 +9,13 @@ import jakarta.ws.rs.core.Response;
 
 import io.github.solaris.jaxrs.client.test.response.ResponseActions;
 import io.github.solaris.jaxrs.client.test.response.ResponseCreator;
+import org.jspecify.annotations.Nullable;
 
 public class RequestExpectation implements RequestMatcher, ResponseActions, ResponseCreator {
 
     private int matchedCount;
+
+    @Nullable
     private ResponseCreator responseCreator;
 
     private final List<RequestMatcher> matchers = new ArrayList<>();
@@ -58,6 +61,9 @@ public class RequestExpectation implements RequestMatcher, ResponseActions, Resp
 
     @Override
     public Response createResponse(ClientRequestContext request) throws IOException {
+        if (responseCreator == null) {
+            throw new IllegalStateException("Call to createResponse before responseCreator was set.");
+        }
         return responseCreator.createResponse(request);
     }
 }

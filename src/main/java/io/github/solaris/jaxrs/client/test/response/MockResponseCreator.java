@@ -16,10 +16,14 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.StatusType;
 import jakarta.ws.rs.core.Variant;
 
+import org.jspecify.annotations.Nullable;
+
 public class MockResponseCreator implements ResponseCreator {
     private final StatusType status;
 
+    @Nullable
     private Object entity;
+
     private final MultivaluedMap<String, Object> headers = new MultivaluedHashMap<>();
     private final List<NewCookie> cookies = new ArrayList<>();
     private final List<Link> links = new ArrayList<>();

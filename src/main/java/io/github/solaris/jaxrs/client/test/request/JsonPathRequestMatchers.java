@@ -10,6 +10,7 @@ import java.util.Map;
 import jakarta.ws.rs.client.ClientRequestContext;
 
 import com.jayway.jsonpath.JsonPath;
+import org.jspecify.annotations.Nullable;
 
 public class JsonPathRequestMatchers {
 
@@ -21,7 +22,7 @@ public class JsonPathRequestMatchers {
         this.jsonPath = JsonPath.compile(this.expression);
     }
 
-    public RequestMatcher value(Object expectedValue) {
+    public RequestMatcher value(@Nullable Object expectedValue) {
         return request -> {
             String jsonString = getJsonString(request);
             Object value = evaluate(jsonString);
@@ -147,6 +148,7 @@ public class JsonPathRequestMatchers {
         return value;
     }
 
+    @Nullable
     private Object evaluate(String jsonString) {
         try {
             return jsonPath.read(jsonString);
@@ -166,7 +168,7 @@ public class JsonPathRequestMatchers {
         }
     }
 
-    private String createFailureMessage(String description, Object value) {
+    private String createFailureMessage(String description, @Nullable Object value) {
         String valueString = (value instanceof CharSequence) ? ("'" + value + "'") : String.valueOf(value);
         return "Expected %s at JSON Path \"%s\" but found %s".formatted(description, expression, valueString);
     }

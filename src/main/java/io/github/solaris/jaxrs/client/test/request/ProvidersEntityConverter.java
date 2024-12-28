@@ -13,6 +13,8 @@ import jakarta.ws.rs.ext.MessageBodyReader;
 import jakarta.ws.rs.ext.MessageBodyWriter;
 import jakarta.ws.rs.ext.Providers;
 
+import org.jspecify.annotations.Nullable;
+
 public final class ProvidersEntityConverter extends EntityConverter {
     private static final Annotation[] ANNOTATIONS = new Annotation[]{};
     private final Providers providers;
@@ -33,7 +35,7 @@ public final class ProvidersEntityConverter extends EntityConverter {
     }
 
     @SuppressWarnings("unchecked")
-    private <T> T convertEntity(ClientRequestContext requestContext, Class<T> type, Type genericType) throws IOException {
+    private <T> T convertEntity(ClientRequestContext requestContext, Class<T> type, @Nullable Type genericType) throws IOException {
         if (canShortCircuit(requestContext, type, genericType)) {
             return (T) requestContext.getEntity();
         }
