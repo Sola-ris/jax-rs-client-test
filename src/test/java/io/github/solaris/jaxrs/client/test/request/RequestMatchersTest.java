@@ -21,7 +21,7 @@ class RequestMatchersTest {
 
     @Test
     void testAnything() {
-        assertThatCode(() -> RequestMatchers.anything().match(null)).doesNotThrowAnyException();
+        assertThatCode(() -> RequestMatchers.anything().match(new MockClientRequestContext())).doesNotThrowAnyException();
     }
 
     @Test

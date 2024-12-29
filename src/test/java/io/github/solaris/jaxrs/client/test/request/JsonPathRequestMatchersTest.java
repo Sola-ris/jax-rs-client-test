@@ -16,6 +16,7 @@ import io.github.solaris.jaxrs.client.test.util.FilterExceptionAssert;
 import io.github.solaris.jaxrs.client.test.util.extension.JaxRsVendorTest;
 import io.github.solaris.jaxrs.client.test.util.extension.RunInQuarkus;
 import net.minidev.json.JSONArray;
+import org.jspecify.annotations.Nullable;
 
 @RunInQuarkus
 class JsonPathRequestMatchersTest {
@@ -609,5 +610,5 @@ class JsonPathRequestMatchersTest {
         return array;
     }
 
-    private record Dto(Object something) {}
+    private record Dto(@Nullable Object something) {}
 }

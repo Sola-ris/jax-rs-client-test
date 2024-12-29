@@ -36,20 +36,21 @@ import jakarta.ws.rs.core.UriBuilder;
 import jakarta.ws.rs.core.Variant;
 
 import io.github.solaris.jaxrs.client.test.server.MockRestServer;
+import io.github.solaris.jaxrs.client.test.util.MockClientRequestContext;
 import io.github.solaris.jaxrs.client.test.util.extension.JaxRsVendorTest;
 
 class MockResponseCreatorTest {
 
     @JaxRsVendorTest
     void testResponseWithStatus() {
-        try (Response response = new MockResponseCreator(OK).createResponse(null)) {
+        try (Response response = new MockResponseCreator(OK).createResponse(new MockClientRequestContext())) {
             assertThat(response.getStatusInfo().toEnum()).isEqualTo(OK);
         }
     }
 
     @JaxRsVendorTest
     void testResponseWithMediaType() {
-        try (Response response = new MockResponseCreator(OK).mediaType(APPLICATION_JSON_TYPE).createResponse(null)) {
+        try (Response response = new MockResponseCreator(OK).mediaType(APPLICATION_JSON_TYPE).createResponse(new MockClientRequestContext())) {
             assertThat(response.getMediaType()).isEqualTo(APPLICATION_JSON_TYPE);
         }
     }
@@ -60,7 +61,7 @@ class MockResponseCreatorTest {
                  new MockResponseCreator(OK)
                      .header(ACCEPT_ENCODING, "gzip", "deflate", "br")
                      .header(ACCEPT, WILDCARD)
-                     .createResponse(null)) {
+                     .createResponse(new MockClientRequestContext())) {
             assertThat(response.getHeaders()).satisfies(
                 headers -> assertThat(headers.get(ACCEPT_ENCODING)).containsExactlyInAnyOrder("gzip", "deflate", "br"),
                 headers -> assertThat(headers.get(ACCEPT)).singleElement().isEqualTo(WILDCARD)
@@ -71,7 +72,7 @@ class MockResponseCreatorTest {
     @JaxRsVendorTest
     void testRespondWithEntity() {
         String json = "{\"foo\": true}";
-        try (Response response = new MockResponseCreator(OK).entity(json).createResponse(null)) {
+        try (Response response = new MockResponseCreator(OK).entity(json).createResponse(new MockClientRequestContext())) {
             assertThat(response.getEntity()).isEqualTo(json);
         }
     }
@@ -98,7 +99,7 @@ class MockResponseCreatorTest {
         try (Response response =
                  new MockResponseCreator(OK)
                      .cookies(sessionCookie, themeCookie)
-                     .createResponse(null)) {
+                     .createResponse(new MockClientRequestContext())) {
             assertThat(response.getCookies()).satisfies(
                 cookies -> assertThat(cookies.get("session-token")).isEqualTo(sessionCookie),
                 cookies -> assertThat(cookies.get("theme")).isEqualTo(themeCookie)
@@ -142,7 +143,8 @@ class MockResponseCreatorTest {
             .encodings(UTF_8.name(), UTF_16.name())
             .build();
 
-        try (Response response = new MockResponseCreator(OK).variants(variants.toArray(new Variant[0])).createResponse(null)) {
+        try (Response response =
+                 new MockResponseCreator(OK).variants(variants.toArray(new Variant[0])).createResponse(new MockClientRequestContext())) {
             assertThat(response.getHeaderString(VARY)).contains(ACCEPT, ACCEPT_ENCODING, ACCEPT_LANGUAGE);
         }
     }

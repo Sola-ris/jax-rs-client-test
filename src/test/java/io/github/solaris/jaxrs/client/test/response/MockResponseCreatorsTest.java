@@ -28,6 +28,7 @@ import java.net.URI;
 
 import jakarta.ws.rs.core.Response;
 
+import io.github.solaris.jaxrs.client.test.util.MockClientRequestContext;
 import io.github.solaris.jaxrs.client.test.util.extension.JaxRsVendorTest;
 import org.junit.jupiter.api.Test;
 
@@ -35,7 +36,7 @@ class MockResponseCreatorsTest {
 
     @JaxRsVendorTest
     void testSuccess() {
-        try (Response response = MockResponseCreators.withSuccess().createResponse(null)) {
+        try (Response response = MockResponseCreators.withSuccess().createResponse(new MockClientRequestContext())) {
             assertThat(response.getStatusInfo().toEnum()).isEqualTo(OK);
         }
     }
@@ -43,7 +44,7 @@ class MockResponseCreatorsTest {
     @JaxRsVendorTest
     void testSuccess_withEntity() {
         String json = "{\"hello\": true}";
-        try (Response response = MockResponseCreators.withSuccess(json, null).createResponse(null)) {
+        try (Response response = MockResponseCreators.withSuccess(json, null).createResponse(new MockClientRequestContext())) {
             assertThat(response).satisfies(
                 r -> assertThat(r.getStatusInfo().toEnum()).isEqualTo(OK),
                 r -> assertThat(r.getMediaType()).isNull(),
@@ -55,7 +56,7 @@ class MockResponseCreatorsTest {
     @JaxRsVendorTest
     void testSuccess_withEntityAndMediaType() {
         String json = "{\"hello\": true}";
-        try (Response response = MockResponseCreators.withSuccess(json, APPLICATION_JSON_TYPE).createResponse(null)) {
+        try (Response response = MockResponseCreators.withSuccess(json, APPLICATION_JSON_TYPE).createResponse(new MockClientRequestContext())) {
             assertThat(response).satisfies(
                 r -> assertThat(r.getStatusInfo().toEnum()).isEqualTo(OK),
                 r -> assertThat(r.getMediaType()).isEqualTo(APPLICATION_JSON_TYPE),
@@ -67,7 +68,7 @@ class MockResponseCreatorsTest {
     @JaxRsVendorTest
     void testCreated() {
         URI location = URI.create("local.host");
-        try (Response response = MockResponseCreators.withCreated(location).createResponse(null)) {
+        try (Response response = MockResponseCreators.withCreated(location).createResponse(new MockClientRequestContext())) {
             assertThat(response).satisfies(
                 r -> assertThat(r.getStatusInfo().toEnum()).isEqualTo(CREATED),
                 r -> assertThat(r.getLocation()).isEqualTo(location)
@@ -77,63 +78,63 @@ class MockResponseCreatorsTest {
 
     @JaxRsVendorTest
     void testAccepted() {
-        try (Response response = MockResponseCreators.withAccepted().createResponse(null)) {
+        try (Response response = MockResponseCreators.withAccepted().createResponse(new MockClientRequestContext())) {
             assertThat(response.getStatusInfo().toEnum()).isEqualTo(ACCEPTED);
         }
     }
 
     @JaxRsVendorTest
     void testNoContent() {
-        try (Response response = MockResponseCreators.withNoContent().createResponse(null)) {
+        try (Response response = MockResponseCreators.withNoContent().createResponse(new MockClientRequestContext())) {
             assertThat(response.getStatusInfo().toEnum()).isEqualTo(NO_CONTENT);
         }
     }
 
     @JaxRsVendorTest
     void testBadRequest() {
-        try (Response response = MockResponseCreators.withBadRequest().createResponse(null)) {
+        try (Response response = MockResponseCreators.withBadRequest().createResponse(new MockClientRequestContext())) {
             assertThat(response.getStatusInfo().toEnum()).isEqualTo(BAD_REQUEST);
         }
     }
 
     @JaxRsVendorTest
     void testUnauthorized() {
-        try (Response response = MockResponseCreators.withUnauthorized().createResponse(null)) {
+        try (Response response = MockResponseCreators.withUnauthorized().createResponse(new MockClientRequestContext())) {
             assertThat(response.getStatusInfo().toEnum()).isEqualTo(UNAUTHORIZED);
         }
     }
 
     @JaxRsVendorTest
     void testForbidden() {
-        try (Response response = MockResponseCreators.withForbidden().createResponse(null)) {
+        try (Response response = MockResponseCreators.withForbidden().createResponse(new MockClientRequestContext())) {
             assertThat(response.getStatusInfo().toEnum()).isEqualTo(FORBIDDEN);
         }
     }
 
     @JaxRsVendorTest
     void testNotFound() {
-        try (Response response = MockResponseCreators.withNotFound().createResponse(null)) {
+        try (Response response = MockResponseCreators.withNotFound().createResponse(new MockClientRequestContext())) {
             assertThat(response.getStatusInfo().toEnum()).isEqualTo(NOT_FOUND);
         }
     }
 
     @JaxRsVendorTest
     void testConflict() {
-        try (Response response = MockResponseCreators.withConflict().createResponse(null)) {
+        try (Response response = MockResponseCreators.withConflict().createResponse(new MockClientRequestContext())) {
             assertThat(response.getStatusInfo().toEnum()).isEqualTo(CONFLICT);
         }
     }
 
     @JaxRsVendorTest
     void testTooManyRequests() {
-        try (Response response = MockResponseCreators.withTooManyRequests().createResponse(null)) {
+        try (Response response = MockResponseCreators.withTooManyRequests().createResponse(new MockClientRequestContext())) {
             assertThat(response.getStatusInfo().toEnum()).isEqualTo(TOO_MANY_REQUESTS);
         }
     }
 
     @JaxRsVendorTest
     void testTooManyRequests_withRetryAfter() {
-        try (Response response = MockResponseCreators.withTooManyRequests(42).createResponse(null)) {
+        try (Response response = MockResponseCreators.withTooManyRequests(42).createResponse(new MockClientRequestContext())) {
             assertThat(response).satisfies(
                 r -> assertThat(r.getStatusInfo().toEnum()).isEqualTo(TOO_MANY_REQUESTS),
                 r -> assertThat(r.getHeaderString(RETRY_AFTER)).isEqualTo("42")
@@ -143,42 +144,42 @@ class MockResponseCreatorsTest {
 
     @JaxRsVendorTest
     void testInternalServerError() {
-        try (Response response = MockResponseCreators.withInternalServerError().createResponse(null)) {
+        try (Response response = MockResponseCreators.withInternalServerError().createResponse(new MockClientRequestContext())) {
             assertThat(response.getStatusInfo().toEnum()).isEqualTo(INTERNAL_SERVER_ERROR);
         }
     }
 
     @JaxRsVendorTest
     void testServiceUnavailable() {
-        try (Response response = MockResponseCreators.withServiceUnavailable().createResponse(null)) {
+        try (Response response = MockResponseCreators.withServiceUnavailable().createResponse(new MockClientRequestContext())) {
             assertThat(response.getStatusInfo().toEnum()).isEqualTo(SERVICE_UNAVAILABLE);
         }
     }
 
     @JaxRsVendorTest
     void testGatewayTimeout() {
-        try (Response response = MockResponseCreators.withGatewayTimeout().createResponse(null)) {
+        try (Response response = MockResponseCreators.withGatewayTimeout().createResponse(new MockClientRequestContext())) {
             assertThat(response.getStatusInfo().toEnum()).isEqualTo(GATEWAY_TIMEOUT);
         }
     }
 
     @JaxRsVendorTest
     void testStatus() {
-        try (Response response = MockResponseCreators.withStatus(LENGTH_REQUIRED).createResponse(null)) {
+        try (Response response = MockResponseCreators.withStatus(LENGTH_REQUIRED).createResponse(new MockClientRequestContext())) {
             assertThat(response.getStatusInfo().toEnum()).isEqualTo(LENGTH_REQUIRED);
         }
     }
 
     @JaxRsVendorTest
     void testCustomStatus_definedInStatusEnum() {
-        try (Response response = MockResponseCreators.withStatus(451).createResponse(null)) {
+        try (Response response = MockResponseCreators.withStatus(451).createResponse(new MockClientRequestContext())) {
             assertThat(response.getStatusInfo().toEnum()).isEqualTo(UNAVAILABLE_FOR_LEGAL_REASONS);
         }
     }
 
     @JaxRsVendorTest
     void testCustomStatus_notDefinedInStatusEnum() {
-        try (Response response = MockResponseCreators.withStatus(418).createResponse(null)) {
+        try (Response response = MockResponseCreators.withStatus(418).createResponse(new MockClientRequestContext())) {
             assertThat(response).satisfies(
                 r -> assertThat(r.getStatus()).isEqualTo(418),
                 r -> assertThat(r.getStatusInfo().getFamily()).isEqualTo(CLIENT_ERROR),
@@ -189,7 +190,7 @@ class MockResponseCreatorsTest {
 
     @JaxRsVendorTest(skipFor = CXF) // CXF doesn't support status codes > 599
     void testCustomStatus_familyOther() {
-        try (Response response = MockResponseCreators.withStatus(999).createResponse(null)) {
+        try (Response response = MockResponseCreators.withStatus(999).createResponse(new MockClientRequestContext())) {
             assertThat(response).satisfies(
                 r -> assertThat(r.getStatus()).isEqualTo(999),
                 r -> assertThat(r.getStatusInfo().getFamily()).isEqualTo(OTHER),
@@ -200,7 +201,7 @@ class MockResponseCreatorsTest {
 
     @Test
     void testException() {
-        assertThatThrownBy(() -> MockResponseCreators.withException(new SocketException("Connection Reset")).createResponse(null).close())
+        assertThatThrownBy(() -> MockResponseCreators.withException(new SocketException("Connection Reset")).createResponse(new MockClientRequestContext()).close())
             .isInstanceOf(SocketException.class)
             .hasMessage("Connection Reset");
     }

@@ -20,8 +20,9 @@ public sealed interface ConfiguredClientSupplier extends Supplier<Client> {
     final class CxfClientSupplier implements ConfiguredClientSupplier {
         @Override
         public Client get() {
-            return ClientBuilder.newClient()
-                .register(new JacksonJsonProvider());
+            Client client = ClientBuilder.newClient();
+            client.register(new JacksonJsonProvider());
+            return client;
         }
     }
 }

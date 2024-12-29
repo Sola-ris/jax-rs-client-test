@@ -28,10 +28,12 @@ import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 import io.github.solaris.jaxrs.client.test.server.MockRestServer;
 import io.github.solaris.jaxrs.client.test.util.extension.JaxRsVendorTest;
+import org.jspecify.annotations.NullUnmarked;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 
+@NullUnmarked
 class ExecutingResponseCreatorTest {
     private static final AssertableHandler HANDLER = new AssertableHandler();
     private static final URI REQUEST_URI = URI.create("http://localhost:8080/hello");

@@ -23,6 +23,7 @@ import io.github.solaris.jaxrs.client.test.server.MockRestServer;
 import io.github.solaris.jaxrs.client.test.util.FilterExceptionAssert;
 import io.github.solaris.jaxrs.client.test.util.extension.JaxRsVendorTest;
 import io.github.solaris.jaxrs.client.test.util.extension.RunInQuarkus;
+import org.jspecify.annotations.NullUnmarked;
 import org.xml.sax.SAXParseException;
 
 @RunInQuarkus
@@ -327,6 +328,7 @@ class XpathRequestMatchersTest {
             .hasMessage("Prefix must resolve to a namespace: greeting");
     }
 
+    @NullUnmarked
     @XmlRootElement
     private static class XmlDto {
 

@@ -45,6 +45,10 @@ public record MockClientRequestContext(
         this(null, null, null, mediaType);
     }
 
+    public MockClientRequestContext() {
+        this(null, null, null, null);
+    }
+
     //<editor-fold desc="Interface methods">
     @Override
     public Object getProperty(String name) {

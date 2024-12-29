@@ -552,12 +552,12 @@ public class MockRestServerTest {
             server.expect(requestTo("/hello")).andRespond(withSuccess());
             server.expect(requestTo("/goodbye")).andRespond(withSuccess());
 
-            assertThatCode(() -> {
-                try (client) {
+            try (client) {
+                assertThatCode(() -> {
                     assertThat(target.path("/hello").request().get().getStatusInfo().toEnum()).isEqualTo(OK);
                     assertThat(target.path("/goodbye").request().get().getStatusInfo().toEnum()).isEqualTo(OK);
-                }
-            }).doesNotThrowAnyException();
+                }).doesNotThrowAnyException();
+            }
 
             server.verify();
         }
@@ -571,12 +571,12 @@ public class MockRestServerTest {
             server.expect(requestTo("/hello")).andRespond(withSuccess());
             server.expect(requestTo("/goodbye")).andRespond(withSuccess());
 
-            assertThatCode(() -> {
-                try (client) {
+            try (client) {
+                assertThatCode(() -> {
                     assertThat(target.path("/goodbye").request().get().getStatusInfo().toEnum()).isEqualTo(OK);
                     assertThat(target.path("/hello").request().get().getStatusInfo().toEnum()).isEqualTo(OK);
-                }
-            }).doesNotThrowAnyException();
+                }).doesNotThrowAnyException();
+            }
 
             server.verify();
         }
