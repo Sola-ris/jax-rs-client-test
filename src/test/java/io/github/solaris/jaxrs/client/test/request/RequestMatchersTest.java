@@ -90,7 +90,15 @@ class RequestMatchersTest {
         URI uri = URI.create("local.host?greeting=hello");
         assertThatThrownBy(() -> RequestMatchers.queryParam("greeting", "salutations").match(new MockClientRequestContext(uri)))
             .isInstanceOf(AssertionError.class)
-            .hasMessage("QueryParam [greeting] expected: <salutations> but was: <hello>");
+            .hasMessage("QueryParam [name=greeting, position=0] expected: <salutations> but was: <hello>");
+    }
+
+    @Test
+    void testQueryParam_orderMismatch() {
+        URI uri = URI.create("local.host?greeting=hello&greeting=salutations");
+        assertThatThrownBy(() -> RequestMatchers.queryParam("greeting", "salutations", "hello").match(new MockClientRequestContext(uri)))
+            .isInstanceOf(AssertionError.class)
+            .hasMessage("QueryParam [name=greeting, position=0] expected: <salutations> but was: <hello>");
     }
 
     @Test
@@ -119,7 +127,17 @@ class RequestMatchersTest {
 
         assertThatThrownBy(() -> RequestMatchers.header(ACCEPT, APPLICATION_XML).match(new MockClientRequestContext(headers)))
             .isInstanceOf(AssertionError.class)
-            .hasMessage("Request header [%s] expected: <%s> but was: <%s>", ACCEPT, APPLICATION_XML, APPLICATION_JSON);
+            .hasMessage("Request header [name=%s, position=0] expected: <%s> but was: <%s>", ACCEPT, APPLICATION_XML, APPLICATION_JSON);
+    }
+
+    @Test
+    void testHeader_orderMismatch() {
+        MultivaluedMap<String, String> headers = new MultivaluedHashMap<>();
+        headers.put(ACCEPT, List.of(APPLICATION_JSON, APPLICATION_XML));
+
+        assertThatThrownBy(() -> RequestMatchers.header(ACCEPT, APPLICATION_XML, APPLICATION_JSON).match(new MockClientRequestContext(headers)))
+            .isInstanceOf(AssertionError.class)
+            .hasMessage("Request header [name=%s, position=0] expected: <%s> but was: <%s>", ACCEPT, APPLICATION_XML, APPLICATION_JSON);
     }
 
     @Test

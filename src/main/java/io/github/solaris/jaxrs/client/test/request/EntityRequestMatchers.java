@@ -60,7 +60,9 @@ public final class EntityRequestMatchers {
                 assertTrue("Expected " + actualMap + " to contain parameter '" + name + "'", actualMap.get(name) != null);
                 assertTrue("Expected " + values + " to be smaller or the same size as " + actualMap.get(name),
                     values.size() <= actualMap.get(name).size());
-                assertTrue("Expected " + values + " to be a subset of " + actualMap.get(name), actualMap.get(name).containsAll(values));
+                for (int i = 0; i < values.size(); i++) {
+                    assertEqual("FormParam [name=" + name + ", position=" + i + "]", values.get(i), actualMap.get(name).get(i));
+                }
             }
         };
     }

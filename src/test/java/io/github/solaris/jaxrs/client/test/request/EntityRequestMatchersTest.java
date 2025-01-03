@@ -277,13 +277,13 @@ class EntityRequestMatchersTest {
     }
 
     @JaxRsVendorTest
-    void testFormContains_subsetHasDifferentValues(FilterExceptionAssert filterExceptionAssert) {
+    void testFormContains_subsetHasDifferentValue(FilterExceptionAssert filterExceptionAssert) {
         Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         Form actualForm = new Form()
             .param("greeting", "hello")
-            .param("greeting", "salutation");
+            .param("greeting", "salutations");
 
         Form subset = new Form()
             .param("greeting", "good morning");
@@ -296,7 +296,34 @@ class EntityRequestMatchersTest {
                     .post(Entity.form(actualForm))
                     .close())
                 .isInstanceOf(AssertionError.class)
-                .hasMessage("Expected %s to be a subset of %s", subset.asMap().get("greeting"), actualForm.asMap().get("greeting"));
+                .hasMessage("FormParam [name=greeting, position=0] expected: <good morning> but was: <hello>");
+        }
+    }
+
+    @JaxRsVendorTest
+    void testFormContains_subsetHasDifferentOrder(FilterExceptionAssert filterExceptionAssert) {
+        Client client = ClientBuilder.newClient();
+        MockRestServer server = MockRestServer.bindTo(client).build();
+
+        Form actualForm = new Form()
+            .param("greeting", "hello")
+            .param("greeting", "salutations")
+            .param("greeting", "good morning");
+
+        Form subset = new Form()
+            .param("greeting", "salutations")
+            .param("greeting", "hello");
+
+
+        server.expect(RequestMatchers.entity().formContains(subset)).andRespond(withSuccess());
+
+        try (client) {
+            filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello")
+                    .request()
+                    .post(Entity.form(actualForm))
+                    .close())
+                .isInstanceOf(AssertionError.class)
+                .hasMessage("FormParam [name=greeting, position=0] expected: <salutations> but was: <hello>");
         }
     }
 

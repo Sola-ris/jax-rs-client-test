@@ -39,7 +39,7 @@ public final class RequestMatchers {
             assertCount("QueryParam", name, queryParams, expectedValues.length);
 
             for (int i = 0; i < expectedValues.length; i++) {
-                assertEqual("QueryParam [" + name + "]", expectedValues[i], queryParams.get(name).get(i));
+                assertEqual("QueryParam [name=" + name + ", position=" + i + "]", expectedValues[i], queryParams.get(name).get(i));
             }
         };
     }
@@ -50,7 +50,7 @@ public final class RequestMatchers {
 
             List<String> actualValues = request.getStringHeaders().get(name);
             for (int i = 0; i < expectedValues.length; i++) {
-                assertEqual("Request header [" + name + "]", expectedValues[i], actualValues.get(i));
+                assertEqual("Request header [name=" + name + ", position=" + i + "]", expectedValues[i], actualValues.get(i));
             }
         };
     }
