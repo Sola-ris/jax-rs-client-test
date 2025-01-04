@@ -4,32 +4,30 @@ import jakarta.ws.rs.core.Configurable;
 
 import io.github.solaris.jaxrs.client.test.manager.OrderedRequestExpectationManager;
 import io.github.solaris.jaxrs.client.test.manager.RequestExpectationManager;
+import io.github.solaris.jaxrs.client.test.manager.StrictlyOrderedRequestExpectationManager;
 import io.github.solaris.jaxrs.client.test.manager.UnorderedRequestExpectationManager;
 
 public class MockRestServerBuilder {
     private final Configurable<?> configurable;
 
-    private boolean ignoreRequestOrder;
+    private RequestOrder order = RequestOrder.ORDERED;
 
     MockRestServerBuilder(Configurable<?> configurable) {
         this.configurable = configurable;
     }
 
-    private RequestExpectationManager getExpectationManager() {
-        if (ignoreRequestOrder) {
-            return new UnorderedRequestExpectationManager();
-        }
-
-        return new OrderedRequestExpectationManager();
-    }
-
-    public MockRestServerBuilder ignoreRequestOrder(boolean ignoreRequestOrder) {
-        this.ignoreRequestOrder = ignoreRequestOrder;
+    public MockRestServerBuilder withRequestOrder(RequestOrder order) {
+        this.order = order;
         return this;
     }
 
     public MockRestServer build() {
-        RequestExpectationManager expectationManager = getExpectationManager();
+        RequestExpectationManager expectationManager = switch (order) {
+            case ORDERED -> new OrderedRequestExpectationManager();
+            case UNORDERED -> new UnorderedRequestExpectationManager();
+            case STRICT -> new StrictlyOrderedRequestExpectationManager();
+        };
+
         if (!configurable.getConfiguration().isRegistered(MockResponseFilter.class)) {
             configurable.register(MockResponseFilter.class, Integer.MAX_VALUE);
         }

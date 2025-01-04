@@ -1,9 +1,12 @@
 package io.github.solaris.jaxrs.client.test.server;
 
 import static io.github.solaris.jaxrs.client.test.request.ExpectedCount.min;
+import static io.github.solaris.jaxrs.client.test.request.ExpectedCount.times;
 import static io.github.solaris.jaxrs.client.test.request.RequestMatchers.requestTo;
 import static io.github.solaris.jaxrs.client.test.response.MockResponseCreators.withException;
 import static io.github.solaris.jaxrs.client.test.response.MockResponseCreators.withSuccess;
+import static io.github.solaris.jaxrs.client.test.server.RequestOrder.STRICT;
+import static io.github.solaris.jaxrs.client.test.server.RequestOrder.UNORDERED;
 import static io.github.solaris.jaxrs.client.test.util.JaxRsVendor.CXF;
 import static io.github.solaris.jaxrs.client.test.util.JaxRsVendor.RESTEASY_REACTIVE;
 import static jakarta.ws.rs.core.Response.Status.OK;
@@ -55,7 +58,7 @@ public class MockRestServerTest {
         @JaxRsVendorTest
         void testUnorderedExpectations() {
             ClientBuilder builder = ClientBuilder.newBuilder();
-            MockRestServer server = MockRestServer.bindTo(builder).ignoreRequestOrder(true).build();
+            MockRestServer server = MockRestServer.bindTo(builder).withRequestOrder(UNORDERED).build();
 
             server.expect(requestTo("/hello")).andRespond(withSuccess());
             server.expect(requestTo("/goodbye")).andRespond(withSuccess());
@@ -71,6 +74,25 @@ public class MockRestServerTest {
         }
 
         @JaxRsVendorTest
+        void testStrictExpectations() {
+            ClientBuilder builder = ClientBuilder.newBuilder();
+            MockRestServer server = MockRestServer.bindTo(builder).withRequestOrder(STRICT).build();
+
+            server.expect(times(2), requestTo("/hello")).andRespond(withSuccess());
+            server.expect(requestTo("/goodbye")).andRespond(withSuccess());
+
+            assertThatCode(() -> {
+                try (Client client = builder.build()) {
+                    assertThat(client.target("/hello").request().get().getStatusInfo().toEnum()).isEqualTo(OK);
+                    assertThat(client.target("/hello").request().get().getStatusInfo().toEnum()).isEqualTo(OK);
+                    assertThat(client.target("/goodbye").request().get().getStatusInfo().toEnum()).isEqualTo(OK);
+                }
+            }).doesNotThrowAnyException();
+
+            server.verify();
+        }
+
+        @JaxRsVendorTest
         void testOrderedExpectations_requestsOutOfOrder(FilterExceptionAssert filterExceptionAssert) {
             ClientBuilder builder = ClientBuilder.newBuilder();
             MockRestServer server = MockRestServer.bindTo(builder).build();
@@ -79,6 +101,22 @@ public class MockRestServerTest {
             server.expect(requestTo("/goodbye")).andRespond(withSuccess());
 
             try (Client client = builder.build()) {
+                filterExceptionAssert.assertThatThrownBy(() -> client.target("/goodbye").request().get())
+                    .isInstanceOf(AssertionError.class)
+                    .hasMessageEndingWith("Unexpected Request. expected: </hello> but was: </goodbye>");
+            }
+        }
+
+        @JaxRsVendorTest
+        void testStrictExpectations_firstRequestUnsatisfied(FilterExceptionAssert filterExceptionAssert) {
+            ClientBuilder builder = ClientBuilder.newBuilder();
+            MockRestServer server = MockRestServer.bindTo(builder).withRequestOrder(STRICT).build();
+
+            server.expect(min(2), requestTo("/hello")).andRespond(withSuccess());
+            server.expect(requestTo("/goodbye")).andRespond(withSuccess());
+
+            try (Client client = builder.build()) {
+                assertThat(client.target("/hello").request().get().getStatusInfo().toEnum()).isEqualTo(OK);
                 filterExceptionAssert.assertThatThrownBy(() -> client.target("/goodbye").request().get())
                     .isInstanceOf(AssertionError.class)
                     .hasMessageEndingWith("Unexpected Request. expected: </hello> but was: </goodbye>");
@@ -138,7 +176,7 @@ public class MockRestServerTest {
                 server.verify();
             }
 
-            server = serverBuilder.ignoreRequestOrder(true).build();
+            server = serverBuilder.withRequestOrder(UNORDERED).build();
             server.expect(requestTo("/hello")).andRespond(withSuccess());
             server.expect(requestTo("/goodbye")).andRespond(withSuccess());
 
@@ -151,6 +189,17 @@ public class MockRestServerTest {
             server = serverBuilder.build();
             server.expect(requestTo("/goodbye")).andRespond(withSuccess());
             try (Client client = clientBuilder.build()) {
+                assertThat(client.target("/goodbye").request().get().getStatusInfo().toEnum()).isEqualTo(OK);
+                server.verify();
+            }
+
+            server = serverBuilder.withRequestOrder(STRICT).build();
+            server.expect(min(2), requestTo("/hello")).andRespond(withSuccess());
+            server.expect(requestTo("/goodbye")).andRespond(withSuccess());
+
+            try (Client client = clientBuilder.build()) {
+                assertThat(client.target("/hello").request().get().getStatusInfo().toEnum()).isEqualTo(OK);
+                assertThat(client.target("/hello").request().get().getStatusInfo().toEnum()).isEqualTo(OK);
                 assertThat(client.target("/goodbye").request().get().getStatusInfo().toEnum()).isEqualTo(OK);
                 server.verify();
             }
@@ -324,7 +373,7 @@ public class MockRestServerTest {
         @JaxRsVendorTest
         void testUnorderedExpectations() {
             Client client = ClientBuilder.newClient();
-            MockRestServer server = MockRestServer.bindTo(client).ignoreRequestOrder(true).build();
+            MockRestServer server = MockRestServer.bindTo(client).withRequestOrder(UNORDERED).build();
 
             server.expect(requestTo("/hello")).andRespond(withSuccess());
             server.expect(requestTo("/goodbye")).andRespond(withSuccess());
@@ -340,6 +389,25 @@ public class MockRestServerTest {
         }
 
         @JaxRsVendorTest
+        void testStrictExpectations() {
+            Client client = ClientBuilder.newClient();
+            MockRestServer server = MockRestServer.bindTo(client).withRequestOrder(STRICT).build();
+
+            server.expect(times(2), requestTo("/hello")).andRespond(withSuccess());
+            server.expect(requestTo("/goodbye")).andRespond(withSuccess());
+
+            assertThatCode(() -> {
+                try (client) {
+                    assertThat(client.target("/hello").request().get().getStatusInfo().toEnum()).isEqualTo(OK);
+                    assertThat(client.target("/hello").request().get().getStatusInfo().toEnum()).isEqualTo(OK);
+                    assertThat(client.target("/goodbye").request().get().getStatusInfo().toEnum()).isEqualTo(OK);
+                }
+            }).doesNotThrowAnyException();
+
+            server.verify();
+        }
+
+        @JaxRsVendorTest
         void testOrderedExpectations_requestsOutOfOrder(FilterExceptionAssert filterExceptionAssert) {
             Client client = ClientBuilder.newClient();
             MockRestServer server = MockRestServer.bindTo(client).build();
@@ -348,6 +416,22 @@ public class MockRestServerTest {
             server.expect(requestTo("/goodbye")).andRespond(withSuccess());
 
             try (client) {
+                filterExceptionAssert.assertThatThrownBy(() -> client.target("/goodbye").request().get())
+                    .isInstanceOf(AssertionError.class)
+                    .hasMessageEndingWith("Unexpected Request. expected: </hello> but was: </goodbye>");
+            }
+        }
+
+        @JaxRsVendorTest
+        void testStrictExpectations_firstRequestUnsatisfied(FilterExceptionAssert filterExceptionAssert) {
+            Client client = ClientBuilder.newClient();
+            MockRestServer server = MockRestServer.bindTo(client).withRequestOrder(STRICT).build();
+
+            server.expect(min(2), requestTo("/hello")).andRespond(withSuccess());
+            server.expect(requestTo("/goodbye")).andRespond(withSuccess());
+
+            try (client) {
+                assertThat(client.target("/hello").request().get().getStatusInfo().toEnum()).isEqualTo(OK);
                 filterExceptionAssert.assertThatThrownBy(() -> client.target("/goodbye").request().get())
                     .isInstanceOf(AssertionError.class)
                     .hasMessageEndingWith("Unexpected Request. expected: </hello> but was: </goodbye>");
@@ -405,7 +489,7 @@ public class MockRestServerTest {
             assertThat(client.target("/hello").request().get().getStatusInfo().toEnum()).isEqualTo(OK);
             server.verify();
 
-            server = serverBuilder.ignoreRequestOrder(true).build();
+            server = serverBuilder.withRequestOrder(UNORDERED).build();
             server.expect(requestTo("/hello")).andRespond(withSuccess());
             server.expect(requestTo("/goodbye")).andRespond(withSuccess());
 
@@ -415,7 +499,17 @@ public class MockRestServerTest {
 
             server = serverBuilder.build();
             server.expect(requestTo("/goodbye")).andRespond(withSuccess());
+
+            assertThat(client.target("/goodbye").request().get().getStatusInfo().toEnum()).isEqualTo(OK);
+            server.verify();
+
+            server = serverBuilder.withRequestOrder(STRICT).build();
+            server.expect(min(2), requestTo("/hello")).andRespond(withSuccess());
+            server.expect(requestTo("/goodbye")).andRespond(withSuccess());
+
             try (client) {
+                assertThat(client.target("/hello").request().get().getStatusInfo().toEnum()).isEqualTo(OK);
+                assertThat(client.target("/hello").request().get().getStatusInfo().toEnum()).isEqualTo(OK);
                 assertThat(client.target("/goodbye").request().get().getStatusInfo().toEnum()).isEqualTo(OK);
                 server.verify();
             }
@@ -566,7 +660,7 @@ public class MockRestServerTest {
         void testUnorderedExpectations() {
             Client client = ClientBuilder.newClient();
             WebTarget target = client.target("");
-            MockRestServer server = MockRestServer.bindTo(target).ignoreRequestOrder(true).build();
+            MockRestServer server = MockRestServer.bindTo(target).withRequestOrder(UNORDERED).build();
 
             server.expect(requestTo("/hello")).andRespond(withSuccess());
             server.expect(requestTo("/goodbye")).andRespond(withSuccess());
@@ -575,6 +669,26 @@ public class MockRestServerTest {
                 assertThatCode(() -> {
                     assertThat(target.path("/goodbye").request().get().getStatusInfo().toEnum()).isEqualTo(OK);
                     assertThat(target.path("/hello").request().get().getStatusInfo().toEnum()).isEqualTo(OK);
+                }).doesNotThrowAnyException();
+            }
+
+            server.verify();
+        }
+
+        @JaxRsVendorTest
+        void testStrictExpectations() {
+            Client client = ClientBuilder.newClient();
+            WebTarget target = client.target("");
+            MockRestServer server = MockRestServer.bindTo(target).withRequestOrder(STRICT).build();
+
+            server.expect(times(2), requestTo("/hello")).andRespond(withSuccess());
+            server.expect(requestTo("/goodbye")).andRespond(withSuccess());
+
+            try (client) {
+                assertThatCode(() -> {
+                    assertThat(target.path("/hello").request().get().getStatusInfo().toEnum()).isEqualTo(OK);
+                    assertThat(target.path("/hello").request().get().getStatusInfo().toEnum()).isEqualTo(OK);
+                    assertThat(target.path("/goodbye").request().get().getStatusInfo().toEnum()).isEqualTo(OK);
                 }).doesNotThrowAnyException();
             }
 
@@ -591,6 +705,23 @@ public class MockRestServerTest {
             server.expect(requestTo("/goodbye")).andRespond(withSuccess());
 
             try (client) {
+                filterExceptionAssert.assertThatThrownBy(() -> target.path("/goodbye").request().get())
+                    .isInstanceOf(AssertionError.class)
+                    .hasMessageEndingWith("Unexpected Request. expected: </hello> but was: </goodbye>");
+            }
+        }
+
+        @JaxRsVendorTest
+        void testStrictExpectations_firstRequestUnsatisfied(FilterExceptionAssert filterExceptionAssert) {
+            Client client = ClientBuilder.newClient();
+            WebTarget target = client.target("");
+            MockRestServer server = MockRestServer.bindTo(target).withRequestOrder(STRICT).build();
+
+            server.expect(min(2), requestTo("/hello")).andRespond(withSuccess());
+            server.expect(requestTo("/goodbye")).andRespond(withSuccess());
+
+            try (client) {
+                assertThat(target.path("/hello").request().get().getStatusInfo().toEnum()).isEqualTo(OK);
                 filterExceptionAssert.assertThatThrownBy(() -> target.path("/goodbye").request().get())
                     .isInstanceOf(AssertionError.class)
                     .hasMessageEndingWith("Unexpected Request. expected: </hello> but was: </goodbye>");
@@ -651,7 +782,7 @@ public class MockRestServerTest {
             assertThat(target.path("/hello").request().get().getStatusInfo().toEnum()).isEqualTo(OK);
             server.verify();
 
-            server = serverBuilder.ignoreRequestOrder(true).build();
+            server = serverBuilder.withRequestOrder(UNORDERED).build();
             server.expect(requestTo("/hello")).andRespond(withSuccess());
             server.expect(requestTo("/goodbye")).andRespond(withSuccess());
 
@@ -661,7 +792,16 @@ public class MockRestServerTest {
 
             server = serverBuilder.build();
             server.expect(requestTo("/goodbye")).andRespond(withSuccess());
+            assertThat(target.path("/goodbye").request().get().getStatusInfo().toEnum()).isEqualTo(OK);
+            server.verify();
+
+            server = serverBuilder.withRequestOrder(STRICT).build();
+            server.expect(min(2), requestTo("/hello")).andRespond(withSuccess());
+            server.expect(requestTo("/goodbye")).andRespond(withSuccess());
+
             try (client) {
+                assertThat(target.path("/hello").request().get().getStatusInfo().toEnum()).isEqualTo(OK);
+                assertThat(target.path("/hello").request().get().getStatusInfo().toEnum()).isEqualTo(OK);
                 assertThat(target.path("/goodbye").request().get().getStatusInfo().toEnum()).isEqualTo(OK);
                 server.verify();
             }
@@ -797,13 +937,32 @@ public class MockRestServerTest {
         @JaxRsVendorTest(skipFor = CXF)
         void testUnorderedExpectations() {
             RestClientBuilder restClientBuilder = RestClientBuilder.newBuilder().baseUri("http://localhost");
-            MockRestServer server = MockRestServer.bindTo(restClientBuilder).ignoreRequestOrder(true).build();
+            MockRestServer server = MockRestServer.bindTo(restClientBuilder).withRequestOrder(UNORDERED).build();
 
             server.expect(requestTo("http://localhost/hello")).andRespond(withSuccess());
             server.expect(requestTo("http://localhost/goodbye")).andRespond(withSuccess());
 
             assertThatCode(() -> {
                 try (GreetingSendoffClient client = restClientBuilder.build(GreetingSendoffClient.class)) {
+                    assertThat(client.greeting().getStatusInfo().toEnum()).isEqualTo(OK);
+                    assertThat(client.sendoff().getStatusInfo().toEnum()).isEqualTo(OK);
+                }
+            }).doesNotThrowAnyException();
+
+            server.verify();
+        }
+
+        @JaxRsVendorTest(skipFor = CXF)
+        void testStrictExpectations() {
+            RestClientBuilder restClientBuilder = RestClientBuilder.newBuilder().baseUri("http://localhost");
+            MockRestServer server = MockRestServer.bindTo(restClientBuilder).withRequestOrder(STRICT).build();
+
+            server.expect(times(2),requestTo("http://localhost/hello")).andRespond(withSuccess());
+            server.expect(requestTo("http://localhost/goodbye")).andRespond(withSuccess());
+
+            assertThatCode(() -> {
+                try (GreetingSendoffClient client = restClientBuilder.build(GreetingSendoffClient.class)) {
+                    assertThat(client.greeting().getStatusInfo().toEnum()).isEqualTo(OK);
                     assertThat(client.greeting().getStatusInfo().toEnum()).isEqualTo(OK);
                     assertThat(client.sendoff().getStatusInfo().toEnum()).isEqualTo(OK);
                 }
@@ -821,6 +980,22 @@ public class MockRestServerTest {
             server.expect(requestTo("http://localhost/goodbye")).andRespond(withSuccess());
 
             try (GreetingSendoffClient client = restClientBuilder.build(GreetingSendoffClient.class)) {
+                filterExceptionAssert.assertThatThrownBy(client::sendoff)
+                    .isInstanceOf(AssertionError.class)
+                    .hasMessageEndingWith("Unexpected Request. expected: <http://localhost/hello> but was: <http://localhost/goodbye>");
+            }
+        }
+
+        @JaxRsVendorTest(skipFor = CXF)
+        void testStrictExpectations_firstRequestUnsatisfied(FilterExceptionAssert filterExceptionAssert) throws Exception {
+            RestClientBuilder restClientBuilder = RestClientBuilder.newBuilder().baseUri("http://localhost");
+            MockRestServer server = MockRestServer.bindTo(restClientBuilder).withRequestOrder(STRICT).build();
+
+            server.expect(min(2), requestTo("http://localhost/hello")).andRespond(withSuccess());
+            server.expect(requestTo("http://localhost/goodbye")).andRespond(withSuccess());
+
+            try (GreetingSendoffClient client = restClientBuilder.build(GreetingSendoffClient.class)) {
+                assertThat(client.greeting().getStatusInfo().toEnum()).isEqualTo(OK);
                 filterExceptionAssert.assertThatThrownBy(client::sendoff)
                     .isInstanceOf(AssertionError.class)
                     .hasMessageEndingWith("Unexpected Request. expected: <http://localhost/hello> but was: <http://localhost/goodbye>");
@@ -880,7 +1055,7 @@ public class MockRestServerTest {
                 server.verify();
             }
 
-            server = serverBuilder.ignoreRequestOrder(true).build();
+            server = serverBuilder.withRequestOrder(UNORDERED).build();
             server.expect(requestTo("http://localhost/hello")).andRespond(withSuccess());
             server.expect(requestTo("http://localhost/goodbye")).andRespond(withSuccess());
 
@@ -893,6 +1068,17 @@ public class MockRestServerTest {
             server = serverBuilder.build();
             server.expect(requestTo("http://localhost/goodbye")).andRespond(withSuccess());
             try (GreetingSendoffClient client = restClientBuilder.build(GreetingSendoffClient.class)) {
+                assertThat(client.sendoff().getStatusInfo().toEnum()).isEqualTo(OK);
+                server.verify();
+            }
+
+            server = serverBuilder.withRequestOrder(STRICT).build();
+            server.expect(min(2), requestTo("http://localhost/hello")).andRespond(withSuccess());
+            server.expect(requestTo("http://localhost/goodbye")).andRespond(withSuccess());
+
+            try (GreetingSendoffClient client = restClientBuilder.build(GreetingSendoffClient.class)) {
+                assertThat(client.greeting().getStatusInfo().toEnum()).isEqualTo(OK);
+                assertThat(client.greeting().getStatusInfo().toEnum()).isEqualTo(OK);
                 assertThat(client.sendoff().getStatusInfo().toEnum()).isEqualTo(OK);
                 server.verify();
             }
