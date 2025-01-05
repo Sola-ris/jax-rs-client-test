@@ -1,4 +1,4 @@
-package io.github.solaris.jaxrs.client.test.request;
+package io.github.solaris.jaxrs.client.test.manager;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -7,11 +7,13 @@ import java.util.List;
 import jakarta.ws.rs.client.ClientRequestContext;
 import jakarta.ws.rs.core.Response;
 
+import io.github.solaris.jaxrs.client.test.request.ExpectedCount;
+import io.github.solaris.jaxrs.client.test.request.RequestMatcher;
 import io.github.solaris.jaxrs.client.test.response.ResponseActions;
 import io.github.solaris.jaxrs.client.test.response.ResponseCreator;
 import org.jspecify.annotations.Nullable;
 
-public class RequestExpectation implements RequestMatcher, ResponseActions, ResponseCreator {
+class RequestExpectation implements RequestMatcher, ResponseActions, ResponseCreator {
 
     private int matchedCount;
 
@@ -21,7 +23,7 @@ public class RequestExpectation implements RequestMatcher, ResponseActions, Resp
     private final List<RequestMatcher> matchers = new ArrayList<>();
     private final ExpectedCount expectedCount;
 
-    public RequestExpectation(ExpectedCount expectedCount, RequestMatcher matcher) {
+    RequestExpectation(ExpectedCount expectedCount, RequestMatcher matcher) {
         this.expectedCount = expectedCount;
         matchers.add(matcher);
     }
@@ -44,15 +46,15 @@ public class RequestExpectation implements RequestMatcher, ResponseActions, Resp
         this.responseCreator = responseCreator;
     }
 
-    public boolean hasRemainingCount() {
+    boolean hasRemainingCount() {
         return matchedCount < expectedCount.getMax();
     }
 
-    public boolean isSatisfied() {
+    boolean isSatisfied() {
         return matchedCount >= expectedCount.getMin();
     }
 
-    public void incrementAndValidate() {
+    void incrementAndValidate() {
         matchedCount++;
         if (matchedCount > expectedCount.getMax()) {
             throw new AssertionError("Received more calls than expected.");

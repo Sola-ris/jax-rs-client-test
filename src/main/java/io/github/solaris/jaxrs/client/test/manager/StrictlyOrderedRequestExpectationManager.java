@@ -4,15 +4,13 @@ import java.io.IOException;
 
 import jakarta.ws.rs.client.ClientRequestContext;
 
-import io.github.solaris.jaxrs.client.test.request.RequestExpectation;
-
 public class StrictlyOrderedRequestExpectationManager extends RequestExpectationManager {
 
     @Override
-    protected void expectationsDeclared() {}
+    void expectationsDeclared() {}
 
     @Override
-    protected RequestExpectation matchRequest(ClientRequestContext requestContext) throws IOException {
+    RequestExpectation matchRequest(ClientRequestContext requestContext) throws IOException {
         RequestExpectation matchingExpectation = null;
         for (RequestExpectation expectation : getExpectations()) {
             if (expectation.isSatisfied()) {

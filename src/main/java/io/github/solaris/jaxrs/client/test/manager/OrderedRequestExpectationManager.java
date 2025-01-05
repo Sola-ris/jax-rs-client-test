@@ -5,7 +5,6 @@ import java.util.Iterator;
 
 import jakarta.ws.rs.client.ClientRequestContext;
 
-import io.github.solaris.jaxrs.client.test.request.RequestExpectation;
 import org.jspecify.annotations.Nullable;
 
 public class OrderedRequestExpectationManager extends RequestExpectationManager {
@@ -15,12 +14,12 @@ public class OrderedRequestExpectationManager extends RequestExpectationManager 
     private Iterator<RequestExpectation> expectationIterator;
 
     @Override
-    protected void expectationsDeclared() {
+    void expectationsDeclared() {
         expectationIterator = getExpectations().iterator();
     }
 
     @Override
-    protected RequestExpectation matchRequest(ClientRequestContext requestContext) throws IOException {
+    RequestExpectation matchRequest(ClientRequestContext requestContext) throws IOException {
         RequestExpectation expectation = expectationGroup.findExpectation(requestContext);
         if (expectation == null) {
             if (expectationIterator == null || !expectationIterator.hasNext()) {

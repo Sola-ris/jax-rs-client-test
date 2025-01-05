@@ -4,18 +4,16 @@ import java.io.IOException;
 
 import jakarta.ws.rs.client.ClientRequestContext;
 
-import io.github.solaris.jaxrs.client.test.request.RequestExpectation;
-
 public class UnorderedRequestExpectationManager extends RequestExpectationManager {
     private final RequestExpectationGroup expectationGroup = new RequestExpectationGroup();
 
     @Override
-    protected void expectationsDeclared() {
+    void expectationsDeclared() {
         expectationGroup.addExpectations(getExpectations());
     }
 
     @Override
-    protected RequestExpectation matchRequest(ClientRequestContext requestContext) throws IOException {
+    RequestExpectation matchRequest(ClientRequestContext requestContext) throws IOException {
         RequestExpectation expectation = expectationGroup.findExpectation(requestContext);
         if (expectation == null) {
             throw createUnexpectedRequestError(requestContext);

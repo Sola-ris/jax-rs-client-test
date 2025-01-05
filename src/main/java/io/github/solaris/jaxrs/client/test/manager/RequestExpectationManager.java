@@ -5,33 +5,30 @@ import java.net.URI;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import jakarta.ws.rs.client.ClientRequestContext;
 import jakarta.ws.rs.core.Response;
 
 import io.github.solaris.jaxrs.client.test.request.ExpectedCount;
-import io.github.solaris.jaxrs.client.test.request.RequestExpectation;
 import io.github.solaris.jaxrs.client.test.request.RequestMatcher;
 import io.github.solaris.jaxrs.client.test.response.ResponseActions;
-import org.jspecify.annotations.Nullable;
 
 public abstract class RequestExpectationManager {
     private final List<RequestExpectation> expectations = new ArrayList<>();
     private final List<ClientRequestContext> requests = new ArrayList<>();
     private final Map<ClientRequestContext, Throwable> failedRequests = new LinkedHashMap<>();
 
-    protected abstract void expectationsDeclared();
+    RequestExpectationManager() {}
 
-    protected abstract RequestExpectation matchRequest(ClientRequestContext requestContext) throws IOException;
+    abstract void expectationsDeclared();
 
-    protected List<RequestExpectation> getExpectations() {
+    abstract RequestExpectation matchRequest(ClientRequestContext requestContext) throws IOException;
+
+    List<RequestExpectation> getExpectations() {
         return expectations;
     }
 
@@ -107,7 +104,7 @@ public abstract class RequestExpectationManager {
             .count();
     }
 
-    protected AssertionError createUnexpectedRequestError(ClientRequestContext requestContext) {
+    AssertionError createUnexpectedRequestError(ClientRequestContext requestContext) {
         String method = requestContext.getMethod();
         URI uri = requestContext.getUri();
         return new AssertionError(
@@ -136,40 +133,5 @@ public abstract class RequestExpectationManager {
             builder.append(", headers: ").append(requestContext.getStringHeaders());
         }
         return builder.toString();
-    }
-
-
-    protected static class RequestExpectationGroup {
-        private final Set<RequestExpectation> expectations = new HashSet<>();
-
-        @Nullable
-        public RequestExpectation findExpectation(ClientRequestContext requestContext) throws IOException {
-            for (RequestExpectation expectation : expectations) {
-                try {
-                    expectation.match(requestContext);
-                    return expectation;
-                } catch (AssertionError ignored) {
-                    // Return the matching expectation or null, ignore Exceptions
-                }
-            }
-            return null;
-        }
-
-        public void addExpectations(Collection<RequestExpectation> expectations) {
-            this.expectations.addAll(expectations);
-        }
-
-        public void update(RequestExpectation expectation) {
-            expectation.incrementAndValidate();
-            if (expectation.hasRemainingCount()) {
-                expectations.add(expectation);
-            } else {
-                expectations.remove(expectation);
-            }
-        }
-
-        public void reset() {
-            expectations.clear();
-        }
     }
 }
