@@ -148,8 +148,7 @@ public class JsonPathRequestMatchers {
         return value;
     }
 
-    @Nullable
-    private Object evaluate(String jsonString) {
+    private @Nullable Object evaluate(String jsonString) {
         try {
             return jsonPath.read(jsonString);
         } catch (Throwable t) {

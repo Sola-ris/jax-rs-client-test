@@ -16,8 +16,7 @@ import org.jspecify.annotations.Nullable;
 public class MockResponseFilter implements ClientRequestFilter {
 
     @Context
-    @Nullable
-    private Providers providers;
+    private @Nullable Providers providers;
 
     @Override
     public void filter(ClientRequestContext requestContext) throws IOException {

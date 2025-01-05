@@ -10,8 +10,7 @@ import org.jspecify.annotations.Nullable;
 public class OrderedRequestExpectationManager extends RequestExpectationManager {
     private final RequestExpectationGroup expectationGroup = new RequestExpectationGroup();
 
-    @Nullable
-    private Iterator<RequestExpectation> expectationIterator;
+    private @Nullable Iterator<RequestExpectation> expectationIterator;
 
     @Override
     void expectationsDeclared() {

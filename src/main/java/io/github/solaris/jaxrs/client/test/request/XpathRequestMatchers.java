@@ -51,9 +51,8 @@ public class XpathRequestMatchers {
         return xPath.compile(expression);
     }
 
-    @Nullable
     @SuppressWarnings("unchecked")
-    private <T> T evaluate(ClientRequestContext requestContext, Class<T> targetType) throws Exception {
+    private @Nullable <T> T evaluate(ClientRequestContext requestContext, Class<T> targetType) throws Exception {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         factory.setNamespaceAware(namespaceAware);
         DocumentBuilder builder = factory.newDocumentBuilder();

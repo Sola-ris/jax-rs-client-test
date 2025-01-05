@@ -17,8 +17,7 @@ class RequestExpectation implements RequestMatcher, ResponseActions, ResponseCre
 
     private int matchedCount;
 
-    @Nullable
-    private ResponseCreator responseCreator;
+    private @Nullable ResponseCreator responseCreator;
 
     private final List<RequestMatcher> matchers = new ArrayList<>();
     private final ExpectedCount expectedCount;

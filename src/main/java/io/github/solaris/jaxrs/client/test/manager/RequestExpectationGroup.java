@@ -12,8 +12,7 @@ import org.jspecify.annotations.Nullable;
 class RequestExpectationGroup {
     private final Set<RequestExpectation> expectations = new HashSet<>();
 
-    @Nullable
-    RequestExpectation findExpectation(ClientRequestContext requestContext) throws IOException {
+    @Nullable RequestExpectation findExpectation(ClientRequestContext requestContext) throws IOException {
         for (RequestExpectation expectation : expectations) {
             try {
                 expectation.match(requestContext);
