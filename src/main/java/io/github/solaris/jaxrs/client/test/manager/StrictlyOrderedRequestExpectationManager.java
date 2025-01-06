@@ -1,18 +1,23 @@
 package io.github.solaris.jaxrs.client.test.manager;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import jakarta.ws.rs.client.ClientRequestContext;
 
 public class StrictlyOrderedRequestExpectationManager extends RequestExpectationManager {
+    private final List<RequestExpectation> expectations = new ArrayList<>();
 
     @Override
-    void expectationsDeclared() {}
+    void expectationsDeclared() {
+        expectations.addAll(getExpectations());
+    }
 
     @Override
     RequestExpectation matchRequest(ClientRequestContext requestContext) throws IOException {
         RequestExpectation matchingExpectation = null;
-        for (RequestExpectation expectation : getExpectations()) {
+        for (RequestExpectation expectation : expectations) {
             if (expectation.isSatisfied()) {
                 try {
                     expectation.match(requestContext);
@@ -31,6 +36,9 @@ public class StrictlyOrderedRequestExpectationManager extends RequestExpectation
         }
 
         matchingExpectation.incrementAndValidate();
+        if (!matchingExpectation.hasRemainingCount()) {
+            expectations.remove(matchingExpectation);
+        }
         return matchingExpectation;
     }
 }

@@ -136,4 +136,26 @@ class StrictlyOrderedRequestExpectationManagerTest {
                 GET /hello
                 """);
     }
+
+    @Test
+    void testTooManyRequests() {
+        manager.expectRequest(times(2), requestTo("/hello")).andExpect(method(GET)).andRespond(withSuccess());
+        manager.expectRequest(once(), requestTo("/goodbye")).andExpect(method(GET)).andRespond(withSuccess());
+
+        assertThatCode(() -> {
+            manager.validateRequest(new MockClientRequestContext(GET, "/hello")).close();
+            manager.validateRequest(new MockClientRequestContext(GET, "/hello")).close();
+            manager.validateRequest(new MockClientRequestContext(GET, "/goodbye")).close();
+        }).doesNotThrowAnyException();
+
+        assertThatThrownBy(() -> manager.validateRequest(new MockClientRequestContext(GET, "/hello")).close())
+            .isInstanceOf(AssertionError.class)
+            .hasMessage("""
+                No further requests expected: HTTP GET /hello
+                3 request(s) executed:
+                GET /hello
+                GET /hello
+                GET /goodbye
+                """);
+    }
 }
