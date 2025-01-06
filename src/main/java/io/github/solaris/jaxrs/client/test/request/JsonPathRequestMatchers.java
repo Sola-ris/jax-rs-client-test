@@ -12,6 +12,13 @@ import jakarta.ws.rs.client.ClientRequestContext;
 import com.jayway.jsonpath.JsonPath;
 import org.jspecify.annotations.Nullable;
 
+/**
+ * Factory for {@link RequestMatcher} implementations that use a <a href="https://github.com/jayway/JsonPath">JsonPath</a> expression.
+ * <p>Accessed via {@link RequestMatchers#jsonPath(String, Object...)}</p>
+ * <p>
+ * Requires an Entity Provider for {@code application/json} to be present and registered with the JAX-RS client component that executed the request.
+ * </p>
+ */
 public class JsonPathRequestMatchers {
 
     private final String expression;
@@ -22,6 +29,19 @@ public class JsonPathRequestMatchers {
         this.jsonPath = JsonPath.compile(this.expression);
     }
 
+    /**
+     * Evaluate the JsonPath expression and assert the result is equal to and of the same type as the given Object.
+     * <p>
+     * If the JsonPath expression is not {@linkplain JsonPath#isDefinite() definite}
+     * and evaluates to an array containing a <b>single</b> value, it will be compared to the given Object.
+     * </p>
+     * <p>
+     * If the JsonPath expression is not {@linkplain JsonPath#isDefinite() definite}
+     * and evaluates to an array containing <b>multiple</b> values, an {@link AssertionError} will be thrown.
+     * </p>
+     *
+     * @param expectedValue The expected value, possibly {@code null}
+     */
     public RequestMatcher value(@Nullable Object expectedValue) {
         return request -> {
             String jsonString = getJsonString(request);
@@ -51,10 +71,24 @@ public class JsonPathRequestMatchers {
         };
     }
 
+    /**
+     * Evaluate the JsonPath expression and assert the result is a {@code non-null} value.
+     * <p>
+     * If the JsonPath expression is not {@linkplain JsonPath#isDefinite() definite}
+     * this {@code RequestMatcher} asserts that the result is not empty.
+     * </p>
+     */
     public RequestMatcher exists() {
         return request -> assertExistsAndGet(getJsonString(request));
     }
 
+    /**
+     * Evaluate the JsonPath expression and assert the result is {@code null}.
+     * <p>
+     * If the JsonPath expression is not {@linkplain JsonPath#isDefinite() definite}
+     * this {@code RequestMatcher} asserts that the result is empty.
+     * </p>
+     */
     public RequestMatcher doesNotExist() {
         return request -> {
             Object value;
@@ -73,6 +107,13 @@ public class JsonPathRequestMatchers {
         };
     }
 
+    /**
+     * Evaluate the JsonPath expression and assert that <b>any value</b>, including {@code null}, exists.
+     * <p>
+     * If the JsonPath expression is not {@linkplain JsonPath#isDefinite() definite}
+     * this {@code RequestMatcher} asserts that the result is not empty.
+     * </p>
+     */
     public RequestMatcher hasJsonPath() {
         return request -> {
             Object value = evaluate(getJsonString(request));
@@ -82,6 +123,13 @@ public class JsonPathRequestMatchers {
         };
     }
 
+    /**
+     * Evaluate the JsonPath expression and assert that <b>no value</b>, including {@code null}, exists.
+     * <p>
+     * If the JsonPath expression is not {@linkplain JsonPath#isDefinite() definite}
+     * this {@code RequestMatcher} asserts that the result is empty.
+     * </p>
+     */
     public RequestMatcher doesNotHaveJsonPath() {
         return request -> {
             Object value;
@@ -100,6 +148,9 @@ public class JsonPathRequestMatchers {
         };
     }
 
+    /**
+     * Evaluate the JsonPath expression and assert that the result is a {@link String}.
+     */
     public RequestMatcher isString() {
         return request -> {
             Object value = assertExistsAndGet(getJsonString(request));
@@ -107,6 +158,9 @@ public class JsonPathRequestMatchers {
         };
     }
 
+    /**
+     * Evaluate the JsonPath expression and assert that the result is a {@link Boolean}.
+     */
     public RequestMatcher isBoolean() {
         return request -> {
             Object value = assertExistsAndGet(getJsonString(request));
@@ -114,6 +168,9 @@ public class JsonPathRequestMatchers {
         };
     }
 
+    /**
+     * Evaluate the JsonPath expression and assert that the result is a {@link Number}.
+     */
     public RequestMatcher isNumber() {
         return request -> {
             Object value = assertExistsAndGet(getJsonString(request));
@@ -121,6 +178,9 @@ public class JsonPathRequestMatchers {
         };
     }
 
+    /**
+     * Evaluate the JsonPath expression and assert that the result is an {@code Array}.
+     */
     public RequestMatcher isArray() {
         return request -> {
             Object value = assertExistsAndGet(getJsonString(request));
@@ -128,6 +188,9 @@ public class JsonPathRequestMatchers {
         };
     }
 
+    /**
+     * Evaluate the JsonPath expression and assert that the result is a {@link Map}.
+     */
     public RequestMatcher isMap() {
         return request -> {
             Object value = assertExistsAndGet(getJsonString(request));

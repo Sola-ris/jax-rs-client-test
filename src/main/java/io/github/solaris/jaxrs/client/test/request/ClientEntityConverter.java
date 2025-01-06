@@ -12,6 +12,11 @@ import jakarta.ws.rs.core.Response;
 
 import io.github.solaris.jaxrs.client.test.internal.ClientCleaner;
 
+/**
+ * Fallback {@link EntityConverter} that indirectly uses the available JAX-RS {@link jakarta.ws.rs.ext.Providers Providers}
+ * through a {@link Client} to convert the entity.
+ * <p>Must not be directly instantiated, use {@link EntityConverter#fromRequestContext(ClientRequestContext)}.</p>
+ */
 public final class ClientEntityConverter extends EntityConverter {
     private static final URI LOCALHOST = URI.create("http://localhost");
     private static final RoundTripFilter ROUND_TRIP_FILTER = new RoundTripFilter();

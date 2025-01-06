@@ -32,6 +32,13 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
+/**
+ * Factory for {@link RequestMatcher} implementations that use an {@link XPath} expression.
+ * <p>Accessed via {@link RequestMatchers#xpath(String, Object...)} or {@link RequestMatchers#xpath(String, Map, Object...)}.</p>
+ * <p>
+ * Requires an Entity Provider for {@code application/xml} to be present and registered with the JAX-RS client component that executed the request.
+ * </p>
+ */
 public class XpathRequestMatchers {
     private final String expression;
     private final XPathExpression xPathExpression;
@@ -67,7 +74,7 @@ public class XpathRequestMatchers {
         return (T) xPathExpression.evaluate(document, getQname(targetType));
     }
 
-        private static <T> QName getQname(Class<T> targetType) {
+    private static <T> QName getQname(Class<T> targetType) {
         if (Number.class.isAssignableFrom(targetType)) {
             return XPathConstants.NUMBER;
         } else if (CharSequence.class.isAssignableFrom(targetType)) {
@@ -83,6 +90,9 @@ public class XpathRequestMatchers {
         }
     }
 
+    /**
+     * Assert that a value exists at the given XPath.
+     */
     public RequestMatcher exists() {
         return (XpathRequestMatcher) request -> {
             Node node = evaluate(request, Node.class);
@@ -90,6 +100,9 @@ public class XpathRequestMatchers {
         };
     }
 
+    /**
+     * Assert that no value exists at the given XPath.
+     */
     public RequestMatcher doesNotExist() {
         return (XpathRequestMatcher) request -> {
             Node node = evaluate(request, Node.class);
@@ -97,6 +110,11 @@ public class XpathRequestMatchers {
         };
     }
 
+    /**
+     * Evaluate the XPath expression and assert it evaluated to the given amount of nodes.
+     *
+     * @param expectedCount The expected amount of nodes
+     */
     public RequestMatcher nodeCount(int expectedCount) {
         return (XpathRequestMatcher) request -> {
             NodeList nodeList = evaluate(request, NodeList.class);
@@ -105,6 +123,11 @@ public class XpathRequestMatchers {
         };
     }
 
+    /**
+     * Evaluate the XPath expression and compare the value to the given String
+     *
+     * @param expectedString The expected String value
+     */
     public RequestMatcher string(String expectedString) {
         return (XpathRequestMatcher) request -> {
             String actualString = evaluate(request, String.class);
@@ -112,6 +135,11 @@ public class XpathRequestMatchers {
         };
     }
 
+    /**
+     * Evaluate the XPath expression and compare the value to the given Number
+     *
+     * @param expectedNumber The expected numeric value
+     */
     public RequestMatcher number(Double expectedNumber) {
         return (XpathRequestMatcher) request -> {
             Double actualNumber = evaluate(request, Double.class);
@@ -119,6 +147,11 @@ public class XpathRequestMatchers {
         };
     }
 
+    /**
+     * Evaluate the XPath expression and compare the value to the given boolean
+     *
+     * @param expectedBoolean The expected boolean value
+     */
     public RequestMatcher booleanValue(boolean expectedBoolean) {
         return (XpathRequestMatcher) request -> {
             Boolean actualBoolean = evaluate(request, Boolean.class);

@@ -17,6 +17,11 @@ import io.github.solaris.jaxrs.client.test.request.ExpectedCount;
 import io.github.solaris.jaxrs.client.test.request.RequestMatcher;
 import io.github.solaris.jaxrs.client.test.response.ResponseActions;
 
+/**
+ * Base class for all {@code RequestExpectationManager} implementations.
+ * <p>Responsible for holding expectations, executed and failed requests, as well as checking for unsatisfied request expectations.</p>
+ * <p>The order in which the requests are expected to occur depends on the subclass.</p>
+ */
 public abstract class RequestExpectationManager {
     private final List<RequestExpectation> expectations = new ArrayList<>();
     private final List<ClientRequestContext> requests = new ArrayList<>();
@@ -32,12 +37,23 @@ public abstract class RequestExpectationManager {
         return expectations;
     }
 
+    /**
+     * @see io.github.solaris.jaxrs.client.test.server.MockRestServer#expect(RequestMatcher) MockRestServer.expect(RequestMatcher)
+     * @see io.github.solaris.jaxrs.client.test.server.MockRestServer#expect(ExpectedCount, RequestMatcher) MockRestServer.expect(ExpectedCount, RequestMatcher)
+     */
     public ResponseActions expectRequest(ExpectedCount count, RequestMatcher requestMatcher) {
         RequestExpectation expectation = new RequestExpectation(count, requestMatcher);
         expectations.add(expectation);
         return expectation;
     }
 
+    /**
+     * Validate the incoming request against the set-up expectations and respond if a match was found.
+     *
+     * @param requestContext The incoming request
+     * @return The set-up {@link Response}
+     * @throws IOException If thrown from a {@link RequestMatcher}
+     */
     public Response validateRequest(ClientRequestContext requestContext) throws IOException {
         RequestExpectation expectation;
         synchronized (requests) {
@@ -58,6 +74,9 @@ public abstract class RequestExpectationManager {
         return expectation.createResponse(requestContext);
     }
 
+    /**
+     * @see io.github.solaris.jaxrs.client.test.server.MockRestServer#verify() MockRestServer.verify()
+     */
     public void verify() {
         long unsatisfied = countUnsatisfiedExpectations();
         if (unsatisfied != 0) {
@@ -68,7 +87,9 @@ public abstract class RequestExpectationManager {
             throw new AssertionError(builder);
         }
     }
-
+    /**
+     * @see io.github.solaris.jaxrs.client.test.server.MockRestServer#verify(Duration) MockRestServer.verify(Duration)
+     */
     public void verify(Duration timeout) {
         Instant end = Instant.now().plus(timeout);
         do {
@@ -81,6 +102,9 @@ public abstract class RequestExpectationManager {
         verify();
     }
 
+    /**
+     * @see io.github.solaris.jaxrs.client.test.server.MockRestServer#reset() MockRestServer.reset()
+     */
     public void reset() {
         expectations.clear();
         requests.clear();

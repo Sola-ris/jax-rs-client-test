@@ -234,6 +234,34 @@
             </plugin>
 
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.11.2</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <configuration>
+                            <doclint>all,-missing</doclint>
+                            <links>
+                                <link>https://jspecify.dev/docs/api/</link>
+                                <link>https://jakarta.ee/specifications/restful-ws/3.1/apidocs/</link>
+                                <link>https://download.eclipse.org/microprofile/microprofile-rest-client-4.0/apidocs/</link>
+                            </links>
+                            <additionalDependencies>
+                                <additionalDependency>
+                                    <groupId>org.eclipse.microprofile.rest.client</groupId>
+                                    <artifactId>microprofile-rest-client-api</artifactId>
+                                    <version>4.0</version>
+                                </additionalDependency>
+                            </additionalDependencies>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>0.8.12</version>

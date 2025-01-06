@@ -13,7 +13,11 @@ import io.github.solaris.jaxrs.client.test.request.EntityConverter;
 import io.github.solaris.jaxrs.client.test.request.ProvidersEntityConverter;
 import org.jspecify.annotations.Nullable;
 
-public class MockResponseFilter implements ClientRequestFilter {
+/**
+ * <p>Filter that redirects the current request to a {@link RequestExpectationManager} bound via {@link MockRestServer}.</p>
+ * <p>Not intend to for public use, but must be declared {@code public} so JAX-RS implementations can instantiate it.</p>
+ */
+public final class MockResponseFilter implements ClientRequestFilter {
 
     @Context
     private @Nullable Providers providers;

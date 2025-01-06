@@ -4,6 +4,10 @@ import java.io.IOException;
 
 import jakarta.ws.rs.client.ClientRequestContext;
 
+/**
+ * {@link RequestExpectationManager} that expects requests to be performed in any order.
+ * <p>Corresponds to mockRestServerBuilder.withRequestOrder({@link io.github.solaris.jaxrs.client.test.server.RequestOrder#UNORDERED UNORDERED}).</p>
+ */
 public class UnorderedRequestExpectationManager extends RequestExpectationManager {
     private final RequestExpectationGroup expectationGroup = new RequestExpectationGroup();
 

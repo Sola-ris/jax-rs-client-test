@@ -15,6 +15,10 @@ import jakarta.ws.rs.ext.Providers;
 
 import org.jspecify.annotations.Nullable;
 
+/**
+ * {@link EntityConverter} that directly uses the available JAX-RS {@link Providers} to convert the entity.
+ * <p>Must not be directly instantiated, use {@link EntityConverter#fromRequestContext(ClientRequestContext)}.</p>
+ */
 public final class ProvidersEntityConverter extends EntityConverter {
     private static final Annotation[] ANNOTATIONS = new Annotation[]{};
     private final Providers providers;

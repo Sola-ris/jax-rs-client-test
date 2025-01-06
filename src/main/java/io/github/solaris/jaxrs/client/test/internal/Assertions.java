@@ -4,6 +4,9 @@ import java.util.Objects;
 
 import org.jspecify.annotations.Nullable;
 
+/**
+ * Simple assertions to not have a dependency on external assertion libraries.
+ */
 public class Assertions {
     private Assertions() {}
 

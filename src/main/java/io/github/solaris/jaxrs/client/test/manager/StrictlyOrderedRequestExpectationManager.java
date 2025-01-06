@@ -6,6 +6,10 @@ import java.util.List;
 
 import jakarta.ws.rs.client.ClientRequestContext;
 
+/**
+ * {@link RequestExpectationManager} that expects each request to be satisfied in order of declaration.
+ * <p>Corresponds to mockRestServerBuilder.withRequestOrder({@link io.github.solaris.jaxrs.client.test.server.RequestOrder#STRICT STRICT}).</p>
+ */
 public class StrictlyOrderedRequestExpectationManager extends RequestExpectationManager {
     private final List<RequestExpectation> expectations = new ArrayList<>();
 

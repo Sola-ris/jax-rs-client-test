@@ -10,14 +10,28 @@ import jakarta.ws.rs.core.Form;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.MultivaluedMap;
 
+/**
+ * Factory for {@link RequestMatcher} implementations related to the request {@code entity}.
+ * <p>Accessed via {@link RequestMatchers#entity()}.</p>
+ */
 public final class EntityRequestMatchers {
 
     EntityRequestMatchers() {}
 
+    /**
+     * Assert that the requests {@code Content-Type} header matches the given String
+     *
+     * @param mediaType The expected content of the {@code Content-Type} header
+     */
     public RequestMatcher mediaType(String mediaType) {
         return mediaType(MediaType.valueOf(mediaType));
     }
 
+    /**
+     * Assert that the requests {@code Content-Type} header matches the given {@link MediaType}
+     *
+     * @param mediaType The expected content of the {@code Content-Type} header
+     */
     public RequestMatcher mediaType(MediaType mediaType) {
         return request -> {
             MediaType actual = request.getMediaType();
@@ -26,10 +40,20 @@ public final class EntityRequestMatchers {
         };
     }
 
+    /**
+     * Compare the request entity to the given Object.
+     *
+     * @param expected The expected request entity
+     */
     public RequestMatcher isEqualTo(Object expected) {
         return request -> assertEqual("Entity", expected, request.getEntity());
     }
 
+    /**
+     * Convert the request body into a String and compare it to the given String.
+     *
+     * @param expected The expected request body
+     */
     public RequestMatcher string(String expected) {
         return request -> {
             EntityConverter entityConverter = EntityConverter.fromRequestContext(request);
@@ -38,6 +62,11 @@ public final class EntityRequestMatchers {
         };
     }
 
+    /**
+     * Convert the request entity into a {@link Form} and compare it to the given {@code Form}.
+     *
+     * @param expectedForm The expected request body
+     */
     public RequestMatcher form(Form expectedForm) {
         return request -> {
             EntityConverter entityConverter = EntityConverter.fromRequestContext(request);
@@ -46,6 +75,16 @@ public final class EntityRequestMatchers {
         };
     }
 
+    /**
+     * <p>Convert the request entity into a {@link Form} and assert that it contains the given subset.</p>
+     * <p>If the given subset contains more values for a key that the request, an {@link AssertionError} will be thrown.</p>
+     * <p>
+     * For each key in the expected subset, the n<sup>th</sup> value will be compared to the n<sup>th</sup> of the request {@code Form}.
+     * Any additional values for the key in the request {@code Form} will be ignored.
+     * </p>
+     *
+     * @param expectedForm The expected subset
+     */
     public RequestMatcher formContains(Form expectedForm) {
         return request -> {
             EntityConverter entityConverter = EntityConverter.fromRequestContext(request);

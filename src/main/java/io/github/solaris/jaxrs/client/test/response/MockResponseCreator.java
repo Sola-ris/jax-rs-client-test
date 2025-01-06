@@ -18,6 +18,9 @@ import jakarta.ws.rs.core.Variant;
 
 import org.jspecify.annotations.Nullable;
 
+/**
+ * A {@link ResponseCreator} that creates a mock {@link Response} without calling an external service.
+ */
 public class MockResponseCreator implements ResponseCreator {
     private final StatusType status;
 
@@ -32,16 +35,25 @@ public class MockResponseCreator implements ResponseCreator {
         this.status = status;
     }
 
+    /**
+     * Set the response entity.
+     */
     public MockResponseCreator entity(Object entity) {
         this.entity = entity;
         return this;
     }
 
+    /**
+     * Set the {@code Content-Type} header to the given {@link MediaType}
+     */
     public MockResponseCreator mediaType(MediaType mediaType) {
         headers.putSingle(CONTENT_TYPE, mediaType.toString());
         return this;
     }
 
+    /**
+     * Add a Header with one or more values to the response.
+     */
     public MockResponseCreator header(String name, Object... values) {
         for (Object value : values) {
             headers.add(name, value);
@@ -49,16 +61,25 @@ public class MockResponseCreator implements ResponseCreator {
         return this;
     }
 
+    /**
+     * Add one or more {@link NewCookie NewCookies} to the response.
+     */
     public MockResponseCreator cookies(NewCookie... cookies) {
         this.cookies.addAll(Arrays.asList(cookies));
         return this;
     }
 
+    /**
+     * Add one or more {@link Link Links} to the response.
+     */
     public MockResponseCreator links(Link... links) {
         this.links.addAll(Arrays.asList(links));
         return this;
     }
 
+    /**
+     * Add one or more {@link Variant Variants} to the response.
+     */
     public MockResponseCreator variants(Variant... variants) {
         this.variants.addAll(Arrays.asList(variants));
         return this;
