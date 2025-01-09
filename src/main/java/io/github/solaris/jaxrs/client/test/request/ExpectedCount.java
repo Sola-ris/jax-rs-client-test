@@ -12,7 +12,7 @@ public final class ExpectedCount {
             throw new IllegalArgumentException("'min' must be >= 0");
         }
         if (max < min) {
-            throw new IllegalArgumentException("'min' must be > 'max'");
+            throw new IllegalArgumentException("'max' must be >= 'min'");
         }
         this.min = min;
         this.max = max;

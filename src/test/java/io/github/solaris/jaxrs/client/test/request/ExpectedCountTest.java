@@ -38,6 +38,6 @@ class ExpectedCountTest {
     void testLowerBoundGreaterThanUpperBound() {
         assertThatThrownBy(() -> ExpectedCount.between(Integer.MAX_VALUE, Integer.MIN_VALUE))
             .isInstanceOf(IllegalArgumentException.class)
-            .hasMessage("'min' must be > 'max'");
+            .hasMessage("'max' must be >= 'min'");
     }
 }
