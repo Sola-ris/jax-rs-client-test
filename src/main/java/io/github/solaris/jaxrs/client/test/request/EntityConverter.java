@@ -49,7 +49,7 @@ public abstract sealed class EntityConverter permits ClientEntityConverter, Prov
      * @param requestContext The current request
      * @param type           The target type
      * @return The converted entity
-     * @throws IOException Tf an I/O error occurs during conversion
+     * @throws IOException If an I/O error occurs during conversion
      */
     public abstract <T> T convertEntity(ClientRequestContext requestContext, Class<T> type) throws IOException;
 
