@@ -4,6 +4,10 @@ import static io.github.solaris.jaxrs.client.test.request.RequestMatchers.anythi
 import static jakarta.ws.rs.core.HttpHeaders.ACCEPT;
 import static jakarta.ws.rs.core.HttpHeaders.ACCEPT_ENCODING;
 import static jakarta.ws.rs.core.HttpHeaders.ACCEPT_LANGUAGE;
+import static jakarta.ws.rs.core.HttpHeaders.CACHE_CONTROL;
+import static jakarta.ws.rs.core.HttpHeaders.CONTENT_LANGUAGE;
+import static jakarta.ws.rs.core.HttpHeaders.ETAG;
+import static jakarta.ws.rs.core.HttpHeaders.LAST_MODIFIED;
 import static jakarta.ws.rs.core.HttpHeaders.VARY;
 import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON_TYPE;
 import static jakarta.ws.rs.core.MediaType.APPLICATION_XML_TYPE;
@@ -21,14 +25,18 @@ import static java.util.Locale.ENGLISH;
 import static java.util.Locale.FRENCH;
 import static java.util.Locale.GERMAN;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.InstanceOfAssertFactories.LIST;
 
 import java.time.Instant;
 import java.time.Year;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.core.CacheControl;
+import jakarta.ws.rs.core.EntityTag;
 import jakarta.ws.rs.core.Link;
 import jakarta.ws.rs.core.NewCookie;
 import jakarta.ws.rs.core.Response;
@@ -146,6 +154,55 @@ class MockResponseCreatorTest {
         try (Response response =
                  new MockResponseCreator(OK).variants(variants.toArray(new Variant[0])).createResponse(new MockClientRequestContext())) {
             assertThat(response.getHeaderString(VARY)).contains(ACCEPT, ACCEPT_ENCODING, ACCEPT_LANGUAGE);
+        }
+    }
+
+    // Other typed headers, URI is covered by MockResponseCreatorsTest#testCreated
+
+    @JaxRsVendorTest
+    void testRespondWithCacheControl() {
+        CacheControl cacheControl = new CacheControl();
+        cacheControl.setMaxAge(42);
+        cacheControl.setSMaxAge(42);
+        cacheControl.setNoCache(true);
+        cacheControl.setPrivate(true);
+        cacheControl.setNoStore(true);
+        cacheControl.setNoTransform(true);
+        cacheControl.setMustRevalidate(true);
+        cacheControl.setProxyRevalidate(true);
+
+        try (Response response = new MockResponseCreator(OK).header(CACHE_CONTROL, cacheControl).createResponse(new MockClientRequestContext())) {
+            assertThat(response.getHeaders())
+                .containsKey(CACHE_CONTROL)
+                .extractingByKey(CACHE_CONTROL)
+                .asInstanceOf(LIST)
+                .singleElement()
+                .isEqualTo(cacheControl);
+        }
+    }
+
+    @JaxRsVendorTest
+    void testRespondWithETag() {
+        EntityTag entityTag = new EntityTag(UUID.randomUUID().toString().replace("-", ""), true);
+
+        try (Response response = new MockResponseCreator(OK).header(ETAG, entityTag).createResponse(new MockClientRequestContext())) {
+            assertThat(response.getEntityTag()).isEqualTo(entityTag);
+        }
+    }
+
+    @JaxRsVendorTest
+    void testRespondWithLanguage() {
+        try (Response response = new MockResponseCreator(OK).header(CONTENT_LANGUAGE, ENGLISH).createResponse(new MockClientRequestContext())) {
+            assertThat(response.getLanguage()).isEqualTo(ENGLISH);
+        }
+    }
+
+    @JaxRsVendorTest
+    void testRespondWithLastModified() {
+        Date lastModified = new Date();
+
+        try (Response response = new MockResponseCreator(OK).header(LAST_MODIFIED, lastModified).createResponse(new MockClientRequestContext())) {
+            assertThat(response.getLastModified()).isEqualTo(lastModified);
         }
     }
 }
