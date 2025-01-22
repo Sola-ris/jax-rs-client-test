@@ -13,7 +13,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <version.jersey>3.1.10</version.jersey>
-        <version.quarkus>3.17.6</version.quarkus>
+        <version.quarkus>3.18.0</version.quarkus>
         <version.resteasy>6.2.11.Final</version.resteasy>
     </properties>
 
@@ -64,7 +64,7 @@
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
-            <version>3.27.2</version>
+            <version>3.27.3</version>
             <scope>test</scope>
         </dependency>
 
@@ -172,7 +172,7 @@
         <dependency>
             <groupId>org.jboss.resteasy.microprofile</groupId>
             <artifactId>microprofile-rest-client</artifactId>
-            <version>3.0.0.Final</version>
+            <version>3.0.1.Final</version>
             <scope>test</scope>
         </dependency>
 
