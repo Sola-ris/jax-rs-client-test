@@ -1,12 +1,17 @@
 package io.github.solaris.jaxrs.client.test.request;
 
+import static io.github.solaris.jaxrs.client.test.request.MultiPartRequestContext.ENTITY_PARTS;
+
 import java.net.URI;
+import java.util.List;
 
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.client.ClientRequestContext;
 import jakarta.ws.rs.client.ClientRequestFilter;
 import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.core.EntityPart;
+import jakarta.ws.rs.core.GenericEntity;
 import jakarta.ws.rs.core.GenericType;
 import jakarta.ws.rs.core.Response;
 
@@ -45,6 +50,13 @@ public final class ClientEntityConverter extends EntityConverter {
         }
     }
 
+    @Override
+    List<EntityPart> serializeEntityParts(ClientRequestContext requestContext) {
+        try (Response response = convertEntity(requestContext)) {
+            return response.readEntity(ENTITY_PARTS);
+        }
+    }
+
     private Response convertEntity(ClientRequestContext requestContext) {
         // Directly closing the 'inner' client here causes Jersey to close the 'outer' client as well
         Client client = ClientBuilder.newClient().register(ROUND_TRIP_FILTER);
@@ -58,7 +70,7 @@ public final class ClientEntityConverter extends EntityConverter {
 
         @Override
         public void filter(ClientRequestContext requestContext) {
-            requestContext.abortWith(Response.ok(requestContext.getEntity(), requestContext.getMediaType()).build());
+            requestContext.abortWith(Response.ok(new GenericEntity<>(requestContext.getEntity()) {}, requestContext.getMediaType()).build());
         }
     }
 }

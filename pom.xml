@@ -135,6 +135,12 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.glassfish.jersey.media</groupId>
+            <artifactId>jersey-media-multipart</artifactId>
+            <version>${version.jersey}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.glassfish.jersey.ext.microprofile</groupId>
             <artifactId>jersey-mp-rest-client</artifactId>
             <version>${version.jersey}</version>
@@ -166,6 +172,12 @@
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-jaxb-provider</artifactId>
+            <version>${version.resteasy}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.resteasy</groupId>
+            <artifactId>resteasy-multipart-provider</artifactId>
             <version>${version.resteasy}</version>
             <scope>test</scope>
         </dependency>
@@ -288,6 +300,11 @@
                         <goals>
                             <goal>report</goal>
                         </goals>
+                        <configuration>
+                            <excludes>
+                                <exclude>**/MultiPartRequestContext.class</exclude>
+                            </excludes>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

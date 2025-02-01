@@ -1,25 +1,39 @@
 package io.github.solaris.jaxrs.client.test.request;
 
 import static io.github.solaris.jaxrs.client.test.response.MockResponseCreators.withSuccess;
+import static io.github.solaris.jaxrs.client.test.util.JaxRsVendor.CXF;
+import static io.github.solaris.jaxrs.client.test.util.JaxRsVendor.JERSEY;
+import static io.github.solaris.jaxrs.client.test.util.JaxRsVendor.RESTEASY_REACTIVE;
+import static io.github.solaris.jaxrs.client.test.util.MultiParts.imagePart;
+import static io.github.solaris.jaxrs.client.test.util.MultiParts.jsonPart;
+import static io.github.solaris.jaxrs.client.test.util.MultiParts.partsBufferMatcher;
+import static io.github.solaris.jaxrs.client.test.util.MultiParts.plainPart;
 import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
 import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON_TYPE;
 import static jakarta.ws.rs.core.MediaType.APPLICATION_OCTET_STREAM;
 import static jakarta.ws.rs.core.MediaType.APPLICATION_OCTET_STREAM_TYPE;
 import static jakarta.ws.rs.core.MediaType.APPLICATION_SVG_XML;
 import static jakarta.ws.rs.core.MediaType.APPLICATION_SVG_XML_TYPE;
+import static jakarta.ws.rs.core.MediaType.MULTIPART_FORM_DATA_TYPE;
 import static jakarta.ws.rs.core.MediaType.TEXT_PLAIN_TYPE;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.core.Form;
+import jakarta.ws.rs.core.GenericEntity;
 import jakarta.ws.rs.core.MediaType;
 
 import io.github.solaris.jaxrs.client.test.server.MockRestServer;
 import io.github.solaris.jaxrs.client.test.util.FilterExceptionAssert;
 import io.github.solaris.jaxrs.client.test.util.MockClientRequestContext;
+import io.github.solaris.jaxrs.client.test.util.MultiParts.PartsBuffer;
 import io.github.solaris.jaxrs.client.test.util.extension.JaxRsVendorTest;
 
 class EntityRequestMatchersTest {
@@ -324,6 +338,114 @@ class EntityRequestMatchersTest {
                     .close())
                 .isInstanceOf(AssertionError.class)
                 .hasMessage("FormParam [name=greeting, position=0] expected: <salutations> but was: <hello>");
+        }
+    }
+
+    @JaxRsVendorTest(skipFor = {JERSEY, CXF, RESTEASY_REACTIVE})
+    void testMultipartForm() throws IOException {
+        Client client = ClientBuilder.newClient();
+        MockRestServer server = MockRestServer.bindTo(client).build();
+
+        server.expect(RequestMatchers.entity().multipartForm(List.of(plainPart(), imagePart(), jsonPart()))).andRespond(withSuccess());
+
+        try (client) {
+            assertThatCode(
+                () -> client.target("/hello")
+                    .request()
+                    .post(Entity.entity(new GenericEntity<>(List.of(plainPart(), imagePart(), jsonPart())) {}, MULTIPART_FORM_DATA_TYPE)).close())
+                .doesNotThrowAnyException();
+        }
+    }
+
+    @JaxRsVendorTest(skipFor = {JERSEY, CXF, RESTEASY_REACTIVE})
+    void testMultipartForm_noMatch(FilterExceptionAssert filterExceptionAssert) throws IOException {
+        Client client = ClientBuilder.newClient();
+        MockRestServer server = MockRestServer.bindTo(client).build();
+
+        AtomicReference<PartsBuffer> partsBuffer = new AtomicReference<>();
+        server.expect(partsBufferMatcher(List.of(plainPart()), partsBuffer))
+            .andExpect(RequestMatchers.entity().multipartForm(List.of(plainPart()))).andRespond(withSuccess());
+
+        try (client) {
+            filterExceptionAssert.assertThatThrownBy(
+                    () -> client.target("/hello")
+                        .request()
+                        .post(Entity.entity(new GenericEntity<>(List.of(plainPart(), imagePart(), jsonPart())) {}, MULTIPART_FORM_DATA_TYPE)).close())
+                .isInstanceOf(AssertionError.class)
+                .hasMessage("Multipart Form expected: <%s> but was: <%s>", partsBuffer.get().expected(), partsBuffer.get().actual());
+        }
+    }
+
+    @JaxRsVendorTest(skipFor = {JERSEY, CXF, RESTEASY_REACTIVE})
+    void testMultipartForm_noMatch_wrongOrder(FilterExceptionAssert filterExceptionAssert) throws IOException {
+        Client client = ClientBuilder.newClient();
+        MockRestServer server = MockRestServer.bindTo(client).build();
+
+        AtomicReference<PartsBuffer> partsBuffer = new AtomicReference<>();
+        server.expect(partsBufferMatcher(List.of(jsonPart(), imagePart(), plainPart()), partsBuffer))
+            .andExpect(RequestMatchers.entity().multipartForm(List.of(jsonPart(), imagePart(), plainPart()))).andRespond(withSuccess());
+
+        try (client) {
+            filterExceptionAssert.assertThatThrownBy(
+                    () -> client.target("/hello")
+                        .request()
+                        .post(Entity.entity(new GenericEntity<>(List.of(plainPart(), imagePart(), jsonPart())) {}, MULTIPART_FORM_DATA_TYPE)).close())
+                .isInstanceOf(AssertionError.class)
+                .hasMessage("Multipart Form expected: <%s> but was: <%s>", partsBuffer.get().expected(), partsBuffer.get().actual());
+        }
+    }
+
+    @JaxRsVendorTest(skipFor = {JERSEY, CXF, RESTEASY_REACTIVE})
+    void testMultipartFormContains() throws IOException {
+        Client client = ClientBuilder.newClient();
+        MockRestServer server = MockRestServer.bindTo(client).build();
+
+        server.expect(RequestMatchers.entity().multipartFormContains(List.of(plainPart(), jsonPart()))).andRespond(withSuccess());
+
+        try (client) {
+            assertThatCode(
+                () -> client.target("/hello")
+                    .request()
+                    .post(Entity.entity(new GenericEntity<>(List.of(plainPart(), imagePart(), jsonPart())) {}, MULTIPART_FORM_DATA_TYPE)).close())
+                .doesNotThrowAnyException();
+        }
+    }
+
+    @JaxRsVendorTest(skipFor = {JERSEY, CXF, RESTEASY_REACTIVE})
+    void testMultipartFormContains_subsetIsLarger(FilterExceptionAssert filterExceptionAssert) throws IOException {
+        Client client = ClientBuilder.newClient();
+        MockRestServer server = MockRestServer.bindTo(client).build();
+
+        AtomicReference<PartsBuffer> partsBuffer = new AtomicReference<>();
+        server.expect(partsBufferMatcher(List.of(jsonPart(), imagePart(), plainPart()), partsBuffer))
+            .andExpect(RequestMatchers.entity().multipartFormContains(List.of(jsonPart(), imagePart(), plainPart()))).andRespond(withSuccess());
+
+        try (client) {
+            filterExceptionAssert.assertThatThrownBy(
+                    () -> client.target("/hello")
+                        .request()
+                        .post(Entity.entity(new GenericEntity<>(List.of(plainPart(), imagePart())) {}, MULTIPART_FORM_DATA_TYPE)).close())
+                .isInstanceOf(AssertionError.class)
+                .hasMessage("Expected %s to be smaller or the same size as %s", partsBuffer.get().expected(), partsBuffer.get().actual());
+        }
+    }
+
+    @JaxRsVendorTest(skipFor = {JERSEY, CXF, RESTEASY_REACTIVE})
+    void testMultipartFormContains_noMatch(FilterExceptionAssert filterExceptionAssert) throws IOException {
+        Client client = ClientBuilder.newClient();
+        MockRestServer server = MockRestServer.bindTo(client).build();
+
+        AtomicReference<PartsBuffer> partsBuffer = new AtomicReference<>();
+        server.expect(partsBufferMatcher(List.of(jsonPart()), partsBuffer))
+            .andExpect(RequestMatchers.entity().multipartFormContains(List.of(jsonPart()))).andRespond(withSuccess());
+
+        try (client) {
+            filterExceptionAssert.assertThatThrownBy(
+                    () -> client.target("/hello")
+                        .request()
+                        .post(Entity.entity(new GenericEntity<>(List.of(plainPart(), imagePart())) {}, MULTIPART_FORM_DATA_TYPE)).close())
+                .isInstanceOf(AssertionError.class)
+                .hasMessage("Expected %s to contain all of %s", partsBuffer.get().actual(), partsBuffer.get().expected());
         }
     }
 

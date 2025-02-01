@@ -93,7 +93,7 @@ public abstract sealed class EntityConverterAssert {
                     request.getMediaType());
                 verify(providersSpy, times(times)).getMessageBodyReader(
                     String.class,
-                    null,
+                    String.class,
                     request.getEntityAnnotations(),
                     request.getMediaType());
             };

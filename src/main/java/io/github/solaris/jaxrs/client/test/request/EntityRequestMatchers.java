@@ -6,6 +6,7 @@ import static io.github.solaris.jaxrs.client.test.internal.Assertions.assertTrue
 import java.util.List;
 import java.util.Map;
 
+import jakarta.ws.rs.core.EntityPart;
 import jakarta.ws.rs.core.Form;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.MultivaluedMap;
@@ -77,7 +78,7 @@ public final class EntityRequestMatchers {
 
     /**
      * <p>Convert the request entity into a {@link Form} and assert that it contains the given subset.</p>
-     * <p>If the given subset contains more values for a key that the request, an {@link AssertionError} will be thrown.</p>
+     * <p>If the given subset contains more values for a key than the request, an {@link AssertionError} will be thrown.</p>
      * <p>
      * For each key in the expected subset, the n<sup>th</sup> value will be compared to the n<sup>th</sup> of the request {@code Form}.
      * Any additional values for the key in the request {@code Form} will be ignored.
@@ -103,6 +104,42 @@ public final class EntityRequestMatchers {
                     assertEqual("FormParam [name=" + name + ", position=" + i + "]", values.get(i), actualMap.get(name).get(i));
                 }
             }
+        };
+    }
+
+    /**
+     * Convert the request entity into a {@link List} of {@link EntityPart EntityParts}, buffer them
+     * and assert that it contains the given subset.
+     *
+     * @param expectedEntityParts The expected request entity
+     */
+    public RequestMatcher multipartForm(List<EntityPart> expectedEntityParts) {
+        return request -> {
+            EntityConverter converter = EntityConverter.fromRequestContext(request);
+            List<EntityPart> expectedParts = converter.bufferExpectedMultipart(expectedEntityParts);
+            List<EntityPart> actualParts = converter.bufferMultipartRequest(request);
+
+            assertEqual("Multipart Form", expectedParts, actualParts);
+        };
+    }
+
+    /**
+     * Convert the request entity into a {@link List} of {@link EntityPart EntityParts}, buffer them
+     * and compare them to the given {@code EntityParts}.
+     *
+     * <p>If the given subset contains more values than the request, an AssertionError will be thrown.</p>
+     *
+     * @param expectedEntityParts The expected subset
+     */
+    public RequestMatcher multipartFormContains(List<EntityPart> expectedEntityParts) {
+        return request -> {
+            EntityConverter converter = EntityConverter.fromRequestContext(request);
+            List<EntityPart> expectedParts = converter.bufferExpectedMultipart(expectedEntityParts);
+            List<EntityPart> actualParts = converter.bufferMultipartRequest(request);
+
+            assertTrue("Expected " + expectedParts + " to be smaller or the same size as " + actualParts,
+                expectedParts.size() <= actualParts.size());
+            assertTrue("Expected " + actualParts + " to contain all of " + expectedParts, actualParts.containsAll(expectedParts));
         };
     }
 }

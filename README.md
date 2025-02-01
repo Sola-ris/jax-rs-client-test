@@ -12,6 +12,7 @@ Heavily inspired by Spring's [Client testing infrastructure](https://docs.spring
     * [Mixing stubs and real requests](#mixing-stubs-and-real-requests)
     * [Request matchers](#request-matchers)
         * [Matching the request entity](#matching-the-request-entity)
+        * [Matching `multipart/form-data` (`EntityPart`)](#matching-multipartform-data-entitypart)
 * [Tested implementations](#tested-implementations)
 * [Limitations](#limitations)
 
@@ -154,7 +155,7 @@ RequestMatcher myMatcher = request -> {
 When implementing a `RequestMatcher`, the entity can be accessed via `ClientRequestContext#getEntity`.
 If the matcher requires a different representation of the entity, e.g. a JSON String instead of POJO, it can be converted via an `EntityConverter`,
 which can be obtained by calling `EntityConverter#fromRequestContext`. The `EntityConverter` has the same capabilities as the client that made the
-request, so if the client has a provider that can handle POJO -> JSON conversion, the `EntityConverter` can do it as well. For example:
+request, so if the client has a provider that can handle POJO -> JSON String conversion, the `EntityConverter` can do it as well. For example:
 
 [@formatter:off]: #
 ```java
@@ -166,6 +167,50 @@ RequestMatcher myMatcher = request -> {
     
     // assetions on the string
 };
+```
+[@formatter:on]: #
+
+#### Matching `multipart/form-data` (`EntityPart`)
+
+`EntityPart` hase certain limitations that require it to be handled separately from other request entities:
+
+* It is `InputStream` based, meaning its contents can only be accessed once
+* Implementations are not required to override `equals`, preventing comparison with another `EntityPart`
+
+The `EntityConverter` provides two methods to work around this:
+
+* `bufferExpectedMultipart`, which takes an arbitrary `List<EntityPart>` and buffers it
+* `bufferMultipartRequest`, which takes the `List<EntityPart>` from the current `ClientRequestContext`,
+  buffers it and sets the request up for further processing or repeated buffering in another `RequestMatcher`
+
+For example:
+
+[@formatter:off]: #
+```java
+EntityPart myEntityPart = EntityPart.withName("username")
+        .mediaType(MediaType.TEXT_PLAIN_TYPE)
+        .content("admin")
+        .build();
+
+RequestMatcher myMultipartMatcher = request -> {
+    EntityConverter converter = EntityConverter.fromRequestContext(request);
+    EntityPart myBufferedPart = converter.bufferExpectedMultipart(List.of(myEntityPart)).get(0);
+    // MediaType multipart/form-data and entity of type List<EntityPart> is assumed
+    EntityPart bufferedRequestPart = converter.bufferMultipartRequest(request).get(0);
+
+    // Assuming AssertJ is present
+
+    // Reading the content here does not prevent further reads
+    // in another matcher or during request execution
+    assertThat(myBufferedPart.getContent(String.class))
+            .isEqualTo(bufferedRequestPart.getContent(String.class))
+
+    // Buffered EntityParts implement equals()
+    assertThat(myBufferedPart)
+            .isEqualTo(bufferedRequestPart)
+};
+
+// Set up the MockRestServer and execute the request
 ```
 [@formatter:on]: #
 
