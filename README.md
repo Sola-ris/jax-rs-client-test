@@ -33,7 +33,8 @@ i.e. without starting a server. The following example shows how to do so with a 
 Client client = ClientBuilder.newClient();
 
 MockRestServer server = MockRestServer.bindTo(client).build();
-server.expect(RequestMatchers.requestTo("/users/42")).andRespond(MockResponseCreators.withNotFound());
+server.expect(RequestMatchers.requestTo("/users/42"))
+        .andRespond(MockResponseCreators.withNotFound());
 
 // Test code that uses the Client
 
@@ -57,8 +58,10 @@ The following example shows how to do so with a `WebTarget`:
 WebTarget target = ClientBuilder.newClient().target("");
 
 MockRestServer server = MockRestServer.bindTo(target).build();
-server.expect(ExpectedCount.max(3), RequestMatchers.requestTo("/hello")).andRespond(MockResponseCreators.withSuccess());
-server.expect(ExpectedCount.between(1, 2), RequestMatchers.requestTo("/goodbye")).andRespond(MockResponseCreators.withSuccess());
+server.expect(ExpectedCount.max(3), RequestMatchers.requestTo("/hello"))
+        .andRespond(MockResponseCreators.withSuccess());
+server.expect(ExpectedCount.between(1, 2), RequestMatchers.requestTo("/goodbye"))
+        .andRespond(MockResponseCreators.withSuccess());
 
 // Use the bound WebTarget e.g. by passing it to the class under test
 
@@ -74,7 +77,9 @@ This behavior can be changed by passing the desired `RequestOrder` to `withReque
 ```java
 ClientBuilder clientBuilder = ClientBuilder.newBuilder()
 
-MockRestServer server = MockRestServer.bindTo(clientBuilder).withRequestOrder(RequestOrder.UNORDERED).build();
+MockRestServer server = MockRestServer.bindTo(clientBuilder)
+        .withRequestOrder(RequestOrder.UNORDERED)
+        .build();
 ```
 
 The following options are available:
@@ -97,7 +102,8 @@ Client client = ClientBuilder.newClient();
 
 MockRestServer server = MockRestServer.bindTo(client).build();
 
-server.expect(RequestMatchers.requestTo("/profile/42")).andRespond(new ExecutingResponseCreator()); // <1>
+server.expect(RequestMatchers.requestTo("/profile/42"))
+        .andRespond(new ExecutingResponseCreator()); // <1>
 
 Client customClient = ClientBuilder.newBuilder().register(new MyAuthFilter()).build(); // <2>
 
