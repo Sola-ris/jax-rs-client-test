@@ -5,7 +5,7 @@ import io.quarkus.test.junit.QuarkusTest;
 import io.github.solaris.jaxrs.client.test.util.extension.QuarkusTestFactory;
 
 @QuarkusTest
-public class QuarkusJsonPathRequestMatchersTest extends QuarkusTestFactory {
+class QuarkusJsonPathRequestMatchersTest extends QuarkusTestFactory {
 
     @Override
     protected Object getTestInstance() {
