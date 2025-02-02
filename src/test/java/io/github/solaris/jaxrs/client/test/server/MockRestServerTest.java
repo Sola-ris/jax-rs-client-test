@@ -1,5 +1,6 @@
 package io.github.solaris.jaxrs.client.test.server;
 
+import static io.github.solaris.jaxrs.client.test.request.ExpectedCount.max;
 import static io.github.solaris.jaxrs.client.test.request.ExpectedCount.min;
 import static io.github.solaris.jaxrs.client.test.request.ExpectedCount.times;
 import static io.github.solaris.jaxrs.client.test.request.RequestMatchers.requestTo;
@@ -123,16 +124,86 @@ public class MockRestServerTest {
         }
 
         @JaxRsVendorTest
-        void testReset() {
+        void testReset(FilterExceptionAssert filterExceptionAssert) {
             ClientBuilder builder = ClientBuilder.newBuilder();
             MockRestServer server = MockRestServer.bindTo(builder).build();
 
-            server.expect(requestTo("/hello")).andRespond(withSuccess());
+            server.expect(max(2), requestTo("/hello")).andRespond(withSuccess());
 
             try (Client client = builder.build()) {
                 assertThat(client.target("/hello").request().get().getStatusInfo().toEnum()).isEqualTo(OK);
 
                 server.verify();
+                server.reset();
+
+                filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().get().close())
+                    .isInstanceOf(AssertionError.class)
+                    .hasMessage("""
+                        No further requests expected: HTTP GET /hello
+                        0 request(s) executed.
+                        """);
+
+                // Clear failed request
+                server.reset();
+
+                server.expect(requestTo("/goodbye")).andRespond(withSuccess());
+                assertThat(client.target("/goodbye").request().get().getStatusInfo().toEnum()).isEqualTo(OK);
+
+                server.verify();
+            }
+        }
+
+        @JaxRsVendorTest
+        void testReset_unordered(FilterExceptionAssert filterExceptionAssert) {
+            ClientBuilder builder = ClientBuilder.newBuilder();
+            MockRestServer server = MockRestServer.bindTo(builder).withRequestOrder(UNORDERED).build();
+
+            server.expect(max(2), requestTo("/hello")).andRespond(withSuccess());
+
+            try (Client client = builder.build()) {
+                assertThat(client.target("/hello").request().get().getStatusInfo().toEnum()).isEqualTo(OK);
+
+                server.verify();
+                server.reset();
+
+                filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().get().close())
+                    .isInstanceOf(AssertionError.class)
+                    .hasMessage("""
+                        No further requests expected: HTTP GET /hello
+                        0 request(s) executed.
+                        """);
+
+                // Clear failed request
+                server.reset();
+
+                server.expect(requestTo("/goodbye")).andRespond(withSuccess());
+                assertThat(client.target("/goodbye").request().get().getStatusInfo().toEnum()).isEqualTo(OK);
+
+                server.verify();
+            }
+        }
+
+        @JaxRsVendorTest
+        void testReset_strict(FilterExceptionAssert filterExceptionAssert) {
+            ClientBuilder builder = ClientBuilder.newBuilder();
+            MockRestServer server = MockRestServer.bindTo(builder).withRequestOrder(STRICT).build();
+
+            server.expect(max(2), requestTo("/hello")).andRespond(withSuccess());
+
+            try (Client client = builder.build()) {
+                assertThat(client.target("/hello").request().get().getStatusInfo().toEnum()).isEqualTo(OK);
+
+                server.verify();
+                server.reset();
+
+                filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().get().close())
+                    .isInstanceOf(AssertionError.class)
+                    .hasMessage("""
+                        No further requests expected: HTTP GET /hello
+                        0 request(s) executed.
+                        """);
+
+                // Clear failed request
                 server.reset();
 
                 server.expect(requestTo("/goodbye")).andRespond(withSuccess());
@@ -438,16 +509,86 @@ public class MockRestServerTest {
         }
 
         @JaxRsVendorTest
-        void testReset() {
+        void testReset(FilterExceptionAssert filterExceptionAssert) {
             Client client = ClientBuilder.newClient();
             MockRestServer server = MockRestServer.bindTo(client).build();
 
-            server.expect(requestTo("/hello")).andRespond(withSuccess());
+            server.expect(max(2), requestTo("/hello")).andRespond(withSuccess());
 
             try (client) {
                 assertThat(client.target("/hello").request().get().getStatusInfo().toEnum()).isEqualTo(OK);
 
                 server.verify();
+                server.reset();
+
+                filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().get().close())
+                    .isInstanceOf(AssertionError.class)
+                    .hasMessage("""
+                        No further requests expected: HTTP GET /hello
+                        0 request(s) executed.
+                        """);
+
+                // Clear failed request
+                server.reset();
+
+                server.expect(requestTo("/goodbye")).andRespond(withSuccess());
+                assertThat(client.target("/goodbye").request().get().getStatusInfo().toEnum()).isEqualTo(OK);
+
+                server.verify();
+            }
+        }
+
+        @JaxRsVendorTest
+        void testReset_unordered(FilterExceptionAssert filterExceptionAssert) {
+            Client client = ClientBuilder.newClient();
+            MockRestServer server = MockRestServer.bindTo(client).build();
+
+            server.expect(max(2), requestTo("/hello")).andRespond(withSuccess());
+
+            try (client) {
+                assertThat(client.target("/hello").request().get().getStatusInfo().toEnum()).isEqualTo(OK);
+
+                server.verify();
+                server.reset();
+
+                filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().get().close())
+                    .isInstanceOf(AssertionError.class)
+                    .hasMessage("""
+                        No further requests expected: HTTP GET /hello
+                        0 request(s) executed.
+                        """);
+
+                // Clear failed request
+                server.reset();
+
+                server.expect(requestTo("/goodbye")).andRespond(withSuccess());
+                assertThat(client.target("/goodbye").request().get().getStatusInfo().toEnum()).isEqualTo(OK);
+
+                server.verify();
+            }
+        }
+
+        @JaxRsVendorTest
+        void testReset_strict(FilterExceptionAssert filterExceptionAssert) {
+            Client client = ClientBuilder.newClient();
+            MockRestServer server = MockRestServer.bindTo(client).build();
+
+            server.expect(max(2), requestTo("/hello")).andRespond(withSuccess());
+
+            try (client) {
+                assertThat(client.target("/hello").request().get().getStatusInfo().toEnum()).isEqualTo(OK);
+
+                server.verify();
+                server.reset();
+
+                filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().get().close())
+                    .isInstanceOf(AssertionError.class)
+                    .hasMessage("""
+                        No further requests expected: HTTP GET /hello
+                        0 request(s) executed.
+                        """);
+
+                // Clear failed request
                 server.reset();
 
                 server.expect(requestTo("/goodbye")).andRespond(withSuccess());
@@ -728,17 +869,89 @@ public class MockRestServerTest {
         }
 
         @JaxRsVendorTest
-        void testReset() {
+        void testReset(FilterExceptionAssert filterExceptionAssert) {
             Client client = ClientBuilder.newClient();
             WebTarget target = client.target("");
             MockRestServer server = MockRestServer.bindTo(target).build();
 
-            server.expect(requestTo("/hello")).andRespond(withSuccess());
+            server.expect(max(2), requestTo("/hello")).andRespond(withSuccess());
 
             try (client) {
                 assertThat(target.path("/hello").request().get().getStatusInfo().toEnum()).isEqualTo(OK);
 
                 server.verify();
+                server.reset();
+
+                filterExceptionAssert.assertThatThrownBy(() -> target.path("/hello").request().get().close())
+                    .isInstanceOf(AssertionError.class)
+                    .hasMessage("""
+                        No further requests expected: HTTP GET /hello
+                        0 request(s) executed.
+                        """);
+
+                // Clear failed request
+                server.reset();
+
+                server.expect(requestTo("/goodbye")).andRespond(withSuccess());
+                assertThat(target.path("/goodbye").request().get().getStatusInfo().toEnum()).isEqualTo(OK);
+
+                server.verify();
+            }
+        }
+
+        @JaxRsVendorTest
+        void testReset_unordered(FilterExceptionAssert filterExceptionAssert) {
+            Client client = ClientBuilder.newClient();
+            WebTarget target = client.target("");
+            MockRestServer server = MockRestServer.bindTo(target).build();
+
+            server.expect(max(2), requestTo("/hello")).andRespond(withSuccess());
+
+            try (client) {
+                assertThat(target.path("/hello").request().get().getStatusInfo().toEnum()).isEqualTo(OK);
+
+                server.verify();
+                server.reset();
+
+                filterExceptionAssert.assertThatThrownBy(() -> target.path("/hello").request().get().close())
+                    .isInstanceOf(AssertionError.class)
+                    .hasMessage("""
+                        No further requests expected: HTTP GET /hello
+                        0 request(s) executed.
+                        """);
+
+                // Clear failed request
+                server.reset();
+
+                server.expect(requestTo("/goodbye")).andRespond(withSuccess());
+                assertThat(target.path("/goodbye").request().get().getStatusInfo().toEnum()).isEqualTo(OK);
+
+                server.verify();
+            }
+        }
+
+        @JaxRsVendorTest
+        void testReset_strict(FilterExceptionAssert filterExceptionAssert) {
+            Client client = ClientBuilder.newClient();
+            WebTarget target = client.target("");
+            MockRestServer server = MockRestServer.bindTo(target).build();
+
+            server.expect(max(2), requestTo("/hello")).andRespond(withSuccess());
+
+            try (client) {
+                assertThat(target.path("/hello").request().get().getStatusInfo().toEnum()).isEqualTo(OK);
+
+                server.verify();
+                server.reset();
+
+                filterExceptionAssert.assertThatThrownBy(() -> target.path("/hello").request().get().close())
+                    .isInstanceOf(AssertionError.class)
+                    .hasMessage("""
+                        No further requests expected: HTTP GET /hello
+                        0 request(s) executed.
+                        """);
+
+                // Clear failed request
                 server.reset();
 
                 server.expect(requestTo("/goodbye")).andRespond(withSuccess());
@@ -956,7 +1169,7 @@ public class MockRestServerTest {
             RestClientBuilder restClientBuilder = RestClientBuilder.newBuilder().baseUri("http://localhost");
             MockRestServer server = MockRestServer.bindTo(restClientBuilder).withRequestOrder(STRICT).build();
 
-            server.expect(times(2),requestTo("http://localhost/hello")).andRespond(withSuccess());
+            server.expect(times(2), requestTo("http://localhost/hello")).andRespond(withSuccess());
             server.expect(requestTo("http://localhost/goodbye")).andRespond(withSuccess());
 
             assertThatCode(() -> {
@@ -1002,16 +1215,86 @@ public class MockRestServerTest {
         }
 
         @JaxRsVendorTest(skipFor = CXF)
-        void testReset() throws Exception {
+        void testReset(FilterExceptionAssert filterExceptionAssert) throws Exception {
             RestClientBuilder restClientBuilder = RestClientBuilder.newBuilder().baseUri("http://localhost");
             MockRestServer server = MockRestServer.bindTo(restClientBuilder).build();
 
-            server.expect(requestTo("http://localhost/hello")).andRespond(withSuccess());
+            server.expect(max(2), requestTo("http://localhost/hello")).andRespond(withSuccess());
 
             try (GreetingSendoffClient client = restClientBuilder.build(GreetingSendoffClient.class)) {
                 assertThat(client.greeting().getStatusInfo().toEnum()).isEqualTo(OK);
 
                 server.verify();
+                server.reset();
+
+                filterExceptionAssert.assertThatThrownBy(() -> client.greeting().close())
+                    .isInstanceOf(AssertionError.class)
+                    .hasMessage("""
+                        No further requests expected: HTTP GET http://localhost/hello
+                        0 request(s) executed.
+                        """);
+
+                // Clear failed request
+                server.reset();
+
+                server.expect(requestTo("http://localhost/goodbye")).andRespond(withSuccess());
+                assertThat(client.sendoff().getStatusInfo().toEnum()).isEqualTo(OK);
+
+                server.verify();
+            }
+        }
+
+        @JaxRsVendorTest(skipFor = CXF)
+        void testReset_unordered(FilterExceptionAssert filterExceptionAssert) throws Exception {
+            RestClientBuilder restClientBuilder = RestClientBuilder.newBuilder().baseUri("http://localhost");
+            MockRestServer server = MockRestServer.bindTo(restClientBuilder).build();
+
+            server.expect(max(2), requestTo("http://localhost/hello")).andRespond(withSuccess());
+
+            try (GreetingSendoffClient client = restClientBuilder.build(GreetingSendoffClient.class)) {
+                assertThat(client.greeting().getStatusInfo().toEnum()).isEqualTo(OK);
+
+                server.verify();
+                server.reset();
+
+                filterExceptionAssert.assertThatThrownBy(() -> client.greeting().close())
+                    .isInstanceOf(AssertionError.class)
+                    .hasMessage("""
+                        No further requests expected: HTTP GET http://localhost/hello
+                        0 request(s) executed.
+                        """);
+
+                // Clear failed request
+                server.reset();
+
+                server.expect(requestTo("http://localhost/goodbye")).andRespond(withSuccess());
+                assertThat(client.sendoff().getStatusInfo().toEnum()).isEqualTo(OK);
+
+                server.verify();
+            }
+        }
+
+        @JaxRsVendorTest(skipFor = CXF)
+        void testReset_strict(FilterExceptionAssert filterExceptionAssert) throws Exception {
+            RestClientBuilder restClientBuilder = RestClientBuilder.newBuilder().baseUri("http://localhost");
+            MockRestServer server = MockRestServer.bindTo(restClientBuilder).build();
+
+            server.expect(max(2), requestTo("http://localhost/hello")).andRespond(withSuccess());
+
+            try (GreetingSendoffClient client = restClientBuilder.build(GreetingSendoffClient.class)) {
+                assertThat(client.greeting().getStatusInfo().toEnum()).isEqualTo(OK);
+
+                server.verify();
+                server.reset();
+
+                filterExceptionAssert.assertThatThrownBy(() -> client.greeting().close())
+                    .isInstanceOf(AssertionError.class)
+                    .hasMessage("""
+                        No further requests expected: HTTP GET http://localhost/hello
+                        0 request(s) executed.
+                        """);
+
+                // Clear failed request
                 server.reset();
 
                 server.expect(requestTo("http://localhost/goodbye")).andRespond(withSuccess());

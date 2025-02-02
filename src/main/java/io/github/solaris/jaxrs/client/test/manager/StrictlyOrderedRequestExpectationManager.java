@@ -45,4 +45,10 @@ public class StrictlyOrderedRequestExpectationManager extends RequestExpectation
         }
         return matchingExpectation;
     }
+
+    @Override
+    public void reset() {
+        super.reset();
+        expectations.clear();
+    }
 }
