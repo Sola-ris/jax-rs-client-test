@@ -158,4 +158,15 @@ class StrictlyOrderedRequestExpectationManagerTest {
                 GET /goodbye
                 """);
     }
+
+    @Test
+    void testExpectationAfterFirstRequest() {
+        manager.expectRequest(max(2), requestTo("/hello")).andExpect(method(GET)).andRespond(withSuccess());
+
+        assertThatCode(() -> manager.validateRequest(new MockClientRequestContext(GET, "/hello")).close()).doesNotThrowAnyException();
+
+        assertThatThrownBy(() -> manager.expectRequest(once(), requestTo("/goodbye")))
+            .isInstanceOf(IllegalStateException.class)
+            .hasMessage("Cannot declare further expectations after the first request.");
+    }
 }
