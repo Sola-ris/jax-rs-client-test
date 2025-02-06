@@ -14,8 +14,9 @@ import java.util.List;
 import jakarta.ws.rs.core.MultivaluedHashMap;
 import jakarta.ws.rs.core.MultivaluedMap;
 
-import io.github.solaris.jaxrs.client.test.util.MockClientRequestContext;
 import org.junit.jupiter.api.Test;
+
+import io.github.solaris.jaxrs.client.test.util.MockClientRequestContext;
 
 class RequestMatchersTest {
 

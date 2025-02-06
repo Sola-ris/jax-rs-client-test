@@ -1,8 +1,7 @@
 package io.github.solaris.jaxrs.client.test.server;
 
-import io.quarkus.test.junit.QuarkusTest;
-
 import io.github.solaris.jaxrs.client.test.util.extension.QuarkusTestFactory;
+import io.quarkus.test.junit.QuarkusTest;
 
 @QuarkusTest
 class QuarkusMockRestServerTest extends QuarkusTestFactory {

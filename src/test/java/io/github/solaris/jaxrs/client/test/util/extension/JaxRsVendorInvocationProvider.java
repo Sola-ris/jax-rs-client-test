@@ -8,12 +8,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
-import io.github.solaris.jaxrs.client.test.util.JaxRsVendor;
 import org.junit.jupiter.api.extension.Extension;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.TestTemplateInvocationContext;
 import org.junit.jupiter.api.extension.TestTemplateInvocationContextProvider;
 import org.junit.platform.commons.support.AnnotationSupport;
+
+import io.github.solaris.jaxrs.client.test.util.JaxRsVendor;
 
 class JaxRsVendorInvocationProvider implements TestTemplateInvocationContextProvider {
 

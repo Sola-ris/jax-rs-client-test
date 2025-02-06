@@ -6,7 +6,6 @@ import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.ext.RuntimeDelegate;
 
 import org.eclipse.microprofile.rest.client.spi.RestClientBuilderResolver;
-
 import org.glassfish.jersey.client.JerseyClientBuilder;
 import org.glassfish.jersey.inject.hk2.Hk2InjectionManagerFactory;
 import org.glassfish.jersey.inject.injectless.NonInjectionManagerFactory;

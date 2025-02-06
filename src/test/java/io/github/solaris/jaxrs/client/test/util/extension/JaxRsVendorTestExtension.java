@@ -9,6 +9,12 @@ import java.lang.reflect.Method;
 import jakarta.ws.rs.ext.RuntimeDelegate;
 
 import org.eclipse.microprofile.rest.client.spi.RestClientBuilderResolver;
+import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.api.extension.InvocationInterceptor;
+import org.junit.jupiter.api.extension.ParameterContext;
+import org.junit.jupiter.api.extension.ParameterResolutionException;
+import org.junit.jupiter.api.extension.ParameterResolver;
+import org.junit.jupiter.api.extension.ReflectiveInvocationContext;
 
 import io.github.solaris.jaxrs.client.test.util.ConfiguredClientSupplier;
 import io.github.solaris.jaxrs.client.test.util.ConfiguredClientSupplier.CxfClientSupplier;
@@ -20,12 +26,6 @@ import io.github.solaris.jaxrs.client.test.util.FilterExceptionAssert;
 import io.github.solaris.jaxrs.client.test.util.FilterExceptionAssert.CxfFilterExceptionAssert;
 import io.github.solaris.jaxrs.client.test.util.FilterExceptionAssert.DefaultFilterExceptionAssert;
 import io.github.solaris.jaxrs.client.test.util.JaxRsVendor;
-import org.junit.jupiter.api.extension.ExtensionContext;
-import org.junit.jupiter.api.extension.InvocationInterceptor;
-import org.junit.jupiter.api.extension.ParameterContext;
-import org.junit.jupiter.api.extension.ParameterResolutionException;
-import org.junit.jupiter.api.extension.ParameterResolver;
-import org.junit.jupiter.api.extension.ReflectiveInvocationContext;
 
 class JaxRsVendorTestExtension implements InvocationInterceptor, ParameterResolver {
     private final JaxRsVendor vendor;

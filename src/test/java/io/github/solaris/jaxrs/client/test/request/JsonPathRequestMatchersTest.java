@@ -9,14 +9,17 @@ import java.util.Map;
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.Entity;
 
+import org.jspecify.annotations.Nullable;
+
 import com.jayway.jsonpath.JsonPathException;
+
 import io.github.solaris.jaxrs.client.test.server.MockRestServer;
 import io.github.solaris.jaxrs.client.test.util.ConfiguredClientSupplier;
 import io.github.solaris.jaxrs.client.test.util.FilterExceptionAssert;
 import io.github.solaris.jaxrs.client.test.util.extension.JaxRsVendorTest;
 import io.github.solaris.jaxrs.client.test.util.extension.RunInQuarkus;
+
 import net.minidev.json.JSONArray;
-import org.jspecify.annotations.Nullable;
 
 @RunInQuarkus
 class JsonPathRequestMatchersTest {

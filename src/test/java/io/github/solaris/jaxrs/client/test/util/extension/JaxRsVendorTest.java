@@ -7,10 +7,11 @@ import static org.junit.jupiter.api.parallel.ExecutionMode.SAME_THREAD;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import io.github.solaris.jaxrs.client.test.util.JaxRsVendor;
 import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.parallel.Execution;
+
+import io.github.solaris.jaxrs.client.test.util.JaxRsVendor;
 
 @TestTemplate
 @Target(METHOD)

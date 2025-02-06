@@ -94,6 +94,7 @@ public abstract class RequestExpectationManager {
             throw new AssertionError(builder);
         }
     }
+
     /**
      * @see io.github.solaris.jaxrs.client.test.server.MockRestServer#verify(Duration) MockRestServer.verify(Duration)
      */

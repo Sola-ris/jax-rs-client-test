@@ -13,8 +13,9 @@ import static jakarta.ws.rs.HttpMethod.POST;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import io.github.solaris.jaxrs.client.test.util.MockClientRequestContext;
 import org.junit.jupiter.api.Test;
+
+import io.github.solaris.jaxrs.client.test.util.MockClientRequestContext;
 
 class StrictlyOrderedRequestExpectationManagerTest {
     private final RequestExpectationManager manager = new StrictlyOrderedRequestExpectationManager();
@@ -87,7 +88,7 @@ class StrictlyOrderedRequestExpectationManagerTest {
 
         assertThatCode(manager::verify).doesNotThrowAnyException();
     }
-    
+
     @Test
     void testFirstRequestSatisfiedSecondWithCallsRemainingThirdSatisfied() {
         manager.expectRequest(times(2), requestTo("/hello")).andExpect(method(GET)).andRespond(withSuccess());

@@ -23,15 +23,17 @@ import jakarta.ws.rs.core.MultivaluedHashMap;
 import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.Response;
 
-import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
-import com.sun.net.httpserver.HttpServer;
-import io.github.solaris.jaxrs.client.test.server.MockRestServer;
-import io.github.solaris.jaxrs.client.test.util.extension.JaxRsVendorTest;
 import org.jspecify.annotations.NullUnmarked;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpHandler;
+import com.sun.net.httpserver.HttpServer;
+
+import io.github.solaris.jaxrs.client.test.server.MockRestServer;
+import io.github.solaris.jaxrs.client.test.util.extension.JaxRsVendorTest;
 
 @NullUnmarked
 class ExecutingResponseCreatorTest {

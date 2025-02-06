@@ -23,14 +23,14 @@ import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.client.WebTarget;
 
+import org.assertj.core.api.Assertions;
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
+import org.junit.jupiter.api.Nested;
 
 import io.github.solaris.jaxrs.client.test.util.FilterExceptionAssert;
 import io.github.solaris.jaxrs.client.test.util.GreetingSendoffClient;
 import io.github.solaris.jaxrs.client.test.util.extension.JaxRsVendorTest;
 import io.github.solaris.jaxrs.client.test.util.extension.RunInQuarkus;
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.Nested;
 
 class MockRestServerTest {
 

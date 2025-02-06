@@ -7,11 +7,12 @@ import jakarta.ws.rs.client.ClientRequestFilter;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.ext.Providers;
 
+import org.jspecify.annotations.Nullable;
+
 import io.github.solaris.jaxrs.client.test.manager.RequestExpectationManager;
 import io.github.solaris.jaxrs.client.test.request.ClientEntityConverter;
 import io.github.solaris.jaxrs.client.test.request.EntityConverter;
 import io.github.solaris.jaxrs.client.test.request.ProvidersEntityConverter;
-import org.jspecify.annotations.Nullable;
 
 /**
  * <p>Filter that redirects the current request to a {@link RequestExpectationManager} bound via {@link MockRestServer}.</p>

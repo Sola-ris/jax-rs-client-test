@@ -7,11 +7,12 @@ import java.util.List;
 import jakarta.ws.rs.client.ClientRequestContext;
 import jakarta.ws.rs.core.Response;
 
+import org.jspecify.annotations.Nullable;
+
 import io.github.solaris.jaxrs.client.test.request.ExpectedCount;
 import io.github.solaris.jaxrs.client.test.request.RequestMatcher;
 import io.github.solaris.jaxrs.client.test.response.ResponseActions;
 import io.github.solaris.jaxrs.client.test.response.ResponseCreator;
-import org.jspecify.annotations.Nullable;
 
 class RequestExpectation implements RequestMatcher, ResponseActions, ResponseCreator {
 

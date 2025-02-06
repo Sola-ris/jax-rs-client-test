@@ -28,9 +28,10 @@ import java.net.URI;
 
 import jakarta.ws.rs.core.Response;
 
+import org.junit.jupiter.api.Test;
+
 import io.github.solaris.jaxrs.client.test.util.MockClientRequestContext;
 import io.github.solaris.jaxrs.client.test.util.extension.JaxRsVendorTest;
-import org.junit.jupiter.api.Test;
 
 class MockResponseCreatorsTest {
 
@@ -188,7 +189,8 @@ class MockResponseCreatorsTest {
         }
     }
 
-    @JaxRsVendorTest(skipFor = CXF) // CXF doesn't support status codes > 599
+    // CXF doesn't support status codes > 599
+    @JaxRsVendorTest(skipFor = CXF)
     void testCustomStatus_familyOther() {
         try (Response response = MockResponseCreators.withStatus(999).createResponse(new MockClientRequestContext())) {
             assertThat(response).satisfies(

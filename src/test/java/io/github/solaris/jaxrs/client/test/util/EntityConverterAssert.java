@@ -16,13 +16,14 @@ import jakarta.ws.rs.core.GenericType;
 import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.ext.Providers;
 
+import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
+
 import io.github.solaris.jaxrs.client.test.request.ClientEntityConverter;
 import io.github.solaris.jaxrs.client.test.request.EntityConverter;
 import io.github.solaris.jaxrs.client.test.request.ProvidersEntityConverter;
 import io.github.solaris.jaxrs.client.test.request.RequestMatcher;
-import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
-import org.mockito.MockedStatic;
-import org.mockito.Mockito;
 
 public abstract sealed class EntityConverterAssert {
     private static final GenericType<MultivaluedMap<String, String>> GENERIC_TYPE = new GenericType<>() {};

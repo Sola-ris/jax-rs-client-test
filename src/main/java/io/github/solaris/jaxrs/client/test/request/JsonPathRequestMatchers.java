@@ -9,8 +9,9 @@ import java.util.Map;
 
 import jakarta.ws.rs.client.ClientRequestContext;
 
-import com.jayway.jsonpath.JsonPath;
 import org.jspecify.annotations.Nullable;
+
+import com.jayway.jsonpath.JsonPath;
 
 /**
  * Factory for {@link RequestMatcher} implementations that use a <a href="https://github.com/jayway/JsonPath">JsonPath</a> expression.

@@ -10,6 +10,8 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.nio.file.StandardOpenOption.APPEND;
 import static java.nio.file.StandardOpenOption.READ;
 
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
@@ -18,9 +20,6 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.imageio.ImageIO;
-
-import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
 
 import jakarta.ws.rs.core.EntityPart;
 import jakarta.ws.rs.core.MediaType;

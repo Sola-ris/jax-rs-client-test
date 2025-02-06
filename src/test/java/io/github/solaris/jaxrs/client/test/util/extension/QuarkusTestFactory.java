@@ -13,15 +13,15 @@ import java.util.stream.Stream;
 import jakarta.ws.rs.ext.RuntimeDelegate;
 
 import org.eclipse.microprofile.rest.client.spi.RestClientBuilderResolver;
+import org.junit.jupiter.api.DynamicNode;
+import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.TestFactory;
+import org.junit.platform.commons.support.ReflectionSupport;
 
 import io.github.solaris.jaxrs.client.test.util.ConfiguredClientSupplier;
 import io.github.solaris.jaxrs.client.test.util.ConfiguredClientSupplier.DefaultClientSupplier;
 import io.github.solaris.jaxrs.client.test.util.FilterExceptionAssert;
 import io.github.solaris.jaxrs.client.test.util.FilterExceptionAssert.DefaultFilterExceptionAssert;
-import org.junit.jupiter.api.DynamicNode;
-import org.junit.jupiter.api.DynamicTest;
-import org.junit.jupiter.api.TestFactory;
-import org.junit.platform.commons.support.ReflectionSupport;
 
 public abstract class QuarkusTestFactory {
 

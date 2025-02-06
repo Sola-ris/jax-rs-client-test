@@ -17,8 +17,9 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.io.IOException;
 import java.net.SocketException;
 
-import io.github.solaris.jaxrs.client.test.util.MockClientRequestContext;
 import org.junit.jupiter.api.Test;
+
+import io.github.solaris.jaxrs.client.test.util.MockClientRequestContext;
 
 class OrderedRequestExpectationManagerTest {
     private final RequestExpectationManager manager = new OrderedRequestExpectationManager();

@@ -19,12 +19,13 @@ import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlElementWrapper;
 import jakarta.xml.bind.annotation.XmlRootElement;
 
+import org.jspecify.annotations.NullUnmarked;
+import org.xml.sax.SAXParseException;
+
 import io.github.solaris.jaxrs.client.test.server.MockRestServer;
 import io.github.solaris.jaxrs.client.test.util.FilterExceptionAssert;
 import io.github.solaris.jaxrs.client.test.util.extension.JaxRsVendorTest;
 import io.github.solaris.jaxrs.client.test.util.extension.RunInQuarkus;
-import org.jspecify.annotations.NullUnmarked;
-import org.xml.sax.SAXParseException;
 
 @RunInQuarkus
 class XpathRequestMatchersTest {
@@ -43,7 +44,8 @@ class XpathRequestMatchersTest {
             <greeting xml:lang='de'>hallo</greeting>
         </xmlDto>""";
 
-    @JaxRsVendorTest(skipFor = JERSEY) // Jersey without HK2 throws an NPE when trying to obtain the XML string using the ClientEntityConverter
+    // Jersey without HK2 throws an NPE when trying to obtain the XML string using the ClientEntityConverter
+    @JaxRsVendorTest(skipFor = JERSEY)
     void testExists() throws XPathExpressionException {
         Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();

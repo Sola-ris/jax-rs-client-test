@@ -20,7 +20,7 @@ public interface RequestMatcher {
      * Match the given {@link ClientRequestContext} against specific expectations.
      *
      * @param request The current request to match on
-     * @throws IOException In case of an I/O error
+     * @throws IOException    In case of an I/O error
      * @throws AssertionError If the request does not match
      */
     void match(ClientRequestContext request) throws IOException, AssertionError;

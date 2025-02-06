@@ -5,6 +5,7 @@ target/
 
 ### IntelliJ IDEA ###
 .idea/*
+!.idea/codeStyles/
 !.idea/runConfigurations/
 *.iws
 *.iml

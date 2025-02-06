@@ -11,8 +11,9 @@ import static jakarta.ws.rs.HttpMethod.GET;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import io.github.solaris.jaxrs.client.test.util.MockClientRequestContext;
 import org.junit.jupiter.api.Test;
+
+import io.github.solaris.jaxrs.client.test.util.MockClientRequestContext;
 
 class UnorderedRequestExpectationManagerTest {
     private final RequestExpectationManager manager = new UnorderedRequestExpectationManager();
