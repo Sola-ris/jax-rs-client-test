@@ -30,8 +30,8 @@ class StrictlyOrderedRequestExpectationManagerTest {
         manager.expectRequest(once(), requestTo("/hello"));
 
         assertThatThrownBy(() -> manager.validateRequest(new MockClientRequestContext(GET, "/hello")).close())
-            .isInstanceOf(IllegalStateException.class)
-            .hasMessage("Call to createResponse before responseCreator was set.");
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("Call to createResponse before responseCreator was set.");
     }
 
     @Test
@@ -39,27 +39,27 @@ class StrictlyOrderedRequestExpectationManagerTest {
         manager.expectRequest(never(), requestTo("/hello"));
 
         assertThatThrownBy(() -> manager.validateRequest(new MockClientRequestContext(GET, "/hello")).close())
-            .isInstanceOf(AssertionError.class)
-            .hasMessage("Received more calls than expected.");
+                .isInstanceOf(AssertionError.class)
+                .hasMessage("Received more calls than expected.");
 
         assertThatThrownBy(manager::verify)
-            .isInstanceOf(AssertionError.class)
-            .hasMessage("""
-                Some requests did not execute successfully.
-                
-                Failed request:
-                GET /hello
-                java.lang.AssertionError: Received more calls than expected.""");
+                .isInstanceOf(AssertionError.class)
+                .hasMessage("""
+                        Some requests did not execute successfully.
+                        
+                        Failed request:
+                        GET /hello
+                        java.lang.AssertionError: Received more calls than expected.""");
     }
 
     @Test
     void testUnexpectedRequest() {
         assertThatThrownBy(() -> manager.validateRequest(new MockClientRequestContext(GET, "/hello")).close())
-            .isInstanceOf(AssertionError.class)
-            .hasMessage("""
-                No further requests expected: HTTP GET /hello
-                0 request(s) executed.
-                """);
+                .isInstanceOf(AssertionError.class)
+                .hasMessage("""
+                        No further requests expected: HTTP GET /hello
+                        0 request(s) executed.
+                        """);
     }
 
     @Test
@@ -111,11 +111,11 @@ class StrictlyOrderedRequestExpectationManagerTest {
         manager.expectRequest(once(), requestTo("/goodbye")).andExpect(method(GET)).andRespond(withSuccess());
 
         assertThatCode(() -> manager.validateRequest(new MockClientRequestContext(GET, "/hello")).close())
-            .doesNotThrowAnyException();
+                .doesNotThrowAnyException();
 
         assertThatThrownBy(() -> manager.validateRequest(new MockClientRequestContext(GET, "/goodbye")).close())
-            .isInstanceOf(AssertionError.class)
-            .hasMessage("Unexpected Request. expected: </hello> but was: </goodbye>");
+                .isInstanceOf(AssertionError.class)
+                .hasMessage("Unexpected Request. expected: </hello> but was: </goodbye>");
     }
 
     @Test
@@ -129,13 +129,13 @@ class StrictlyOrderedRequestExpectationManagerTest {
         }).doesNotThrowAnyException();
 
         assertThatThrownBy(manager::verify)
-            .isInstanceOf(AssertionError.class)
-            .hasMessage("""
-                Further request(s) expected leaving 1 unsatisfied expectation(s).
-                2 request(s) executed:
-                GET /hello
-                GET /hello
-                """);
+                .isInstanceOf(AssertionError.class)
+                .hasMessage("""
+                        Further request(s) expected leaving 1 unsatisfied expectation(s).
+                        2 request(s) executed:
+                        GET /hello
+                        GET /hello
+                        """);
     }
 
     @Test
@@ -150,14 +150,14 @@ class StrictlyOrderedRequestExpectationManagerTest {
         }).doesNotThrowAnyException();
 
         assertThatThrownBy(() -> manager.validateRequest(new MockClientRequestContext(GET, "/hello")).close())
-            .isInstanceOf(AssertionError.class)
-            .hasMessage("""
-                No further requests expected: HTTP GET /hello
-                3 request(s) executed:
-                GET /hello
-                GET /hello
-                GET /goodbye
-                """);
+                .isInstanceOf(AssertionError.class)
+                .hasMessage("""
+                        No further requests expected: HTTP GET /hello
+                        3 request(s) executed:
+                        GET /hello
+                        GET /hello
+                        GET /goodbye
+                        """);
     }
 
     @Test
@@ -167,7 +167,7 @@ class StrictlyOrderedRequestExpectationManagerTest {
         assertThatCode(() -> manager.validateRequest(new MockClientRequestContext(GET, "/hello")).close()).doesNotThrowAnyException();
 
         assertThatThrownBy(() -> manager.expectRequest(once(), requestTo("/goodbye")))
-            .isInstanceOf(IllegalStateException.class)
-            .hasMessage("Cannot declare further expectations after the first request.");
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("Cannot declare further expectations after the first request.");
     }
 }

@@ -16,31 +16,31 @@ import org.jboss.resteasy.core.providerfactory.ResteasyProviderFactoryImpl;
 
 public enum JaxRsVendor {
     JERSEY(
-        org.glassfish.jersey.internal.RuntimeDelegateImpl.class,
-        JerseyClientBuilder.class,
-        JerseyRestClientBuilderResolver.class,
-        NonInjectionManagerFactory.class
+            org.glassfish.jersey.internal.RuntimeDelegateImpl.class,
+            JerseyClientBuilder.class,
+            JerseyRestClientBuilderResolver.class,
+            NonInjectionManagerFactory.class
     ),
     JERSEY_HK2(
-        org.glassfish.jersey.internal.RuntimeDelegateImpl.class,
-        JerseyClientBuilder.class,
-        JerseyRestClientBuilderResolver.class,
-        Hk2InjectionManagerFactory.class
+            org.glassfish.jersey.internal.RuntimeDelegateImpl.class,
+            JerseyClientBuilder.class,
+            JerseyRestClientBuilderResolver.class,
+            Hk2InjectionManagerFactory.class
     ),
     RESTEASY(
-        ResteasyProviderFactoryImpl.class,
-        ResteasyClientBuilderImpl.class,
-        org.jboss.resteasy.microprofile.client.BuilderResolver.class
+            ResteasyProviderFactoryImpl.class,
+            ResteasyClientBuilderImpl.class,
+            org.jboss.resteasy.microprofile.client.BuilderResolver.class
     ),
     CXF(
-        org.apache.cxf.jaxrs.impl.RuntimeDelegateImpl.class,
-        org.apache.cxf.jaxrs.client.spec.ClientBuilderImpl.class,
-        null
+            org.apache.cxf.jaxrs.impl.RuntimeDelegateImpl.class,
+            org.apache.cxf.jaxrs.client.spec.ClientBuilderImpl.class,
+            null
     ),
     RESTEASY_REACTIVE(
-        org.jboss.resteasy.reactive.common.jaxrs.RuntimeDelegateImpl.class,
-        org.jboss.resteasy.reactive.client.impl.ClientBuilderImpl.class,
-        io.quarkus.rest.client.reactive.runtime.BuilderResolver.class
+            org.jboss.resteasy.reactive.common.jaxrs.RuntimeDelegateImpl.class,
+            org.jboss.resteasy.reactive.client.impl.ClientBuilderImpl.class,
+            io.quarkus.rest.client.reactive.runtime.BuilderResolver.class
     );
 
     public static final List<JaxRsVendor> VENDORS = List.of(JaxRsVendor.values());
@@ -52,18 +52,18 @@ public enum JaxRsVendor {
     private final VendorClassLoader vendorClassLoader;
 
     JaxRsVendor(
-        Class<? extends RuntimeDelegate> runtimeDelegateClass,
-        Class<? extends ClientBuilder> clientBuilderClass,
-        Class<? extends RestClientBuilderResolver> restClientBuilderResolverClass
+            Class<? extends RuntimeDelegate> runtimeDelegateClass,
+            Class<? extends ClientBuilder> clientBuilderClass,
+            Class<? extends RestClientBuilderResolver> restClientBuilderResolverClass
     ) {
         this(runtimeDelegateClass, clientBuilderClass, restClientBuilderResolverClass, null);
     }
 
     JaxRsVendor(
-        Class<? extends RuntimeDelegate> runtimeDelegateClass,
-        Class<? extends ClientBuilder> clientBuilderClass,
-        Class<? extends RestClientBuilderResolver> restClientBuilderResolverClass,
-        Class<? extends InjectionManagerFactory> injectionManagerFactoryClass
+            Class<? extends RuntimeDelegate> runtimeDelegateClass,
+            Class<? extends ClientBuilder> clientBuilderClass,
+            Class<? extends RestClientBuilderResolver> restClientBuilderResolverClass,
+            Class<? extends InjectionManagerFactory> injectionManagerFactoryClass
     ) {
         this.runtimeDelegateClass = runtimeDelegateClass;
         this.clientBuilderClass = clientBuilderClass;

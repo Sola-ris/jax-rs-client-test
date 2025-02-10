@@ -30,17 +30,17 @@ public abstract class QuarkusTestFactory {
     @TestFactory
     Stream<DynamicNode> generate() {
         return ReflectionSupport.streamMethods(getTestInstance().getClass(), method -> method.isAnnotationPresent(JaxRsVendorTest.class), TOP_DOWN)
-            .map(method -> DynamicTest.dynamicTest(generateMethodName(method), () -> {
-                ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
-                try {
-                    RuntimeDelegate.setInstance(null);
-                    RestClientBuilderResolver.setInstance(null);
-                    Thread.currentThread().setContextClassLoader(RESTEASY_REACTIVE.getVendorClassLoader());
-                    ReflectionSupport.invokeMethod(method, getTestInstance(), getArgs(method));
-                } finally {
-                    Thread.currentThread().setContextClassLoader(oldClassLoader);
-                }
-            }));
+                .map(method -> DynamicTest.dynamicTest(generateMethodName(method), () -> {
+                    ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
+                    try {
+                        RuntimeDelegate.setInstance(null);
+                        RestClientBuilderResolver.setInstance(null);
+                        Thread.currentThread().setContextClassLoader(RESTEASY_REACTIVE.getVendorClassLoader());
+                        ReflectionSupport.invokeMethod(method, getTestInstance(), getArgs(method));
+                    } finally {
+                        Thread.currentThread().setContextClassLoader(oldClassLoader);
+                    }
+                }));
     }
 
     private static String generateMethodName(Method method) {

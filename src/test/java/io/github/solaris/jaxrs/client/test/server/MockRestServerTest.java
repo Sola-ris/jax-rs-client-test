@@ -102,8 +102,8 @@ class MockRestServerTest {
 
             try (Client client = builder.build()) {
                 filterExceptionAssert.assertThatThrownBy(() -> client.target("/goodbye").request().get())
-                    .isInstanceOf(AssertionError.class)
-                    .hasMessageEndingWith("Unexpected Request. expected: </hello> but was: </goodbye>");
+                        .isInstanceOf(AssertionError.class)
+                        .hasMessageEndingWith("Unexpected Request. expected: </hello> but was: </goodbye>");
             }
         }
 
@@ -118,8 +118,8 @@ class MockRestServerTest {
             try (Client client = builder.build()) {
                 assertThat(client.target("/hello").request().get().getStatusInfo().toEnum()).isEqualTo(OK);
                 filterExceptionAssert.assertThatThrownBy(() -> client.target("/goodbye").request().get())
-                    .isInstanceOf(AssertionError.class)
-                    .hasMessageEndingWith("Unexpected Request. expected: </hello> but was: </goodbye>");
+                        .isInstanceOf(AssertionError.class)
+                        .hasMessageEndingWith("Unexpected Request. expected: </hello> but was: </goodbye>");
             }
         }
 
@@ -137,11 +137,11 @@ class MockRestServerTest {
                 server.reset();
 
                 filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().get().close())
-                    .isInstanceOf(AssertionError.class)
-                    .hasMessage("""
-                        No further requests expected: HTTP GET /hello
-                        0 request(s) executed.
-                        """);
+                        .isInstanceOf(AssertionError.class)
+                        .hasMessage("""
+                                No further requests expected: HTTP GET /hello
+                                0 request(s) executed.
+                                """);
 
                 // Clear failed request
                 server.reset();
@@ -167,11 +167,11 @@ class MockRestServerTest {
                 server.reset();
 
                 filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().get().close())
-                    .isInstanceOf(AssertionError.class)
-                    .hasMessage("""
-                        No further requests expected: HTTP GET /hello
-                        0 request(s) executed.
-                        """);
+                        .isInstanceOf(AssertionError.class)
+                        .hasMessage("""
+                                No further requests expected: HTTP GET /hello
+                                0 request(s) executed.
+                                """);
 
                 // Clear failed request
                 server.reset();
@@ -197,11 +197,11 @@ class MockRestServerTest {
                 server.reset();
 
                 filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().get().close())
-                    .isInstanceOf(AssertionError.class)
-                    .hasMessage("""
-                        No further requests expected: HTTP GET /hello
-                        0 request(s) executed.
-                        """);
+                        .isInstanceOf(AssertionError.class)
+                        .hasMessage("""
+                                No further requests expected: HTTP GET /hello
+                                0 request(s) executed.
+                                """);
 
                 // Clear failed request
                 server.reset();
@@ -225,12 +225,12 @@ class MockRestServerTest {
                 assertThat(client.target("/hello").request().get().getStatusInfo().toEnum()).isEqualTo(OK);
 
                 Assertions.assertThatThrownBy(server::verify)
-                    .isInstanceOf(AssertionError.class)
-                    .hasMessageMatching("""
-                        Further request\\(s\\) expected leaving 1 unsatisfied expectation\\(s\\)\\.
-                        1 request\\(s\\) executed:
-                        GET /hello.*$
-                        """);
+                        .isInstanceOf(AssertionError.class)
+                        .hasMessageMatching("""
+                                Further request\\(s\\) expected leaving 1 unsatisfied expectation\\(s\\)\\.
+                                1 request\\(s\\) executed:
+                                GET /hello.*$
+                                """);
             }
         }
 
@@ -289,14 +289,14 @@ class MockRestServerTest {
 
                 Instant start = Instant.now();
                 Assertions.assertThatThrownBy(() -> server.verify(verifyDuration))
-                    .isInstanceOf(AssertionError.class)
-                    .hasMessageMatching("""
-                        Further request\\(s\\) expected leaving 1 unsatisfied expectation\\(s\\)\\.
-                        1 request\\(s\\) executed:
-                        GET /hello.*$
-                        """);
+                        .isInstanceOf(AssertionError.class)
+                        .hasMessageMatching("""
+                                Further request\\(s\\) expected leaving 1 unsatisfied expectation\\(s\\)\\.
+                                1 request\\(s\\) executed:
+                                GET /hello.*$
+                                """);
                 assertThat(Duration.between(start, Instant.now()))
-                    .isGreaterThan(verifyDuration);
+                        .isGreaterThan(verifyDuration);
             }
 
             MockRestServer otherServer = MockRestServer.bindTo(builder).build();
@@ -309,9 +309,9 @@ class MockRestServerTest {
 
                 Instant start = Instant.now();
                 assertThatCode(() -> otherServer.verify(verifyDuration))
-                    .doesNotThrowAnyException();
+                        .doesNotThrowAnyException();
                 assertThat(Duration.between(start, Instant.now()))
-                    .isLessThan(verifyDuration);
+                        .isLessThan(verifyDuration);
             }
         }
 
@@ -325,13 +325,13 @@ class MockRestServerTest {
             try (Client client = builder.build()) {
                 assertThat(client.target("/hello").request().get().getStatusInfo().toEnum()).isEqualTo(OK);
                 filterExceptionAssert.assertThatThrownBy(() -> client.target("/goodbye").request().get())
-                    .isInstanceOf(AssertionError.class)
-                    .hasMessageStartingWith("No further requests expected");
+                        .isInstanceOf(AssertionError.class)
+                        .hasMessageStartingWith("No further requests expected");
             }
 
             assertThatThrownBy(server::verify)
-                .isInstanceOf(AssertionError.class)
-                .hasMessageStartingWith("Some requests did not execute successfully.");
+                    .isInstanceOf(AssertionError.class)
+                    .hasMessageStartingWith("Some requests did not execute successfully.");
         }
 
         @JaxRsVendorTest
@@ -346,8 +346,8 @@ class MockRestServerTest {
                 server.verify();
 
                 filterExceptionAssert.assertThatThrownBy(() -> client.target("/goodbye").request().get())
-                    .isInstanceOf(AssertionError.class)
-                    .hasMessageStartingWith("No further requests expected");
+                        .isInstanceOf(AssertionError.class)
+                        .hasMessageStartingWith("No further requests expected");
 
                 server.reset();
 
@@ -368,8 +368,8 @@ class MockRestServerTest {
 
             try (Client client = builder.build()) {
                 filterExceptionAssert.assertThatThrownBy(() -> client.target("/error").request().get())
-                    .isInstanceOf(SocketException.class)
-                    .hasMessage("Connection Reset");
+                        .isInstanceOf(SocketException.class)
+                        .hasMessage("Connection Reset");
 
                 assertThat(client.target("/hello").request().get().getStatusInfo().toEnum()).isEqualTo(OK);
 
@@ -391,7 +391,7 @@ class MockRestServerTest {
 
             try (Client otherClient = builder.build()) {
                 assertThatThrownBy(() -> otherClient.target("/hello").request().get())
-                    .isInstanceOf(ProcessingException.class);
+                        .isInstanceOf(ProcessingException.class);
             }
 
             server.verify();
@@ -412,7 +412,7 @@ class MockRestServerTest {
 
             try (Client otherClient = builder.build()) {
                 assertThatThrownBy(() -> otherClient.target("/hello").request().get())
-                    .isInstanceOf(ProcessingException.class);
+                        .isInstanceOf(ProcessingException.class);
             }
 
             server.verify();
@@ -487,8 +487,8 @@ class MockRestServerTest {
 
             try (client) {
                 filterExceptionAssert.assertThatThrownBy(() -> client.target("/goodbye").request().get())
-                    .isInstanceOf(AssertionError.class)
-                    .hasMessageEndingWith("Unexpected Request. expected: </hello> but was: </goodbye>");
+                        .isInstanceOf(AssertionError.class)
+                        .hasMessageEndingWith("Unexpected Request. expected: </hello> but was: </goodbye>");
             }
         }
 
@@ -503,8 +503,8 @@ class MockRestServerTest {
             try (client) {
                 assertThat(client.target("/hello").request().get().getStatusInfo().toEnum()).isEqualTo(OK);
                 filterExceptionAssert.assertThatThrownBy(() -> client.target("/goodbye").request().get())
-                    .isInstanceOf(AssertionError.class)
-                    .hasMessageEndingWith("Unexpected Request. expected: </hello> but was: </goodbye>");
+                        .isInstanceOf(AssertionError.class)
+                        .hasMessageEndingWith("Unexpected Request. expected: </hello> but was: </goodbye>");
             }
         }
 
@@ -522,11 +522,11 @@ class MockRestServerTest {
                 server.reset();
 
                 filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().get().close())
-                    .isInstanceOf(AssertionError.class)
-                    .hasMessage("""
-                        No further requests expected: HTTP GET /hello
-                        0 request(s) executed.
-                        """);
+                        .isInstanceOf(AssertionError.class)
+                        .hasMessage("""
+                                No further requests expected: HTTP GET /hello
+                                0 request(s) executed.
+                                """);
 
                 // Clear failed request
                 server.reset();
@@ -552,11 +552,11 @@ class MockRestServerTest {
                 server.reset();
 
                 filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().get().close())
-                    .isInstanceOf(AssertionError.class)
-                    .hasMessage("""
-                        No further requests expected: HTTP GET /hello
-                        0 request(s) executed.
-                        """);
+                        .isInstanceOf(AssertionError.class)
+                        .hasMessage("""
+                                No further requests expected: HTTP GET /hello
+                                0 request(s) executed.
+                                """);
 
                 // Clear failed request
                 server.reset();
@@ -582,11 +582,11 @@ class MockRestServerTest {
                 server.reset();
 
                 filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().get().close())
-                    .isInstanceOf(AssertionError.class)
-                    .hasMessage("""
-                        No further requests expected: HTTP GET /hello
-                        0 request(s) executed.
-                        """);
+                        .isInstanceOf(AssertionError.class)
+                        .hasMessage("""
+                                No further requests expected: HTTP GET /hello
+                                0 request(s) executed.
+                                """);
 
                 // Clear failed request
                 server.reset();
@@ -610,12 +610,12 @@ class MockRestServerTest {
                 assertThat(client.target("/hello").request().get().getStatusInfo().toEnum()).isEqualTo(OK);
 
                 Assertions.assertThatThrownBy(server::verify)
-                    .isInstanceOf(AssertionError.class)
-                    .hasMessageMatching("""
-                        Further request\\(s\\) expected leaving 1 unsatisfied expectation\\(s\\)\\.
-                        1 request\\(s\\) executed:
-                        GET /hello.*$
-                        """);
+                        .isInstanceOf(AssertionError.class)
+                        .hasMessageMatching("""
+                                Further request\\(s\\) expected leaving 1 unsatisfied expectation\\(s\\)\\.
+                                1 request\\(s\\) executed:
+                                GET /hello.*$
+                                """);
             }
         }
 
@@ -668,14 +668,14 @@ class MockRestServerTest {
 
             Instant start = Instant.now();
             Assertions.assertThatThrownBy(() -> server.verify(verifyDuration))
-                .isInstanceOf(AssertionError.class)
-                .hasMessageMatching("""
-                    Further request\\(s\\) expected leaving 1 unsatisfied expectation\\(s\\)\\.
-                    1 request\\(s\\) executed:
-                    GET /hello.*$
-                    """);
+                    .isInstanceOf(AssertionError.class)
+                    .hasMessageMatching("""
+                            Further request\\(s\\) expected leaving 1 unsatisfied expectation\\(s\\)\\.
+                            1 request\\(s\\) executed:
+                            GET /hello.*$
+                            """);
             assertThat(Duration.between(start, Instant.now()))
-                .isGreaterThan(verifyDuration);
+                    .isGreaterThan(verifyDuration);
 
             MockRestServer otherServer = MockRestServer.bindTo(client).build();
             otherServer.expect(requestTo("/hello")).andRespond(withSuccess().entity("hello"));
@@ -687,9 +687,9 @@ class MockRestServerTest {
 
                 Instant otherStart = Instant.now();
                 assertThatCode(() -> otherServer.verify(verifyDuration))
-                    .doesNotThrowAnyException();
+                        .doesNotThrowAnyException();
                 assertThat(Duration.between(otherStart, Instant.now()))
-                    .isLessThan(verifyDuration);
+                        .isLessThan(verifyDuration);
             }
         }
 
@@ -703,13 +703,13 @@ class MockRestServerTest {
             try (client) {
                 assertThat(client.target("/hello").request().get().getStatusInfo().toEnum()).isEqualTo(OK);
                 filterExceptionAssert.assertThatThrownBy(() -> client.target("/goodbye").request().get())
-                    .isInstanceOf(AssertionError.class)
-                    .hasMessageStartingWith("No further requests expected");
+                        .isInstanceOf(AssertionError.class)
+                        .hasMessageStartingWith("No further requests expected");
             }
 
             assertThatThrownBy(server::verify)
-                .isInstanceOf(AssertionError.class)
-                .hasMessageStartingWith("Some requests did not execute successfully.");
+                    .isInstanceOf(AssertionError.class)
+                    .hasMessageStartingWith("Some requests did not execute successfully.");
         }
 
         @JaxRsVendorTest
@@ -724,8 +724,8 @@ class MockRestServerTest {
                 server.verify();
 
                 filterExceptionAssert.assertThatThrownBy(() -> client.target("/goodbye").request().get())
-                    .isInstanceOf(AssertionError.class)
-                    .hasMessageStartingWith("No further requests expected");
+                        .isInstanceOf(AssertionError.class)
+                        .hasMessageStartingWith("No further requests expected");
 
                 server.reset();
 
@@ -746,8 +746,8 @@ class MockRestServerTest {
 
             try (client) {
                 filterExceptionAssert.assertThatThrownBy(() -> client.target("/error").request().get())
-                    .isInstanceOf(SocketException.class)
-                    .hasMessage("Connection Reset");
+                        .isInstanceOf(SocketException.class)
+                        .hasMessage("Connection Reset");
 
                 assertThat(client.target("/hello").request().get().getStatusInfo().toEnum()).isEqualTo(OK);
 
@@ -767,7 +767,7 @@ class MockRestServerTest {
 
             try (client) {
                 assertThatThrownBy(() -> client.target("/hello").request().get())
-                    .isInstanceOf(ProcessingException.class);
+                        .isInstanceOf(ProcessingException.class);
             }
 
             server.verify();
@@ -846,8 +846,8 @@ class MockRestServerTest {
 
             try (client) {
                 filterExceptionAssert.assertThatThrownBy(() -> target.path("/goodbye").request().get())
-                    .isInstanceOf(AssertionError.class)
-                    .hasMessageEndingWith("Unexpected Request. expected: </hello> but was: </goodbye>");
+                        .isInstanceOf(AssertionError.class)
+                        .hasMessageEndingWith("Unexpected Request. expected: </hello> but was: </goodbye>");
             }
         }
 
@@ -863,8 +863,8 @@ class MockRestServerTest {
             try (client) {
                 assertThat(target.path("/hello").request().get().getStatusInfo().toEnum()).isEqualTo(OK);
                 filterExceptionAssert.assertThatThrownBy(() -> target.path("/goodbye").request().get())
-                    .isInstanceOf(AssertionError.class)
-                    .hasMessageEndingWith("Unexpected Request. expected: </hello> but was: </goodbye>");
+                        .isInstanceOf(AssertionError.class)
+                        .hasMessageEndingWith("Unexpected Request. expected: </hello> but was: </goodbye>");
             }
         }
 
@@ -883,11 +883,11 @@ class MockRestServerTest {
                 server.reset();
 
                 filterExceptionAssert.assertThatThrownBy(() -> target.path("/hello").request().get().close())
-                    .isInstanceOf(AssertionError.class)
-                    .hasMessage("""
-                        No further requests expected: HTTP GET /hello
-                        0 request(s) executed.
-                        """);
+                        .isInstanceOf(AssertionError.class)
+                        .hasMessage("""
+                                No further requests expected: HTTP GET /hello
+                                0 request(s) executed.
+                                """);
 
                 // Clear failed request
                 server.reset();
@@ -914,11 +914,11 @@ class MockRestServerTest {
                 server.reset();
 
                 filterExceptionAssert.assertThatThrownBy(() -> target.path("/hello").request().get().close())
-                    .isInstanceOf(AssertionError.class)
-                    .hasMessage("""
-                        No further requests expected: HTTP GET /hello
-                        0 request(s) executed.
-                        """);
+                        .isInstanceOf(AssertionError.class)
+                        .hasMessage("""
+                                No further requests expected: HTTP GET /hello
+                                0 request(s) executed.
+                                """);
 
                 // Clear failed request
                 server.reset();
@@ -945,11 +945,11 @@ class MockRestServerTest {
                 server.reset();
 
                 filterExceptionAssert.assertThatThrownBy(() -> target.path("/hello").request().get().close())
-                    .isInstanceOf(AssertionError.class)
-                    .hasMessage("""
-                        No further requests expected: HTTP GET /hello
-                        0 request(s) executed.
-                        """);
+                        .isInstanceOf(AssertionError.class)
+                        .hasMessage("""
+                                No further requests expected: HTTP GET /hello
+                                0 request(s) executed.
+                                """);
 
                 // Clear failed request
                 server.reset();
@@ -974,12 +974,12 @@ class MockRestServerTest {
                 assertThat(target.path("/hello").request().get().getStatusInfo().toEnum()).isEqualTo(OK);
 
                 Assertions.assertThatThrownBy(server::verify)
-                    .isInstanceOf(AssertionError.class)
-                    .hasMessageMatching("""
-                        Further request\\(s\\) expected leaving 1 unsatisfied expectation\\(s\\)\\.
-                        1 request\\(s\\) executed:
-                        GET /hello.*$
-                        """);
+                        .isInstanceOf(AssertionError.class)
+                        .hasMessageMatching("""
+                                Further request\\(s\\) expected leaving 1 unsatisfied expectation\\(s\\)\\.
+                                1 request\\(s\\) executed:
+                                GET /hello.*$
+                                """);
             }
         }
 
@@ -1033,14 +1033,14 @@ class MockRestServerTest {
 
             Instant start = Instant.now();
             Assertions.assertThatThrownBy(() -> server.verify(verifyDuration))
-                .isInstanceOf(AssertionError.class)
-                .hasMessageMatching("""
-                    Further request\\(s\\) expected leaving 1 unsatisfied expectation\\(s\\)\\.
-                    1 request\\(s\\) executed:
-                    GET /hello.*$
-                    """);
+                    .isInstanceOf(AssertionError.class)
+                    .hasMessageMatching("""
+                            Further request\\(s\\) expected leaving 1 unsatisfied expectation\\(s\\)\\.
+                            1 request\\(s\\) executed:
+                            GET /hello.*$
+                            """);
             assertThat(Duration.between(start, Instant.now()))
-                .isGreaterThan(verifyDuration);
+                    .isGreaterThan(verifyDuration);
 
             MockRestServer otherServer = MockRestServer.bindTo(target).build();
             otherServer.expect(requestTo("/hello")).andRespond(withSuccess().entity("hello"));
@@ -1052,9 +1052,9 @@ class MockRestServerTest {
 
                 Instant otherStart = Instant.now();
                 assertThatCode(() -> otherServer.verify(verifyDuration))
-                    .doesNotThrowAnyException();
+                        .doesNotThrowAnyException();
                 assertThat(Duration.between(otherStart, Instant.now()))
-                    .isLessThan(verifyDuration);
+                        .isLessThan(verifyDuration);
             }
         }
 
@@ -1069,13 +1069,13 @@ class MockRestServerTest {
             try (client) {
                 assertThat(target.path("/hello").request().get().getStatusInfo().toEnum()).isEqualTo(OK);
                 filterExceptionAssert.assertThatThrownBy(() -> target.path("/goodbye").request().get())
-                    .isInstanceOf(AssertionError.class)
-                    .hasMessageStartingWith("No further requests expected");
+                        .isInstanceOf(AssertionError.class)
+                        .hasMessageStartingWith("No further requests expected");
             }
 
             assertThatThrownBy(server::verify)
-                .isInstanceOf(AssertionError.class)
-                .hasMessageStartingWith("Some requests did not execute successfully.");
+                    .isInstanceOf(AssertionError.class)
+                    .hasMessageStartingWith("Some requests did not execute successfully.");
         }
 
         @JaxRsVendorTest
@@ -1091,8 +1091,8 @@ class MockRestServerTest {
                 server.verify();
 
                 filterExceptionAssert.assertThatThrownBy(() -> target.path("/goodbye").request().get())
-                    .isInstanceOf(AssertionError.class)
-                    .hasMessageStartingWith("No further requests expected");
+                        .isInstanceOf(AssertionError.class)
+                        .hasMessageStartingWith("No further requests expected");
 
                 server.reset();
 
@@ -1114,8 +1114,8 @@ class MockRestServerTest {
 
             try (client) {
                 filterExceptionAssert.assertThatThrownBy(() -> target.path("/error").request().get())
-                    .isInstanceOf(SocketException.class)
-                    .hasMessage("Connection Reset");
+                        .isInstanceOf(SocketException.class)
+                        .hasMessage("Connection Reset");
 
                 assertThat(target.path("/hello").request().get().getStatusInfo().toEnum()).isEqualTo(OK);
 
@@ -1193,8 +1193,8 @@ class MockRestServerTest {
 
             try (GreetingSendoffClient client = restClientBuilder.build(GreetingSendoffClient.class)) {
                 filterExceptionAssert.assertThatThrownBy(client::sendoff)
-                    .isInstanceOf(AssertionError.class)
-                    .hasMessageEndingWith("Unexpected Request. expected: <http://localhost/hello> but was: <http://localhost/goodbye>");
+                        .isInstanceOf(AssertionError.class)
+                        .hasMessageEndingWith("Unexpected Request. expected: <http://localhost/hello> but was: <http://localhost/goodbye>");
             }
         }
 
@@ -1209,8 +1209,8 @@ class MockRestServerTest {
             try (GreetingSendoffClient client = restClientBuilder.build(GreetingSendoffClient.class)) {
                 assertThat(client.greeting().getStatusInfo().toEnum()).isEqualTo(OK);
                 filterExceptionAssert.assertThatThrownBy(client::sendoff)
-                    .isInstanceOf(AssertionError.class)
-                    .hasMessageEndingWith("Unexpected Request. expected: <http://localhost/hello> but was: <http://localhost/goodbye>");
+                        .isInstanceOf(AssertionError.class)
+                        .hasMessageEndingWith("Unexpected Request. expected: <http://localhost/hello> but was: <http://localhost/goodbye>");
             }
         }
 
@@ -1228,11 +1228,11 @@ class MockRestServerTest {
                 server.reset();
 
                 filterExceptionAssert.assertThatThrownBy(() -> client.greeting().close())
-                    .isInstanceOf(AssertionError.class)
-                    .hasMessage("""
-                        No further requests expected: HTTP GET http://localhost/hello
-                        0 request(s) executed.
-                        """);
+                        .isInstanceOf(AssertionError.class)
+                        .hasMessage("""
+                                No further requests expected: HTTP GET http://localhost/hello
+                                0 request(s) executed.
+                                """);
 
                 // Clear failed request
                 server.reset();
@@ -1258,11 +1258,11 @@ class MockRestServerTest {
                 server.reset();
 
                 filterExceptionAssert.assertThatThrownBy(() -> client.greeting().close())
-                    .isInstanceOf(AssertionError.class)
-                    .hasMessage("""
-                        No further requests expected: HTTP GET http://localhost/hello
-                        0 request(s) executed.
-                        """);
+                        .isInstanceOf(AssertionError.class)
+                        .hasMessage("""
+                                No further requests expected: HTTP GET http://localhost/hello
+                                0 request(s) executed.
+                                """);
 
                 // Clear failed request
                 server.reset();
@@ -1288,11 +1288,11 @@ class MockRestServerTest {
                 server.reset();
 
                 filterExceptionAssert.assertThatThrownBy(() -> client.greeting().close())
-                    .isInstanceOf(AssertionError.class)
-                    .hasMessage("""
-                        No further requests expected: HTTP GET http://localhost/hello
-                        0 request(s) executed.
-                        """);
+                        .isInstanceOf(AssertionError.class)
+                        .hasMessage("""
+                                No further requests expected: HTTP GET http://localhost/hello
+                                0 request(s) executed.
+                                """);
 
                 // Clear failed request
                 server.reset();
@@ -1316,12 +1316,12 @@ class MockRestServerTest {
                 assertThat(client.greeting().getStatusInfo().toEnum()).isEqualTo(OK);
 
                 Assertions.assertThatThrownBy(server::verify)
-                    .isInstanceOf(AssertionError.class)
-                    .hasMessageMatching("""
-                        Further request\\(s\\) expected leaving 1 unsatisfied expectation\\(s\\)\\.
-                        1 request\\(s\\) executed:
-                        GET http://localhost/hello.*$
-                        """);
+                        .isInstanceOf(AssertionError.class)
+                        .hasMessageMatching("""
+                                Further request\\(s\\) expected leaving 1 unsatisfied expectation\\(s\\)\\.
+                                1 request\\(s\\) executed:
+                                GET http://localhost/hello.*$
+                                """);
             }
         }
 
@@ -1380,14 +1380,14 @@ class MockRestServerTest {
 
                 Instant start = Instant.now();
                 Assertions.assertThatThrownBy(() -> server.verify(verifyDuration))
-                    .isInstanceOf(AssertionError.class)
-                    .hasMessageMatching("""
-                        Further request\\(s\\) expected leaving 1 unsatisfied expectation\\(s\\)\\.
-                        1 request\\(s\\) executed:
-                        GET http://localhost/hello.*$
-                        """);
+                        .isInstanceOf(AssertionError.class)
+                        .hasMessageMatching("""
+                                Further request\\(s\\) expected leaving 1 unsatisfied expectation\\(s\\)\\.
+                                1 request\\(s\\) executed:
+                                GET http://localhost/hello.*$
+                                """);
                 assertThat(Duration.between(start, Instant.now()))
-                    .isGreaterThan(verifyDuration);
+                        .isGreaterThan(verifyDuration);
             }
 
             MockRestServer otherServer = MockRestServer.bindTo(restClientBuilder).build();
@@ -1400,9 +1400,9 @@ class MockRestServerTest {
 
                 Instant start = Instant.now();
                 assertThatCode(() -> otherServer.verify(verifyDuration))
-                    .doesNotThrowAnyException();
+                        .doesNotThrowAnyException();
                 assertThat(Duration.between(start, Instant.now()))
-                    .isLessThan(verifyDuration);
+                        .isLessThan(verifyDuration);
             }
         }
 
@@ -1416,13 +1416,13 @@ class MockRestServerTest {
             try (GreetingSendoffClient client = restClientBuilder.build(GreetingSendoffClient.class)) {
                 assertThat(client.greeting().getStatusInfo().toEnum()).isEqualTo(OK);
                 filterExceptionAssert.assertThatThrownBy(client::sendoff)
-                    .isInstanceOf(AssertionError.class)
-                    .hasMessageStartingWith("No further requests expected");
+                        .isInstanceOf(AssertionError.class)
+                        .hasMessageStartingWith("No further requests expected");
             }
 
             assertThatThrownBy(server::verify)
-                .isInstanceOf(AssertionError.class)
-                .hasMessageStartingWith("Some requests did not execute successfully.");
+                    .isInstanceOf(AssertionError.class)
+                    .hasMessageStartingWith("Some requests did not execute successfully.");
         }
 
         @JaxRsVendorTest(skipFor = CXF)
@@ -1437,8 +1437,8 @@ class MockRestServerTest {
                 server.verify();
 
                 filterExceptionAssert.assertThatThrownBy(client::sendoff)
-                    .isInstanceOf(AssertionError.class)
-                    .hasMessageStartingWith("No further requests expected");
+                        .isInstanceOf(AssertionError.class)
+                        .hasMessageStartingWith("No further requests expected");
 
                 server.reset();
 
@@ -1459,8 +1459,8 @@ class MockRestServerTest {
 
             try (GreetingSendoffClient client = restClientBuilder.build(GreetingSendoffClient.class)) {
                 filterExceptionAssert.assertThatThrownBy(client::sendoff)
-                    .isInstanceOf(SocketException.class)
-                    .hasMessage("Connection Reset");
+                        .isInstanceOf(SocketException.class)
+                        .hasMessage("Connection Reset");
 
                 assertThat(client.greeting().getStatusInfo().toEnum()).isEqualTo(OK);
 

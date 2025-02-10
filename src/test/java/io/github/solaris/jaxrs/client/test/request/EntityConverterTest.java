@@ -138,9 +138,9 @@ class EntityConverterTest {
 
         try (client) {
             converterAssert.assertConversionFailure(() -> client.target("/hello")
-                .request()
-                .post(Entity.entity(Class.class, TEXT_HTML_TYPE))
-                .close());
+                    .request()
+                    .post(Entity.entity(Class.class, TEXT_HTML_TYPE))
+                    .close());
         }
     }
 
@@ -160,7 +160,7 @@ class EntityConverterTest {
 
         try (client) {
             assertThatCode(() -> client.target("/hello").request().get().close())
-                .doesNotThrowAnyException();
+                    .doesNotThrowAnyException();
         }
     }
 
@@ -180,7 +180,7 @@ class EntityConverterTest {
 
         try (client) {
             assertThatCode(() -> client.target("/hello").request().get().close())
-                .doesNotThrowAnyException();
+                    .doesNotThrowAnyException();
         }
     }
 
@@ -200,7 +200,7 @@ class EntityConverterTest {
 
         try (client) {
             assertThatCode(() -> client.target("/hello").request().get().close())
-                .doesNotThrowAnyException();
+                    .doesNotThrowAnyException();
         }
     }
 
@@ -220,11 +220,11 @@ class EntityConverterTest {
 
         try (client) {
             assertThatCode(
-                () -> client.target("/hello")
-                    .request()
-                    .post(Entity.entity(new GenericEntity<>(List.of(plainPart())) {}, MULTIPART_FORM_DATA_TYPE))
-                    .close())
-                .doesNotThrowAnyException();
+                    () -> client.target("/hello")
+                            .request()
+                            .post(Entity.entity(new GenericEntity<>(List.of(plainPart())) {}, MULTIPART_FORM_DATA_TYPE))
+                            .close())
+                    .doesNotThrowAnyException();
         }
     }
 
@@ -244,11 +244,11 @@ class EntityConverterTest {
 
         try (client) {
             assertThatCode(
-                () -> client.target("/hello")
-                    .request()
-                    .post(Entity.entity(new GenericEntity<>(List.of(jsonPart())) {}, MULTIPART_FORM_DATA_TYPE))
-                    .close())
-                .doesNotThrowAnyException();
+                    () -> client.target("/hello")
+                            .request()
+                            .post(Entity.entity(new GenericEntity<>(List.of(jsonPart())) {}, MULTIPART_FORM_DATA_TYPE))
+                            .close())
+                    .doesNotThrowAnyException();
         }
     }
 
@@ -268,11 +268,11 @@ class EntityConverterTest {
 
         try (client) {
             assertThatCode(
-                () -> client.target("/hello")
-                    .request()
-                    .post(Entity.entity(new GenericEntity<>(List.of(listPart())) {}, MULTIPART_FORM_DATA_TYPE))
-                    .close())
-                .doesNotThrowAnyException();
+                    () -> client.target("/hello")
+                            .request()
+                            .post(Entity.entity(new GenericEntity<>(List.of(listPart())) {}, MULTIPART_FORM_DATA_TYPE))
+                            .close())
+                    .doesNotThrowAnyException();
         }
     }
 
@@ -287,17 +287,17 @@ class EntityConverterTest {
 
             assertThat(plainPart).isInstanceOf(BufferedEntityPart.class);
             assertThat(request.getHeaderString(CONTENT_TYPE))
-                .contains(MULTIPART_FORM_DATA)
-                .doesNotContain("boundary");
+                    .contains(MULTIPART_FORM_DATA)
+                    .doesNotContain("boundary");
         }).andRespond(withSuccess());
 
         try (client) {
             assertThatCode(
-                () -> client.target("/hello")
-                    .request()
-                    .post(Entity.entity(new GenericEntity<>(List.of(plainPart())) {}, MULTIPART_FORM_DATA_TYPE))
-                    .close())
-                .doesNotThrowAnyException();
+                    () -> client.target("/hello")
+                            .request()
+                            .post(Entity.entity(new GenericEntity<>(List.of(plainPart())) {}, MULTIPART_FORM_DATA_TYPE))
+                            .close())
+                    .doesNotThrowAnyException();
         }
     }
 
@@ -321,11 +321,11 @@ class EntityConverterTest {
 
         try (client) {
             assertThatCode(
-                () -> client.target("/hello")
-                    .request()
-                    .post(Entity.entity(new GenericEntity<>(List.of(plainPart())) {}, MULTIPART_FORM_DATA_TYPE))
-                    .close())
-                .doesNotThrowAnyException();
+                    () -> client.target("/hello")
+                            .request()
+                            .post(Entity.entity(new GenericEntity<>(List.of(plainPart())) {}, MULTIPART_FORM_DATA_TYPE))
+                            .close())
+                    .doesNotThrowAnyException();
         }
     }
 

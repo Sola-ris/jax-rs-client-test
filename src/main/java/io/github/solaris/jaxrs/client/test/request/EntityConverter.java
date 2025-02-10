@@ -121,7 +121,7 @@ public abstract sealed class EntityConverter permits ClientEntityConverter, Prov
             return type.isAssignableFrom(requestContext.getEntityClass());
         }
         return type.isAssignableFrom(requestContext.getEntityClass())
-            && Objects.equals(requestContext.getEntityType(), genericType);
+                && Objects.equals(requestContext.getEntityType(), genericType);
     }
 
     // Jersey expects each EntityPart to be an instance of org.glassfish.jersey.media.multipart.BodyPart which BufferedEntityPart isn't,

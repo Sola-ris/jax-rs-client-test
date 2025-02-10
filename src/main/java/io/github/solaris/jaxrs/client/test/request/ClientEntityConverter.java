@@ -62,8 +62,8 @@ public final class ClientEntityConverter extends EntityConverter {
         Client client = ClientBuilder.newClient().register(ROUND_TRIP_FILTER);
         ClientCleaner.register(this, client);
         return client.target(LOCALHOST)
-            .request(requestContext.getMediaType())
-            .post(Entity.entity(requestContext.getEntity(), requestContext.getMediaType()));
+                .request(requestContext.getMediaType())
+                .post(Entity.entity(requestContext.getEntity(), requestContext.getMediaType()));
     }
 
     private static final class RoundTripFilter implements ClientRequestFilter {

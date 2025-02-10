@@ -88,10 +88,10 @@ public class MockResponseCreator implements ResponseCreator {
     @Override
     public Response createResponse(ClientRequestContext request) {
         Response.ResponseBuilder responseBuilder = Response.status(status)
-            .entity(entity)
-            .replaceAll(headers)
-            .links(links.toArray(new Link[0]))
-            .cookie(cookies.toArray(new NewCookie[0]));
+                .entity(entity)
+                .replaceAll(headers)
+                .links(links.toArray(new Link[0]))
+                .cookie(cookies.toArray(new NewCookie[0]));
 
         // RestEasy Reactive throws an NPE when passed an empty array of Variants
         if (!variants.isEmpty()) {

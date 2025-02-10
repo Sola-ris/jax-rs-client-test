@@ -36,7 +36,7 @@ class JaxRsVendorTestExtension implements InvocationInterceptor, ParameterResolv
 
     @Override
     public void interceptTestTemplateMethod(
-        Invocation<Void> invocation, ReflectiveInvocationContext<Method> invocationContext, ExtensionContext extensionContext) throws Throwable {
+            Invocation<Void> invocation, ReflectiveInvocationContext<Method> invocationContext, ExtensionContext extensionContext) throws Throwable {
 
         ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
         try {
@@ -53,8 +53,8 @@ class JaxRsVendorTestExtension implements InvocationInterceptor, ParameterResolv
     @Override
     public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
         return FilterExceptionAssert.class.isAssignableFrom(parameterContext.getParameter().getType())
-            || EntityConverterAssert.class.isAssignableFrom(parameterContext.getParameter().getType())
-            || ConfiguredClientSupplier.class.isAssignableFrom(parameterContext.getParameter().getType());
+                || EntityConverterAssert.class.isAssignableFrom(parameterContext.getParameter().getType())
+                || ConfiguredClientSupplier.class.isAssignableFrom(parameterContext.getParameter().getType());
     }
 
     @Override

@@ -60,10 +60,10 @@ class BufferedEntityPart implements EntityPart {
     @Override
     public MultivaluedMap<String, String> getHeaders() {
         return actualPart.getHeaders()
-            .entrySet()
-            .stream()
-            .map(BufferedEntityPart::removeDefaultTextCharset)
-            .collect(MultivaluedHashMap::new, (map, entry) -> map.put(entry.getKey(), entry.getValue()), MultivaluedMap::putAll);
+                .entrySet()
+                .stream()
+                .map(BufferedEntityPart::removeDefaultTextCharset)
+                .collect(MultivaluedHashMap::new, (map, entry) -> map.put(entry.getKey(), entry.getValue()), MultivaluedMap::putAll);
     }
 
     // RESTEasy will add charset=us-ascii to the Content-Type header if none is specified it's of type text/*,
@@ -82,10 +82,10 @@ class BufferedEntityPart implements EntityPart {
             }
 
             Map<String, String> parameters = mediaType.getParameters()
-                .entrySet()
-                .stream()
-                .filter(param -> !CHARSET_PARAMETER.equals(param.getKey()))
-                .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
+                    .entrySet()
+                    .stream()
+                    .filter(param -> !CHARSET_PARAMETER.equals(param.getKey()))
+                    .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
             return Map.entry(CONTENT_TYPE, List.of(new MediaType(mediaType.getType(), mediaType.getSubtype(), parameters).toString()));
         }
         return entry;
@@ -110,10 +110,10 @@ class BufferedEntityPart implements EntityPart {
         }
         BufferedEntityPart that = (BufferedEntityPart) o;
         return Arrays.equals(bufferedContent, that.bufferedContent)
-            && Objects.equals(getName(), that.getName())
-            && Objects.equals(getFileName(), that.getFileName())
-            && Objects.equals(getMediaType(), that.getMediaType())
-            && Objects.equals(getHeaders(), that.getHeaders());
+                && Objects.equals(getName(), that.getName())
+                && Objects.equals(getFileName(), that.getFileName())
+                && Objects.equals(getMediaType(), that.getMediaType())
+                && Objects.equals(getHeaders(), that.getHeaders());
     }
 
     @Override
@@ -123,12 +123,12 @@ class BufferedEntityPart implements EntityPart {
 
     @Override
     public String toString() {
-        return "BufferedEntityPart{" +
-            "name=" + getName() +
-            ", fileName=" + getFileName() +
-            ", mediaType=" + getMediaType() +
-            ", headers=" + getHeaders() +
-            ", content=" + bufferedContent.length + " bytes" +
-            '}';
+        return "BufferedEntityPart{"
+                + "name=" + getName()
+                + ", fileName=" + getFileName()
+                + ", mediaType=" + getMediaType()
+                + ", headers=" + getHeaders()
+                + ", content=" + bufferedContent.length + " bytes"
+                + '}';
     }
 }

@@ -47,9 +47,9 @@ class MockResponseCreatorsTest {
         String json = "{\"hello\": true}";
         try (Response response = MockResponseCreators.withSuccess(json, null).createResponse(new MockClientRequestContext())) {
             assertThat(response).satisfies(
-                r -> assertThat(r.getStatusInfo().toEnum()).isEqualTo(OK),
-                r -> assertThat(r.getMediaType()).isNull(),
-                r -> assertThat(r.getEntity()).isEqualTo(json)
+                    r -> assertThat(r.getStatusInfo().toEnum()).isEqualTo(OK),
+                    r -> assertThat(r.getMediaType()).isNull(),
+                    r -> assertThat(r.getEntity()).isEqualTo(json)
             );
         }
     }
@@ -59,9 +59,9 @@ class MockResponseCreatorsTest {
         String json = "{\"hello\": true}";
         try (Response response = MockResponseCreators.withSuccess(json, APPLICATION_JSON_TYPE).createResponse(new MockClientRequestContext())) {
             assertThat(response).satisfies(
-                r -> assertThat(r.getStatusInfo().toEnum()).isEqualTo(OK),
-                r -> assertThat(r.getMediaType()).isEqualTo(APPLICATION_JSON_TYPE),
-                r -> assertThat(r.getEntity()).isEqualTo(json)
+                    r -> assertThat(r.getStatusInfo().toEnum()).isEqualTo(OK),
+                    r -> assertThat(r.getMediaType()).isEqualTo(APPLICATION_JSON_TYPE),
+                    r -> assertThat(r.getEntity()).isEqualTo(json)
             );
         }
     }
@@ -71,8 +71,8 @@ class MockResponseCreatorsTest {
         URI location = URI.create("local.host");
         try (Response response = MockResponseCreators.withCreated(location).createResponse(new MockClientRequestContext())) {
             assertThat(response).satisfies(
-                r -> assertThat(r.getStatusInfo().toEnum()).isEqualTo(CREATED),
-                r -> assertThat(r.getLocation()).isEqualTo(location)
+                    r -> assertThat(r.getStatusInfo().toEnum()).isEqualTo(CREATED),
+                    r -> assertThat(r.getLocation()).isEqualTo(location)
             );
         }
     }
@@ -137,8 +137,8 @@ class MockResponseCreatorsTest {
     void testTooManyRequests_withRetryAfter() {
         try (Response response = MockResponseCreators.withTooManyRequests(42).createResponse(new MockClientRequestContext())) {
             assertThat(response).satisfies(
-                r -> assertThat(r.getStatusInfo().toEnum()).isEqualTo(TOO_MANY_REQUESTS),
-                r -> assertThat(r.getHeaderString(RETRY_AFTER)).isEqualTo("42")
+                    r -> assertThat(r.getStatusInfo().toEnum()).isEqualTo(TOO_MANY_REQUESTS),
+                    r -> assertThat(r.getHeaderString(RETRY_AFTER)).isEqualTo("42")
             );
         }
     }
@@ -182,9 +182,9 @@ class MockResponseCreatorsTest {
     void testCustomStatus_notDefinedInStatusEnum() {
         try (Response response = MockResponseCreators.withStatus(418).createResponse(new MockClientRequestContext())) {
             assertThat(response).satisfies(
-                r -> assertThat(r.getStatus()).isEqualTo(418),
-                r -> assertThat(r.getStatusInfo().getFamily()).isEqualTo(CLIENT_ERROR),
-                r -> assertThat(r.getStatusInfo().toEnum()).isNull()
+                    r -> assertThat(r.getStatus()).isEqualTo(418),
+                    r -> assertThat(r.getStatusInfo().getFamily()).isEqualTo(CLIENT_ERROR),
+                    r -> assertThat(r.getStatusInfo().toEnum()).isNull()
             );
         }
     }
@@ -194,9 +194,9 @@ class MockResponseCreatorsTest {
     void testCustomStatus_familyOther() {
         try (Response response = MockResponseCreators.withStatus(999).createResponse(new MockClientRequestContext())) {
             assertThat(response).satisfies(
-                r -> assertThat(r.getStatus()).isEqualTo(999),
-                r -> assertThat(r.getStatusInfo().getFamily()).isEqualTo(OTHER),
-                r -> assertThat(r.getStatusInfo().toEnum()).isNull()
+                    r -> assertThat(r.getStatus()).isEqualTo(999),
+                    r -> assertThat(r.getStatusInfo().getFamily()).isEqualTo(OTHER),
+                    r -> assertThat(r.getStatusInfo().toEnum()).isNull()
             );
         }
     }
@@ -204,7 +204,7 @@ class MockResponseCreatorsTest {
     @Test
     void testException() {
         assertThatThrownBy(() -> MockResponseCreators.withException(new SocketException("Connection Reset")).createResponse(new MockClientRequestContext()).close())
-            .isInstanceOf(SocketException.class)
-            .hasMessage("Connection Reset");
+                .isInstanceOf(SocketException.class)
+                .hasMessage("Connection Reset");
     }
 }

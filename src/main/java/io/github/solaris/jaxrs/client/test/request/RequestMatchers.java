@@ -157,9 +157,9 @@ public final class RequestMatchers {
 
     private static MultivaluedMap<String, String> getQueryParams(URI uri) {
         return Arrays.stream(uri.getQuery().split("&"))
-            .map(query -> URLDecoder.decode(query, UTF_8))
-            .map(query -> query.split("="))
-            .collect(MultivaluedHashMap::new, (map, query) -> map.add(query[0], query[1]), MultivaluedMap::putAll);
+                .map(query -> URLDecoder.decode(query, UTF_8))
+                .map(query -> query.split("="))
+                .collect(MultivaluedHashMap::new, (map, query) -> map.add(query[0], query[1]), MultivaluedMap::putAll);
     }
 
     private static void assertCount(String valueType, String name, MultivaluedMap<String, String> map, int count) {

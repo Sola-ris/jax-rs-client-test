@@ -57,39 +57,39 @@ public final class MultiParts {
 
     public static EntityPart plainPart() throws IOException {
         return EntityPart.withName("plain")
-            .header(CONTENT_LENGTH, String.valueOf(PLAIN_CONTENT.length()))
-            .mediaType(TEXT_PLAIN_TYPE)
-            .content(PLAIN_CONTENT)
-            .build();
+                .header(CONTENT_LENGTH, String.valueOf(PLAIN_CONTENT.length()))
+                .mediaType(TEXT_PLAIN_TYPE)
+                .content(PLAIN_CONTENT)
+                .build();
     }
 
     public static EntityPart jsonPart() throws IOException {
         return EntityPart.withName("json")
-            .mediaType(APPLICATION_JSON_TYPE)
-            .content(new Dto(false))
-            .build();
+                .mediaType(APPLICATION_JSON_TYPE)
+                .content(new Dto(false))
+                .build();
     }
 
     public static EntityPart listPart() throws IOException {
         return EntityPart.withName("list")
-            .mediaType(APPLICATION_JSON_TYPE.withCharset(UTF_8.name()))
-            .content(LIST_CONTENT)
-            .build();
+                .mediaType(APPLICATION_JSON_TYPE.withCharset(UTF_8.name()))
+                .content(LIST_CONTENT)
+                .build();
     }
 
     public static EntityPart imagePart() throws IOException {
         return EntityPart.withFileName("image.png")
-            .mediaType(new MediaType("image", "png"))
-            .content(Files.newInputStream(IMAGE_FILE, READ))
-            .build();
+                .mediaType(new MediaType("image", "png"))
+                .content(Files.newInputStream(IMAGE_FILE, READ))
+                .build();
     }
 
     public static RequestMatcher partsBufferMatcher(List<EntityPart> expected, AtomicReference<PartsBuffer> target) {
         return request -> {
             EntityConverter converter = EntityConverter.fromRequestContext(request);
             target.set(new PartsBuffer(
-                converter.bufferExpectedMultipart(expected),
-                converter.bufferMultipartRequest(request)
+                    converter.bufferExpectedMultipart(expected),
+                    converter.bufferMultipartRequest(request)
             ));
         };
     }

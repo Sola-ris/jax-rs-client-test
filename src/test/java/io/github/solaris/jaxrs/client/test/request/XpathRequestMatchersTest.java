@@ -30,19 +30,19 @@ import io.github.solaris.jaxrs.client.test.util.extension.RunInQuarkus;
 @RunInQuarkus
 class XpathRequestMatchersTest {
     private static final String EXPLICIT_DEFAULT_NS = """
-        <xmlDto xmlns='urn:jax-rs.client.test'>
-        </xmlDto>""";
+            <xmlDto xmlns='urn:jax-rs.client.test'>
+            </xmlDto>""";
 
     private static final String CHILD_IN_DIFFERENT_NS = """
-        <xmlDto xmlns='urn:jax-rs.client.test' xmlns:other='urn:jax-ws.client.test'>
-            <other:greeting>hello</other:greeting>
-        </xmlDto>""";
+            <xmlDto xmlns='urn:jax-rs.client.test' xmlns:other='urn:jax-ws.client.test'>
+                <other:greeting>hello</other:greeting>
+            </xmlDto>""";
 
     private static final String ATTRIBUTE_IN_XML_NAMESPACE = """
-        <xmlDto>
-            <greeting xml:lang='en'>hello</greeting>
-            <greeting xml:lang='de'>hallo</greeting>
-        </xmlDto>""";
+            <xmlDto>
+                <greeting xml:lang='en'>hello</greeting>
+                <greeting xml:lang='de'>hallo</greeting>
+            </xmlDto>""";
 
     // Jersey without HK2 throws an NPE when trying to obtain the XML string using the ClientEntityConverter
     @JaxRsVendorTest(skipFor = JERSEY)
@@ -79,8 +79,8 @@ class XpathRequestMatchersTest {
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         Map<String, String> namespaces = Map.of(
-            "", "urn:jax-rs.client.test",
-            "other", "urn:jax-ws.client.test"
+                "", "urn:jax-rs.client.test",
+                "other", "urn:jax-ws.client.test"
         );
         server.expect(RequestMatchers.xpath("/:xmlDto/other:greeting", namespaces).exists()).andRespond(withSuccess());
 
@@ -114,12 +114,12 @@ class XpathRequestMatchersTest {
         server.expect(RequestMatchers.xpath("/xmlEntity", Map.of()).exists()).andRespond(withSuccess());
 
         filterExceptionAssert.assertThatThrownBy(() -> {
-                try (client) {
-                    client.target("/hello").request().post(Entity.xml(new XmlDto())).close();
-                }
-            })
-            .isInstanceOf(AssertionError.class)
-            .hasMessage("XPath /xmlEntity does not exist");
+                    try (client) {
+                        client.target("/hello").request().post(Entity.xml(new XmlDto())).close();
+                    }
+                })
+                .isInstanceOf(AssertionError.class)
+                .hasMessage("XPath /xmlEntity does not exist");
     }
 
     @JaxRsVendorTest(skipFor = JERSEY)
@@ -144,12 +144,12 @@ class XpathRequestMatchersTest {
         server.expect(RequestMatchers.xpath("/xmlDto").doesNotExist()).andRespond(withSuccess());
 
         filterExceptionAssert.assertThatThrownBy(() -> {
-                try (client) {
-                    client.target("/hello").request().post(Entity.xml(new XmlDto())).close();
-                }
-            })
-            .isInstanceOf(AssertionError.class)
-            .hasMessage("XPath /xmlDto does exist");
+                    try (client) {
+                        client.target("/hello").request().post(Entity.xml(new XmlDto())).close();
+                    }
+                })
+                .isInstanceOf(AssertionError.class)
+                .hasMessage("XPath /xmlDto does exist");
     }
 
     @JaxRsVendorTest(skipFor = JERSEY)
@@ -178,12 +178,12 @@ class XpathRequestMatchersTest {
         xmlDto.nodes = List.of("hello");
 
         filterExceptionAssert.assertThatThrownBy(() -> {
-                try (client) {
-                    client.target("/hello").request().post(Entity.xml(xmlDto)).close();
-                }
-            })
-            .isInstanceOf(AssertionError.class)
-            .hasMessage("NodeCount for XPath /xmlDto/nodes expected: <2> but was: <1>");
+                    try (client) {
+                        client.target("/hello").request().post(Entity.xml(xmlDto)).close();
+                    }
+                })
+                .isInstanceOf(AssertionError.class)
+                .hasMessage("NodeCount for XPath /xmlDto/nodes expected: <2> but was: <1>");
     }
 
     @JaxRsVendorTest(skipFor = JERSEY)
@@ -230,12 +230,12 @@ class XpathRequestMatchersTest {
         xmlDto.str = "goodbye";
 
         filterExceptionAssert.assertThatThrownBy(() -> {
-                try (client) {
-                    client.target("/hello").request().post(Entity.xml(xmlDto)).close();
-                }
-            })
-            .isInstanceOf(AssertionError.class)
-            .hasMessage("XPath /xmlDto/str expected: <hello> but was: <goodbye>");
+                    try (client) {
+                        client.target("/hello").request().post(Entity.xml(xmlDto)).close();
+                    }
+                })
+                .isInstanceOf(AssertionError.class)
+                .hasMessage("XPath /xmlDto/str expected: <hello> but was: <goodbye>");
     }
 
     @JaxRsVendorTest(skipFor = JERSEY)
@@ -283,12 +283,12 @@ class XpathRequestMatchersTest {
         xmlDto.num = 2;
 
         filterExceptionAssert.assertThatThrownBy(() -> {
-                try (client) {
-                    client.target("/hello").request().post(Entity.xml(xmlDto)).close();
-                }
-            })
-            .isInstanceOf(AssertionError.class)
-            .hasMessage("XPath /xmlDto/num expected: <1.0> but was: <2.0>");
+                    try (client) {
+                        client.target("/hello").request().post(Entity.xml(xmlDto)).close();
+                    }
+                })
+                .isInstanceOf(AssertionError.class)
+                .hasMessage("XPath /xmlDto/num expected: <1.0> but was: <2.0>");
     }
 
     @JaxRsVendorTest(skipFor = JERSEY)
@@ -302,12 +302,12 @@ class XpathRequestMatchersTest {
         xmlDto.str = "hello";
 
         filterExceptionAssert.assertThatThrownBy(() -> {
-                try (client) {
-                    client.target("/hello").request().post(Entity.xml(xmlDto)).close();
-                }
-            })
-            .isInstanceOf(AssertionError.class)
-            .hasMessage("XPath /xmlDto/str expected: <1.0> but was: <NaN>");
+                    try (client) {
+                        client.target("/hello").request().post(Entity.xml(xmlDto)).close();
+                    }
+                })
+                .isInstanceOf(AssertionError.class)
+                .hasMessage("XPath /xmlDto/str expected: <1.0> but was: <NaN>");
     }
 
     @JaxRsVendorTest(skipFor = JERSEY)
@@ -338,12 +338,12 @@ class XpathRequestMatchersTest {
         xmlDto.bool = true;
 
         filterExceptionAssert.assertThatThrownBy(() -> {
-                try (client) {
-                    client.target("/hello").request().post(Entity.xml(xmlDto)).close();
-                }
-            })
-            .isInstanceOf(AssertionError.class)
-            .hasMessage("XPath /xmlDto/bool expected: <false> but was: <true>");
+                    try (client) {
+                        client.target("/hello").request().post(Entity.xml(xmlDto)).close();
+                    }
+                })
+                .isInstanceOf(AssertionError.class)
+                .hasMessage("XPath /xmlDto/bool expected: <false> but was: <true>");
     }
 
     @JaxRsVendorTest
@@ -354,33 +354,33 @@ class XpathRequestMatchersTest {
         server.expect(RequestMatchers.xpath("/xmlDto").exists()).andRespond(withSuccess());
 
         filterExceptionAssert.assertThatThrownBy(() -> {
-                try (client) {
-                    client.target("/hello").request().post(Entity.xml("{\"something\": false}")).close();
-                }
-            })
-            .isInstanceOf(AssertionError.class)
-            .cause()
-            .isInstanceOf(SAXParseException.class)
-            .satisfies(
-                e -> assertThat(e).hasMessage("Content is not allowed in prolog."),
-                e -> assertThat(((SAXParseException) e).getLineNumber()).isOne(),
-                e -> assertThat(((SAXParseException) e).getColumnNumber()).isOne()
-            );
+                    try (client) {
+                        client.target("/hello").request().post(Entity.xml("{\"something\": false}")).close();
+                    }
+                })
+                .isInstanceOf(AssertionError.class)
+                .cause()
+                .isInstanceOf(SAXParseException.class)
+                .satisfies(
+                        e -> assertThat(e).hasMessage("Content is not allowed in prolog."),
+                        e -> assertThat(((SAXParseException) e).getLineNumber()).isOne(),
+                        e -> assertThat(((SAXParseException) e).getColumnNumber()).isOne()
+                );
     }
 
     @JaxRsVendorTest
     void testUnknownNamespace() {
         Map<String, String> namespaces = Map.of(
-            "", "urn:jax-rs.client.test",
-            "other", "urn:jax-ws.client.test"
+                "", "urn:jax-rs.client.test",
+                "other", "urn:jax-ws.client.test"
         );
 
         assertThatThrownBy(() -> RequestMatchers.xpath("/xmlDto/greeting:hello", namespaces).exists())
-            .isInstanceOf(XPathExpressionException.class)
-            .hasMessageEndingWith("Prefix must resolve to a namespace: greeting")
-            .cause()
-            .isInstanceOf(TransformerException.class)
-            .hasMessage("Prefix must resolve to a namespace: greeting");
+                .isInstanceOf(XPathExpressionException.class)
+                .hasMessageEndingWith("Prefix must resolve to a namespace: greeting")
+                .cause()
+                .isInstanceOf(TransformerException.class)
+                .hasMessage("Prefix must resolve to a namespace: greeting");
     }
 
     @NullUnmarked

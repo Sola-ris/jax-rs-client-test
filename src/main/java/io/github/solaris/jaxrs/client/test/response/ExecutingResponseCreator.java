@@ -46,8 +46,8 @@ public class ExecutingResponseCreator implements ResponseCreator {
     @Override
     public Response createResponse(ClientRequestContext request) {
         Invocation.Builder invocationBuilder = client.target(request.getUri())
-            .request()
-            .headers(request.getHeaders());
+                .request()
+                .headers(request.getHeaders());
         if (request.hasEntity()) {
             return invocationBuilder.method(request.getMethod(), Entity.entity(request.getEntity(), request.getMediaType()));
         }

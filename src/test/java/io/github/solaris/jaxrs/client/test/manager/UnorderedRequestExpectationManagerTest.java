@@ -26,11 +26,11 @@ class UnorderedRequestExpectationManagerTest {
     @Test
     void testUnexpectedRequest() {
         assertThatThrownBy(() -> manager.validateRequest(new MockClientRequestContext(GET, "/hello")).close())
-            .isInstanceOf(AssertionError.class)
-            .hasMessage("""
-                No further requests expected: HTTP GET /hello
-                0 request(s) executed.
-                """);
+                .isInstanceOf(AssertionError.class)
+                .hasMessage("""
+                        No further requests expected: HTTP GET /hello
+                        0 request(s) executed.
+                        """);
     }
 
     @Test
@@ -74,15 +74,15 @@ class UnorderedRequestExpectationManagerTest {
         }).doesNotThrowAnyException();
 
         assertThatThrownBy(() -> manager.validateRequest(new MockClientRequestContext(GET, "/hello")).close())
-            .isInstanceOf(AssertionError.class)
-            .hasMessage("""
-                No further requests expected: HTTP GET /hello
-                4 request(s) executed:
-                GET /goodbye
-                GET /hello
-                GET /goodbye
-                GET /hello
-                """);
+                .isInstanceOf(AssertionError.class)
+                .hasMessage("""
+                        No further requests expected: HTTP GET /hello
+                        4 request(s) executed:
+                        GET /goodbye
+                        GET /hello
+                        GET /goodbye
+                        GET /hello
+                        """);
     }
 
     @Test
@@ -97,13 +97,13 @@ class UnorderedRequestExpectationManagerTest {
         }).doesNotThrowAnyException();
 
         assertThatThrownBy(manager::verify)
-            .isInstanceOf(AssertionError.class)
-            .hasMessage("""
-                Further request(s) expected leaving 1 unsatisfied expectation(s).
-                3 request(s) executed:
-                GET /hello
-                GET /goodbye
-                GET /goodbye
-                """);
+                .isInstanceOf(AssertionError.class)
+                .hasMessage("""
+                        Further request(s) expected leaving 1 unsatisfied expectation(s).
+                        3 request(s) executed:
+                        GET /hello
+                        GET /goodbye
+                        GET /goodbye
+                        """);
     }
 }

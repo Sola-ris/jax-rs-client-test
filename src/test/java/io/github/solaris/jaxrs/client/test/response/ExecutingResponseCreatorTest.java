@@ -96,10 +96,10 @@ class ExecutingResponseCreatorTest {
         assertThatCode(() -> {
             try (Client client = builder.build()) {
                 Response serverResponse = client.target(REQUEST_URI)
-                    .register(headerCaptor)
-                    .request()
-                    .header("X-Custom", "Custom-X")
-                    .post(Entity.entity(REQUEST_BODY, TEXT_PLAIN));
+                        .register(headerCaptor)
+                        .request()
+                        .header("X-Custom", "Custom-X")
+                        .post(Entity.entity(REQUEST_BODY, TEXT_PLAIN));
                 assertThat(serverResponse.getStatusInfo().toEnum()).isEqualTo(OK);
                 serverResponse.close();
 
@@ -127,10 +127,10 @@ class ExecutingResponseCreatorTest {
         assertThatCode(() -> {
             try (Client client = builder.build()) {
                 Response serverResponse = client.target(REQUEST_URI)
-                    .register(headerCaptor)
-                    .request()
-                    .header("X-Custom", "Custom-X")
-                    .get();
+                        .register(headerCaptor)
+                        .request()
+                        .header("X-Custom", "Custom-X")
+                        .get();
                 assertThat(serverResponse.getStatusInfo().toEnum()).isEqualTo(OK);
                 serverResponse.close();
 
@@ -157,7 +157,7 @@ class ExecutingResponseCreatorTest {
                 headers.addAll(header.getKey().toLowerCase(), header.getValue());
             }
             requestUri = URI.create(
-                "http://" + exchange.getLocalAddress().getHostName() + ":" + exchange.getLocalAddress().getPort() + exchange.getRequestURI());
+                    "http://" + exchange.getLocalAddress().getHostName() + ":" + exchange.getLocalAddress().getPort() + exchange.getRequestURI());
             body = new String(exchange.getRequestBody().readAllBytes(), UTF_8);
 
             exchange.sendResponseHeaders(OK.getStatusCode(), 0);

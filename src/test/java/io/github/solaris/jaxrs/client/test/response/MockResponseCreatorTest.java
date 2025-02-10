@@ -65,14 +65,13 @@ class MockResponseCreatorTest {
 
     @JaxRsVendorTest
     void testResponseWithHeaders() {
-        try (Response response =
-                 new MockResponseCreator(OK)
-                     .header(ACCEPT_ENCODING, "gzip", "deflate", "br")
-                     .header(ACCEPT, WILDCARD)
-                     .createResponse(new MockClientRequestContext())) {
+        try (Response response = new MockResponseCreator(OK)
+                .header(ACCEPT_ENCODING, "gzip", "deflate", "br")
+                .header(ACCEPT, WILDCARD)
+                .createResponse(new MockClientRequestContext())) {
             assertThat(response.getHeaders()).satisfies(
-                headers -> assertThat(headers.get(ACCEPT_ENCODING)).containsExactlyInAnyOrder("gzip", "deflate", "br"),
-                headers -> assertThat(headers.get(ACCEPT)).singleElement().isEqualTo(WILDCARD)
+                    headers -> assertThat(headers.get(ACCEPT_ENCODING)).containsExactlyInAnyOrder("gzip", "deflate", "br"),
+                    headers -> assertThat(headers.get(ACCEPT)).singleElement().isEqualTo(WILDCARD)
             );
         }
     }
@@ -88,29 +87,28 @@ class MockResponseCreatorTest {
     @JaxRsVendorTest
     void testRespondWithCookies() {
         NewCookie sessionCookie = new NewCookie.Builder("session-token")
-            .maxAge(-1)
-            .comment("top-secret")
-            .value("123456")
-            .sameSite(STRICT)
-            .secure(true)
-            .version(42)
-            .build();
+                .maxAge(-1)
+                .comment("top-secret")
+                .value("123456")
+                .sameSite(STRICT)
+                .secure(true)
+                .version(42)
+                .build();
         NewCookie themeCookie = new NewCookie.Builder("theme")
-            // Truncated to seconds to prevent differences in millis after parsing
-            .expiry(Date.from(Instant.now().plus(Year.now().length(), DAYS).truncatedTo(SECONDS)))
-            .maxAge(Long.valueOf(YEARS.getDuration().getSeconds()).intValue())
-            .secure(false)
-            .sameSite(NONE)
-            .value("dark")
-            .build();
+                // Truncated to seconds to prevent differences in millis after parsing
+                .expiry(Date.from(Instant.now().plus(Year.now().length(), DAYS).truncatedTo(SECONDS)))
+                .maxAge(Long.valueOf(YEARS.getDuration().getSeconds()).intValue())
+                .secure(false)
+                .sameSite(NONE)
+                .value("dark")
+                .build();
 
-        try (Response response =
-                 new MockResponseCreator(OK)
-                     .cookies(sessionCookie, themeCookie)
-                     .createResponse(new MockClientRequestContext())) {
+        try (Response response = new MockResponseCreator(OK)
+                .cookies(sessionCookie, themeCookie)
+                .createResponse(new MockClientRequestContext())) {
             assertThat(response.getCookies()).satisfies(
-                cookies -> assertThat(cookies.get("session-token")).isEqualTo(sessionCookie),
-                cookies -> assertThat(cookies.get("theme")).isEqualTo(themeCookie)
+                    cookies -> assertThat(cookies.get("session-token")).isEqualTo(sessionCookie),
+                    cookies -> assertThat(cookies.get("theme")).isEqualTo(themeCookie)
             );
         }
     }
@@ -118,17 +116,17 @@ class MockResponseCreatorTest {
     @JaxRsVendorTest
     void testRespondWithLinks() {
         Link nextPage = Link.fromUri("http://local.host?page=3")
-            .title("Page 3")
-            .rel("next")
-            .type(TEXT_HTML)
-            .param("greeting", "hello")
-            .build();
+                .title("Page 3")
+                .rel("next")
+                .type(TEXT_HTML)
+                .param("greeting", "hello")
+                .build();
         Link prevPage = Link.fromUriBuilder(UriBuilder.fromUri("?page={page}"))
-            .title("Page 1")
-            .rel("prev")
-            .type(TEXT_HTML)
-            .param("sendoff", "goodbye")
-            .build("1");
+                .title("Page 1")
+                .rel("prev")
+                .type(TEXT_HTML)
+                .param("sendoff", "goodbye")
+                .build("1");
 
         Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
@@ -138,8 +136,8 @@ class MockResponseCreatorTest {
 
         try (client) {
             assertThat(client.target("").request().get()).satisfies(
-                r -> assertThat(r.getStatusInfo().toEnum()).isEqualTo(OK),
-                r -> assertThat(r.getLinks()).containsExactlyInAnyOrder(nextPage, prevPage)
+                    r -> assertThat(r.getStatusInfo().toEnum()).isEqualTo(OK),
+                    r -> assertThat(r.getLinks()).containsExactlyInAnyOrder(nextPage, prevPage)
             );
         }
     }
@@ -147,12 +145,12 @@ class MockResponseCreatorTest {
     @JaxRsVendorTest
     void testRespondWithVariants() {
         List<Variant> variants = Variant.mediaTypes(APPLICATION_JSON_TYPE, APPLICATION_XML_TYPE)
-            .languages(ENGLISH, GERMAN, FRENCH)
-            .encodings(UTF_8.name(), UTF_16.name())
-            .build();
+                .languages(ENGLISH, GERMAN, FRENCH)
+                .encodings(UTF_8.name(), UTF_16.name())
+                .build();
 
         try (Response response =
-                 new MockResponseCreator(OK).variants(variants.toArray(new Variant[0])).createResponse(new MockClientRequestContext())) {
+                     new MockResponseCreator(OK).variants(variants.toArray(new Variant[0])).createResponse(new MockClientRequestContext())) {
             assertThat(response.getHeaderString(VARY)).contains(ACCEPT, ACCEPT_ENCODING, ACCEPT_LANGUAGE);
         }
     }
@@ -173,11 +171,11 @@ class MockResponseCreatorTest {
 
         try (Response response = new MockResponseCreator(OK).header(CACHE_CONTROL, cacheControl).createResponse(new MockClientRequestContext())) {
             assertThat(response.getHeaders())
-                .containsKey(CACHE_CONTROL)
-                .extractingByKey(CACHE_CONTROL)
-                .asInstanceOf(LIST)
-                .singleElement()
-                .isEqualTo(cacheControl);
+                    .containsKey(CACHE_CONTROL)
+                    .extractingByKey(CACHE_CONTROL)
+                    .asInstanceOf(LIST)
+                    .singleElement()
+                    .isEqualTo(cacheControl);
         }
     }
 

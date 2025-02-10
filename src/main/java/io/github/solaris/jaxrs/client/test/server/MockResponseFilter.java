@@ -34,7 +34,7 @@ public final class MockResponseFilter implements ClientRequestFilter {
         Object property = requestContext.getConfiguration().getProperty(RequestExpectationManager.class.getName());
         if (property instanceof RequestExpectationManager expectationManager) {
             requestContext.abortWith(
-                expectationManager.validateRequest(requestContext)
+                    expectationManager.validateRequest(requestContext)
             );
         }
     }

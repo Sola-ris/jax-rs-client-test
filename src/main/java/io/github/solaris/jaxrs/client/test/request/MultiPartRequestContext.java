@@ -25,9 +25,7 @@ import jakarta.ws.rs.core.MultivaluedHashMap;
 import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.Response;
 
-record MultiPartRequestContext(
-    Object entity, Type entityType, MultivaluedMap<String, String> stringHeaders
-) implements ClientRequestContext {
+record MultiPartRequestContext(Object entity, Type entityType, MultivaluedMap<String, String> stringHeaders) implements ClientRequestContext {
     static final GenericType<List<EntityPart>> ENTITY_PARTS = new GenericType<>() {};
 
     MultiPartRequestContext(List<EntityPart> entityParts) {

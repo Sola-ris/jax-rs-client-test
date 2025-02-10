@@ -33,21 +33,21 @@ class RequestMatchersTest {
     @Test
     void testMethod_noMatch() {
         assertThatThrownBy(() -> RequestMatchers.method(HEAD).match(new MockClientRequestContext(PATCH)))
-            .isInstanceOf(AssertionError.class)
-            .hasMessage("Unexpected Method. expected: <%s> but was: <%s>", HEAD, PATCH);
+                .isInstanceOf(AssertionError.class)
+                .hasMessage("Unexpected Method. expected: <%s> but was: <%s>", HEAD, PATCH);
     }
 
     @Test
     void testRequestTo_string() {
         assertThatCode(() -> RequestMatchers.requestTo("local.host").match(new MockClientRequestContext(URI.create("local.host"))))
-            .doesNotThrowAnyException();
+                .doesNotThrowAnyException();
     }
 
     @Test
     void testRequestTo_string_noMatch() {
         assertThatThrownBy(() -> RequestMatchers.requestTo("local.host").match(new MockClientRequestContext(URI.create("remote.host"))))
-            .isInstanceOf(AssertionError.class)
-            .hasMessage("Unexpected Request. expected: <local.host> but was: <remote.host>");
+                .isInstanceOf(AssertionError.class)
+                .hasMessage("Unexpected Request. expected: <local.host> but was: <remote.host>");
     }
 
     @Test
@@ -59,47 +59,47 @@ class RequestMatchersTest {
     @Test
     void testRequestTo_uri_noMatch() {
         assertThatThrownBy(() -> RequestMatchers.requestTo(URI.create("local.host")).match(new MockClientRequestContext(URI.create("remote.host"))))
-            .isInstanceOf(AssertionError.class)
-            .hasMessage("Unexpected Request. expected: <local.host> but was: <remote.host>");
+                .isInstanceOf(AssertionError.class)
+                .hasMessage("Unexpected Request. expected: <local.host> but was: <remote.host>");
     }
 
     @Test
     void testQueryParam() {
         URI uri = URI.create("local.host?greeting=hello&greeting=salutations");
         assertThatCode(() -> RequestMatchers.queryParam("greeting", "hello", "salutations").match(new MockClientRequestContext(uri)))
-            .doesNotThrowAnyException();
+                .doesNotThrowAnyException();
     }
 
     @Test
     void testQueryParam_paramMissing() {
         URI uri = URI.create("local.host?greeting=hello&greeting=salutations");
         assertThatThrownBy(() -> RequestMatchers.queryParam("sendoff", "goodbye", "farewell").match(new MockClientRequestContext(uri)))
-            .isInstanceOf(AssertionError.class)
-            .hasMessage("Expected QueryParam <sendoff> to exist but was null");
+                .isInstanceOf(AssertionError.class)
+                .hasMessage("Expected QueryParam <sendoff> to exist but was null");
     }
 
     @Test
     void testQueryParam_countMismatch() {
         URI uri = URI.create("local.host?greeting=hello");
         assertThatThrownBy(() -> RequestMatchers.queryParam("greeting", "hello", "salutations").match(new MockClientRequestContext(uri)))
-            .isInstanceOf(AssertionError.class)
-            .hasMessage("Expected QueryParam <greeting> to have at least <2> values but found [hello]");
+                .isInstanceOf(AssertionError.class)
+                .hasMessage("Expected QueryParam <greeting> to have at least <2> values but found [hello]");
     }
 
     @Test
     void testQueryParam_valueMismatch() {
         URI uri = URI.create("local.host?greeting=hello");
         assertThatThrownBy(() -> RequestMatchers.queryParam("greeting", "salutations").match(new MockClientRequestContext(uri)))
-            .isInstanceOf(AssertionError.class)
-            .hasMessage("QueryParam [name=greeting, position=0] expected: <salutations> but was: <hello>");
+                .isInstanceOf(AssertionError.class)
+                .hasMessage("QueryParam [name=greeting, position=0] expected: <salutations> but was: <hello>");
     }
 
     @Test
     void testQueryParam_orderMismatch() {
         URI uri = URI.create("local.host?greeting=hello&greeting=salutations");
         assertThatThrownBy(() -> RequestMatchers.queryParam("greeting", "salutations", "hello").match(new MockClientRequestContext(uri)))
-            .isInstanceOf(AssertionError.class)
-            .hasMessage("QueryParam [name=greeting, position=0] expected: <salutations> but was: <hello>");
+                .isInstanceOf(AssertionError.class)
+                .hasMessage("QueryParam [name=greeting, position=0] expected: <salutations> but was: <hello>");
     }
 
     @Test
@@ -108,7 +108,7 @@ class RequestMatchersTest {
         headers.put(ACCEPT, List.of(APPLICATION_JSON, APPLICATION_XML));
 
         assertThatCode(() -> RequestMatchers.header(ACCEPT, APPLICATION_JSON, APPLICATION_XML).match(new MockClientRequestContext(headers)))
-            .doesNotThrowAnyException();
+                .doesNotThrowAnyException();
     }
 
     @Test
@@ -117,8 +117,8 @@ class RequestMatchersTest {
         headers.putSingle(ACCEPT, APPLICATION_JSON);
 
         assertThatThrownBy(() -> RequestMatchers.header(ACCEPT, APPLICATION_JSON, APPLICATION_XML).match(new MockClientRequestContext(headers)))
-            .isInstanceOf(AssertionError.class)
-            .hasMessage("Expected header <%s> to have at least <2> values but found %s", ACCEPT, headers.get(ACCEPT));
+                .isInstanceOf(AssertionError.class)
+                .hasMessage("Expected header <%s> to have at least <2> values but found %s", ACCEPT, headers.get(ACCEPT));
     }
 
     @Test
@@ -127,8 +127,8 @@ class RequestMatchersTest {
         headers.putSingle(ACCEPT, APPLICATION_JSON);
 
         assertThatThrownBy(() -> RequestMatchers.header(ACCEPT, APPLICATION_XML).match(new MockClientRequestContext(headers)))
-            .isInstanceOf(AssertionError.class)
-            .hasMessage("Request header [name=%s, position=0] expected: <%s> but was: <%s>", ACCEPT, APPLICATION_XML, APPLICATION_JSON);
+                .isInstanceOf(AssertionError.class)
+                .hasMessage("Request header [name=%s, position=0] expected: <%s> but was: <%s>", ACCEPT, APPLICATION_XML, APPLICATION_JSON);
     }
 
     @Test
@@ -137,8 +137,8 @@ class RequestMatchersTest {
         headers.put(ACCEPT, List.of(APPLICATION_JSON, APPLICATION_XML));
 
         assertThatThrownBy(() -> RequestMatchers.header(ACCEPT, APPLICATION_XML, APPLICATION_JSON).match(new MockClientRequestContext(headers)))
-            .isInstanceOf(AssertionError.class)
-            .hasMessage("Request header [name=%s, position=0] expected: <%s> but was: <%s>", ACCEPT, APPLICATION_XML, APPLICATION_JSON);
+                .isInstanceOf(AssertionError.class)
+                .hasMessage("Request header [name=%s, position=0] expected: <%s> but was: <%s>", ACCEPT, APPLICATION_XML, APPLICATION_JSON);
     }
 
     @Test
@@ -152,7 +152,7 @@ class RequestMatchersTest {
         headers.putSingle(ACCEPT, APPLICATION_JSON);
 
         assertThatThrownBy(() -> RequestMatchers.headerDoesNotExist(ACCEPT).match(new MockClientRequestContext(headers)))
-            .isInstanceOf(AssertionError.class)
-            .hasMessage("Expected header <%s> to not exist, but it exists with values: %s", ACCEPT, headers.get(ACCEPT));
+                .isInstanceOf(AssertionError.class)
+                .hasMessage("Expected header <%s> to not exist, but it exists with values: %s", ACCEPT, headers.get(ACCEPT));
     }
 }

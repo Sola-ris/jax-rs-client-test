@@ -62,9 +62,9 @@ public class JsonPathRequestMatchers {
                     value = evaluate(jsonString, expectedValue.getClass());
                 } catch (AssertionError e) {
                     throw new AssertionError(value
-                        + " cannot be converted to type "
-                        + expectedValue.getClass().getTypeName()
-                        + " at JSON path \"" + expression + "\"", e);
+                            + " cannot be converted to type "
+                            + expectedValue.getClass().getTypeName()
+                            + " at JSON path \"" + expression + "\"", e);
                 }
             }
 

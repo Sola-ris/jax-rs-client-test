@@ -41,53 +41,53 @@ class EntityRequestMatchersTest {
     @JaxRsVendorTest
     void testMediaType() {
         assertThatCode(() -> RequestMatchers.entity().mediaType(APPLICATION_JSON_TYPE).match(new MockClientRequestContext(APPLICATION_JSON_TYPE)))
-            .doesNotThrowAnyException();
+                .doesNotThrowAnyException();
     }
 
     @JaxRsVendorTest
     void testMediaType_notSet() {
         assertThatThrownBy(
-            () -> RequestMatchers.entity()
-                .mediaType(APPLICATION_SVG_XML_TYPE)
-                .match(new MockClientRequestContext((MediaType) null)))
-            .isInstanceOf(AssertionError.class)
-            .hasMessage("MediaType was not set.");
+                () -> RequestMatchers.entity()
+                        .mediaType(APPLICATION_SVG_XML_TYPE)
+                        .match(new MockClientRequestContext((MediaType) null)))
+                .isInstanceOf(AssertionError.class)
+                .hasMessage("MediaType was not set.");
     }
 
     @JaxRsVendorTest
     void testMediaType_noMatch() {
         assertThatThrownBy(
-            () -> RequestMatchers.entity()
-                .mediaType(APPLICATION_JSON_TYPE)
-                .match(new MockClientRequestContext(APPLICATION_OCTET_STREAM_TYPE)))
-            .isInstanceOf(AssertionError.class)
-            .hasMessage("MediaType expected: <%s> but was: <%s>", APPLICATION_JSON_TYPE, APPLICATION_OCTET_STREAM_TYPE);
+                () -> RequestMatchers.entity()
+                        .mediaType(APPLICATION_JSON_TYPE)
+                        .match(new MockClientRequestContext(APPLICATION_OCTET_STREAM_TYPE)))
+                .isInstanceOf(AssertionError.class)
+                .hasMessage("MediaType expected: <%s> but was: <%s>", APPLICATION_JSON_TYPE, APPLICATION_OCTET_STREAM_TYPE);
     }
 
     @JaxRsVendorTest
     void testMediaType_string() {
         assertThatCode(() -> RequestMatchers.entity().mediaType(APPLICATION_JSON).match(new MockClientRequestContext(APPLICATION_JSON_TYPE)))
-            .doesNotThrowAnyException();
+                .doesNotThrowAnyException();
     }
 
     @JaxRsVendorTest
     void testMediaType_string_notSet() {
         assertThatThrownBy(
-            () -> RequestMatchers.entity()
-                .mediaType(APPLICATION_SVG_XML)
-                .match(new MockClientRequestContext((MediaType) null)))
-            .isInstanceOf(AssertionError.class)
-            .hasMessage("MediaType was not set.");
+                () -> RequestMatchers.entity()
+                        .mediaType(APPLICATION_SVG_XML)
+                        .match(new MockClientRequestContext((MediaType) null)))
+                .isInstanceOf(AssertionError.class)
+                .hasMessage("MediaType was not set.");
     }
 
     @JaxRsVendorTest
     void testMediaType_string_noMatch() {
         assertThatThrownBy(
-            () -> RequestMatchers.entity()
-                .mediaType(APPLICATION_JSON)
-                .match(new MockClientRequestContext(APPLICATION_OCTET_STREAM_TYPE)))
-            .isInstanceOf(AssertionError.class)
-            .hasMessage("MediaType expected: <%s> but was: <%s>", APPLICATION_JSON, APPLICATION_OCTET_STREAM);
+                () -> RequestMatchers.entity()
+                        .mediaType(APPLICATION_JSON)
+                        .match(new MockClientRequestContext(APPLICATION_OCTET_STREAM_TYPE)))
+                .isInstanceOf(AssertionError.class)
+                .hasMessage("MediaType expected: <%s> but was: <%s>", APPLICATION_JSON, APPLICATION_OCTET_STREAM);
     }
 
     @JaxRsVendorTest
@@ -101,7 +101,7 @@ class EntityRequestMatchersTest {
 
         try (client) {
             assertThatCode(() -> client.target("/hello").request().post(Entity.entity(dto, TEXT_PLAIN_TYPE)).close())
-                .doesNotThrowAnyException();
+                    .doesNotThrowAnyException();
         }
     }
 
@@ -116,7 +116,7 @@ class EntityRequestMatchersTest {
 
         try (client) {
             assertThatCode(() -> client.target("/hello").request().post(Entity.entity(dto, TEXT_PLAIN_TYPE)).close())
-                .doesNotThrowAnyException();
+                    .doesNotThrowAnyException();
         }
     }
 
@@ -132,10 +132,10 @@ class EntityRequestMatchersTest {
 
         try (client) {
             filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello")
-                    .request()
-                    .post(Entity.entity(otherDto, TEXT_PLAIN_TYPE)).close())
-                .isInstanceOf(AssertionError.class)
-                .hasMessage("Entity expected: <%s> but was: <%s>", dto, otherDto);
+                            .request()
+                            .post(Entity.entity(otherDto, TEXT_PLAIN_TYPE)).close())
+                    .isInstanceOf(AssertionError.class)
+                    .hasMessage("Entity expected: <%s> but was: <%s>", dto, otherDto);
         }
     }
 
@@ -151,10 +151,10 @@ class EntityRequestMatchersTest {
 
         try (client) {
             filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello")
-                    .request()
-                    .post(Entity.entity(otherDto.toString().getBytes(), TEXT_PLAIN_TYPE)).close())
-                .isInstanceOf(AssertionError.class)
-                .hasMessage("Entity String expected: <%s> but was: <%s>", dto.toString(), otherDto.toString());
+                            .request()
+                            .post(Entity.entity(otherDto.toString().getBytes(), TEXT_PLAIN_TYPE)).close())
+                    .isInstanceOf(AssertionError.class)
+                    .hasMessage("Entity String expected: <%s> but was: <%s>", dto.toString(), otherDto.toString());
         }
     }
 
@@ -169,7 +169,7 @@ class EntityRequestMatchersTest {
 
         try (client) {
             assertThatCode(() -> client.target("/hello").request(APPLICATION_JSON_TYPE).post(Entity.form(form)).close())
-                .doesNotThrowAnyException();
+                    .doesNotThrowAnyException();
         }
     }
 
@@ -185,11 +185,11 @@ class EntityRequestMatchersTest {
 
         try (client) {
             filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello")
-                    .request()
-                    .post(Entity.form(otherForm))
-                    .close())
-                .isInstanceOf(AssertionError.class)
-                .hasMessage("Form expected: <%s> but was: <%s>", form.asMap(), otherForm.asMap());
+                            .request()
+                            .post(Entity.form(otherForm))
+                            .close())
+                    .isInstanceOf(AssertionError.class)
+                    .hasMessage("Form expected: <%s> but was: <%s>", form.asMap(), otherForm.asMap());
         }
     }
 
@@ -199,20 +199,20 @@ class EntityRequestMatchersTest {
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         Form actualForm = new Form()
-            .param("greeting", "hello")
-            .param("greeting", "salutations")
-            .param("sendoff", "goodbye")
-            .param("sendoff", "farewell");
+                .param("greeting", "hello")
+                .param("greeting", "salutations")
+                .param("sendoff", "goodbye")
+                .param("sendoff", "farewell");
 
         Form subset = new Form()
-            .param("greeting", "hello")
-            .param("sendoff", "goodbye");
+                .param("greeting", "hello")
+                .param("sendoff", "goodbye");
 
         server.expect(RequestMatchers.entity().formContains(subset)).andRespond(withSuccess());
 
         try (client) {
             assertThatCode(() -> client.target("/hello").request().post(Entity.form(actualForm)).close())
-                .doesNotThrowAnyException();
+                    .doesNotThrowAnyException();
         }
     }
 
@@ -222,23 +222,23 @@ class EntityRequestMatchersTest {
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         Form actualForm = new Form()
-            .param("sendoff", "goodbye")
-            .param("greeting", "hello");
+                .param("sendoff", "goodbye")
+                .param("greeting", "hello");
 
         Form subset = new Form()
-            .param("greeting", "hello")
-            .param("sendoff", "goodbye")
-            .param("question", "how are you?");
+                .param("greeting", "hello")
+                .param("sendoff", "goodbye")
+                .param("question", "how are you?");
 
         server.expect(RequestMatchers.entity().formContains(subset)).andRespond(withSuccess());
 
         try (client) {
             filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello")
-                    .request()
-                    .post(Entity.form(actualForm))
-                    .close())
-                .isInstanceOf(AssertionError.class)
-                .hasMessage("Expected " + subset.asMap() + " to be smaller or the same size as " + actualForm.asMap());
+                            .request()
+                            .post(Entity.form(actualForm))
+                            .close())
+                    .isInstanceOf(AssertionError.class)
+                    .hasMessage("Expected " + subset.asMap() + " to be smaller or the same size as " + actualForm.asMap());
         }
     }
 
@@ -248,21 +248,21 @@ class EntityRequestMatchersTest {
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         Form actualForm = new Form()
-            .param("sendoff", "goodbye")
-            .param("greeting", "hello");
+                .param("sendoff", "goodbye")
+                .param("greeting", "hello");
 
         Form subset = new Form()
-            .param("question", "how are you?");
+                .param("question", "how are you?");
 
         server.expect(RequestMatchers.entity().formContains(subset)).andRespond(withSuccess());
 
         try (client) {
             filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello")
-                    .request()
-                    .post(Entity.form(actualForm))
-                    .close())
-                .isInstanceOf(AssertionError.class)
-                .hasMessage("Expected " + actualForm.asMap() + " to contain parameter 'question'");
+                            .request()
+                            .post(Entity.form(actualForm))
+                            .close())
+                    .isInstanceOf(AssertionError.class)
+                    .hasMessage("Expected " + actualForm.asMap() + " to contain parameter 'question'");
         }
     }
 
@@ -272,21 +272,21 @@ class EntityRequestMatchersTest {
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         Form actualForm = new Form()
-            .param("greeting", "hello");
+                .param("greeting", "hello");
 
         Form subset = new Form()
-            .param("greeting", "hello")
-            .param("greeting", "salutations");
+                .param("greeting", "hello")
+                .param("greeting", "salutations");
 
         server.expect(RequestMatchers.entity().formContains(subset)).andRespond(withSuccess());
 
         try (client) {
             filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello")
-                    .request()
-                    .post(Entity.form(actualForm))
-                    .close())
-                .isInstanceOf(AssertionError.class)
-                .hasMessage("Expected %s to be smaller or the same size as %s", subset.asMap().get("greeting"), actualForm.asMap().get("greeting"));
+                            .request()
+                            .post(Entity.form(actualForm))
+                            .close())
+                    .isInstanceOf(AssertionError.class)
+                    .hasMessage("Expected %s to be smaller or the same size as %s", subset.asMap().get("greeting"), actualForm.asMap().get("greeting"));
         }
     }
 
@@ -296,21 +296,21 @@ class EntityRequestMatchersTest {
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         Form actualForm = new Form()
-            .param("greeting", "hello")
-            .param("greeting", "salutations");
+                .param("greeting", "hello")
+                .param("greeting", "salutations");
 
         Form subset = new Form()
-            .param("greeting", "good morning");
+                .param("greeting", "good morning");
 
         server.expect(RequestMatchers.entity().formContains(subset)).andRespond(withSuccess());
 
         try (client) {
             filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello")
-                    .request()
-                    .post(Entity.form(actualForm))
-                    .close())
-                .isInstanceOf(AssertionError.class)
-                .hasMessage("FormParam [name=greeting, position=0] expected: <good morning> but was: <hello>");
+                            .request()
+                            .post(Entity.form(actualForm))
+                            .close())
+                    .isInstanceOf(AssertionError.class)
+                    .hasMessage("FormParam [name=greeting, position=0] expected: <good morning> but was: <hello>");
         }
     }
 
@@ -320,24 +320,24 @@ class EntityRequestMatchersTest {
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         Form actualForm = new Form()
-            .param("greeting", "hello")
-            .param("greeting", "salutations")
-            .param("greeting", "good morning");
+                .param("greeting", "hello")
+                .param("greeting", "salutations")
+                .param("greeting", "good morning");
 
         Form subset = new Form()
-            .param("greeting", "salutations")
-            .param("greeting", "hello");
+                .param("greeting", "salutations")
+                .param("greeting", "hello");
 
 
         server.expect(RequestMatchers.entity().formContains(subset)).andRespond(withSuccess());
 
         try (client) {
             filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello")
-                    .request()
-                    .post(Entity.form(actualForm))
-                    .close())
-                .isInstanceOf(AssertionError.class)
-                .hasMessage("FormParam [name=greeting, position=0] expected: <salutations> but was: <hello>");
+                            .request()
+                            .post(Entity.form(actualForm))
+                            .close())
+                    .isInstanceOf(AssertionError.class)
+                    .hasMessage("FormParam [name=greeting, position=0] expected: <salutations> but was: <hello>");
         }
     }
 
@@ -350,10 +350,10 @@ class EntityRequestMatchersTest {
 
         try (client) {
             assertThatCode(
-                () -> client.target("/hello")
-                    .request()
-                    .post(Entity.entity(new GenericEntity<>(List.of(plainPart(), imagePart(), jsonPart())) {}, MULTIPART_FORM_DATA_TYPE)).close())
-                .doesNotThrowAnyException();
+                    () -> client.target("/hello")
+                            .request()
+                            .post(Entity.entity(new GenericEntity<>(List.of(plainPart(), imagePart(), jsonPart())) {}, MULTIPART_FORM_DATA_TYPE)).close())
+                    .doesNotThrowAnyException();
         }
     }
 
@@ -364,15 +364,14 @@ class EntityRequestMatchersTest {
 
         AtomicReference<PartsBuffer> partsBuffer = new AtomicReference<>();
         server.expect(partsBufferMatcher(List.of(plainPart()), partsBuffer))
-            .andExpect(RequestMatchers.entity().multipartForm(List.of(plainPart()))).andRespond(withSuccess());
+                .andExpect(RequestMatchers.entity().multipartForm(List.of(plainPart()))).andRespond(withSuccess());
 
         try (client) {
-            filterExceptionAssert.assertThatThrownBy(
-                    () -> client.target("/hello")
-                        .request()
-                        .post(Entity.entity(new GenericEntity<>(List.of(plainPart(), imagePart(), jsonPart())) {}, MULTIPART_FORM_DATA_TYPE)).close())
-                .isInstanceOf(AssertionError.class)
-                .hasMessage("Multipart Form expected: <%s> but was: <%s>", partsBuffer.get().expected(), partsBuffer.get().actual());
+            filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello")
+                            .request()
+                            .post(Entity.entity(new GenericEntity<>(List.of(plainPart(), imagePart(), jsonPart())) {}, MULTIPART_FORM_DATA_TYPE)).close())
+                    .isInstanceOf(AssertionError.class)
+                    .hasMessage("Multipart Form expected: <%s> but was: <%s>", partsBuffer.get().expected(), partsBuffer.get().actual());
         }
     }
 
@@ -383,15 +382,14 @@ class EntityRequestMatchersTest {
 
         AtomicReference<PartsBuffer> partsBuffer = new AtomicReference<>();
         server.expect(partsBufferMatcher(List.of(jsonPart(), imagePart(), plainPart()), partsBuffer))
-            .andExpect(RequestMatchers.entity().multipartForm(List.of(jsonPart(), imagePart(), plainPart()))).andRespond(withSuccess());
+                .andExpect(RequestMatchers.entity().multipartForm(List.of(jsonPart(), imagePart(), plainPart()))).andRespond(withSuccess());
 
         try (client) {
-            filterExceptionAssert.assertThatThrownBy(
-                    () -> client.target("/hello")
-                        .request()
-                        .post(Entity.entity(new GenericEntity<>(List.of(plainPart(), imagePart(), jsonPart())) {}, MULTIPART_FORM_DATA_TYPE)).close())
-                .isInstanceOf(AssertionError.class)
-                .hasMessage("Multipart Form expected: <%s> but was: <%s>", partsBuffer.get().expected(), partsBuffer.get().actual());
+            filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello")
+                            .request()
+                            .post(Entity.entity(new GenericEntity<>(List.of(plainPart(), imagePart(), jsonPart())) {}, MULTIPART_FORM_DATA_TYPE)).close())
+                    .isInstanceOf(AssertionError.class)
+                    .hasMessage("Multipart Form expected: <%s> but was: <%s>", partsBuffer.get().expected(), partsBuffer.get().actual());
         }
     }
 
@@ -404,10 +402,10 @@ class EntityRequestMatchersTest {
 
         try (client) {
             assertThatCode(
-                () -> client.target("/hello")
-                    .request()
-                    .post(Entity.entity(new GenericEntity<>(List.of(plainPart(), imagePart(), jsonPart())) {}, MULTIPART_FORM_DATA_TYPE)).close())
-                .doesNotThrowAnyException();
+                    () -> client.target("/hello")
+                            .request()
+                            .post(Entity.entity(new GenericEntity<>(List.of(plainPart(), imagePart(), jsonPart())) {}, MULTIPART_FORM_DATA_TYPE)).close())
+                    .doesNotThrowAnyException();
         }
     }
 
@@ -418,15 +416,14 @@ class EntityRequestMatchersTest {
 
         AtomicReference<PartsBuffer> partsBuffer = new AtomicReference<>();
         server.expect(partsBufferMatcher(List.of(jsonPart(), imagePart(), plainPart()), partsBuffer))
-            .andExpect(RequestMatchers.entity().multipartFormContains(List.of(jsonPart(), imagePart(), plainPart()))).andRespond(withSuccess());
+                .andExpect(RequestMatchers.entity().multipartFormContains(List.of(jsonPart(), imagePart(), plainPart()))).andRespond(withSuccess());
 
         try (client) {
-            filterExceptionAssert.assertThatThrownBy(
-                    () -> client.target("/hello")
-                        .request()
-                        .post(Entity.entity(new GenericEntity<>(List.of(plainPart(), imagePart())) {}, MULTIPART_FORM_DATA_TYPE)).close())
-                .isInstanceOf(AssertionError.class)
-                .hasMessage("Expected %s to be smaller or the same size as %s", partsBuffer.get().expected(), partsBuffer.get().actual());
+            filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello")
+                            .request()
+                            .post(Entity.entity(new GenericEntity<>(List.of(plainPart(), imagePart())) {}, MULTIPART_FORM_DATA_TYPE)).close())
+                    .isInstanceOf(AssertionError.class)
+                    .hasMessage("Expected %s to be smaller or the same size as %s", partsBuffer.get().expected(), partsBuffer.get().actual());
         }
     }
 
@@ -437,15 +434,14 @@ class EntityRequestMatchersTest {
 
         AtomicReference<PartsBuffer> partsBuffer = new AtomicReference<>();
         server.expect(partsBufferMatcher(List.of(jsonPart()), partsBuffer))
-            .andExpect(RequestMatchers.entity().multipartFormContains(List.of(jsonPart()))).andRespond(withSuccess());
+                .andExpect(RequestMatchers.entity().multipartFormContains(List.of(jsonPart()))).andRespond(withSuccess());
 
         try (client) {
-            filterExceptionAssert.assertThatThrownBy(
-                    () -> client.target("/hello")
-                        .request()
-                        .post(Entity.entity(new GenericEntity<>(List.of(plainPart(), imagePart())) {}, MULTIPART_FORM_DATA_TYPE)).close())
-                .isInstanceOf(AssertionError.class)
-                .hasMessage("Expected %s to contain all of %s", partsBuffer.get().actual(), partsBuffer.get().expected());
+            filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello")
+                            .request()
+                            .post(Entity.entity(new GenericEntity<>(List.of(plainPart(), imagePart())) {}, MULTIPART_FORM_DATA_TYPE)).close())
+                    .isInstanceOf(AssertionError.class)
+                    .hasMessage("Expected %s to contain all of %s", partsBuffer.get().actual(), partsBuffer.get().expected());
         }
     }
 

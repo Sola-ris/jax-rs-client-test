@@ -86,8 +86,8 @@ class JsonPathRequestMatchersTest {
 
         try (client) {
             filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.json(dto)).close())
-                .isInstanceOf(AssertionError.class)
-                .hasMessage("JSON Path \"%s\" expected: <%s> but was: <%s>", DEFINITE_PATH, true, false);
+                    .isInstanceOf(AssertionError.class)
+                    .hasMessage("JSON Path \"%s\" expected: <%s> but was: <%s>", DEFINITE_PATH, true, false);
         }
     }
 
@@ -102,8 +102,8 @@ class JsonPathRequestMatchersTest {
 
         try (client) {
             filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.json(dto)).close())
-                .isInstanceOf(AssertionError.class)
-                .hasMessage("Found no value matching %s at JSON path \"%s\"", true, DEFINITE_PATH);
+                    .isInstanceOf(AssertionError.class)
+                    .hasMessage("Found no value matching %s at JSON path \"%s\"", true, DEFINITE_PATH);
         }
     }
 
@@ -119,8 +119,8 @@ class JsonPathRequestMatchersTest {
 
         try (client) {
             filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.json(dto)).close())
-                .isInstanceOf(AssertionError.class)
-                .hasMessage("Found list of values %s instead of the expected single value %s", toJsonArray(something), true);
+                    .isInstanceOf(AssertionError.class)
+                    .hasMessage("Found list of values %s instead of the expected single value %s", toJsonArray(something), true);
         }
     }
 
@@ -136,8 +136,8 @@ class JsonPathRequestMatchersTest {
 
         try (client) {
             filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.json(dto)).close())
-                .isInstanceOf(AssertionError.class)
-                .hasMessage("%s cannot be converted to type %s at JSON path \"%s\"", something, Boolean.class.getTypeName(), DEFINITE_PATH);
+                    .isInstanceOf(AssertionError.class)
+                    .hasMessage("%s cannot be converted to type %s at JSON path \"%s\"", something, Boolean.class.getTypeName(), DEFINITE_PATH);
         }
     }
 
@@ -168,8 +168,8 @@ class JsonPathRequestMatchersTest {
 
         try (client) {
             filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.json(dto)).close())
-                .isInstanceOf(AssertionError.class)
-                .hasMessage("Found no value for JSON path \"%s\"", NON_EXISTENT_PATH);
+                    .isInstanceOf(AssertionError.class)
+                    .hasMessage("Found no value for JSON path \"%s\"", NON_EXISTENT_PATH);
         }
     }
 
@@ -184,8 +184,8 @@ class JsonPathRequestMatchersTest {
 
         try (client) {
             filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.json(dto)).close())
-                .isInstanceOf(AssertionError.class)
-                .hasMessage("Found no value for JSON path \"%s\"", DEFINITE_PATH);
+                    .isInstanceOf(AssertionError.class)
+                    .hasMessage("Found no value for JSON path \"%s\"", DEFINITE_PATH);
         }
     }
 
@@ -200,8 +200,8 @@ class JsonPathRequestMatchersTest {
 
         try (client) {
             filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.json(dto)).close())
-                .isInstanceOf(AssertionError.class)
-                .hasMessage("Found no value for JSON path \"%s\"", INDEFINITE_PATH);
+                    .isInstanceOf(AssertionError.class)
+                    .hasMessage("Found no value for JSON path \"%s\"", INDEFINITE_PATH);
         }
     }
 
@@ -265,8 +265,8 @@ class JsonPathRequestMatchersTest {
 
         try (client) {
             filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.json(dto)).close())
-                .isInstanceOf(AssertionError.class)
-                .hasMessage("Expected no value at JSON Path \"%s\" but found true", DEFINITE_PATH);
+                    .isInstanceOf(AssertionError.class)
+                    .hasMessage("Expected no value at JSON Path \"%s\" but found true", DEFINITE_PATH);
         }
     }
 
@@ -282,8 +282,8 @@ class JsonPathRequestMatchersTest {
 
         try (client) {
             filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.json(dto)).close())
-                .isInstanceOf(AssertionError.class)
-                .hasMessage("Expected no value at JSON Path \"%s\" but found %s", INDEFINITE_PATH, toJsonArray(something));
+                    .isInstanceOf(AssertionError.class)
+                    .hasMessage("Expected no value at JSON Path \"%s\" but found %s", INDEFINITE_PATH, toJsonArray(something));
         }
     }
 
@@ -346,8 +346,8 @@ class JsonPathRequestMatchersTest {
 
         try (client) {
             filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.json(dto)).close())
-                .isInstanceOf(AssertionError.class)
-                .hasMessage("Found no value for JSON path \"%s\"", NON_EXISTENT_PATH);
+                    .isInstanceOf(AssertionError.class)
+                    .hasMessage("Found no value for JSON path \"%s\"", NON_EXISTENT_PATH);
         }
     }
 
@@ -362,8 +362,8 @@ class JsonPathRequestMatchersTest {
 
         try (client) {
             filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.json(dto)).close())
-                .isInstanceOf(AssertionError.class)
-                .hasMessage("No values for JSON Path \"%s\"", INDEFINITE_PATH);
+                    .isInstanceOf(AssertionError.class)
+                    .hasMessage("No values for JSON Path \"%s\"", INDEFINITE_PATH);
         }
     }
 
@@ -410,8 +410,8 @@ class JsonPathRequestMatchersTest {
 
         try (client) {
             filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.json(dto)).close())
-                .isInstanceOf(AssertionError.class)
-                .hasMessage("Expected no value at JSON Path \"%s\" but found true", DEFINITE_PATH);
+                    .isInstanceOf(AssertionError.class)
+                    .hasMessage("Expected no value at JSON Path \"%s\" but found true", DEFINITE_PATH);
         }
     }
 
@@ -427,8 +427,8 @@ class JsonPathRequestMatchersTest {
 
         try (client) {
             filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.json(dto)).close())
-                .isInstanceOf(AssertionError.class)
-                .hasMessage("Expected no values at JSON Path \"%s\" but found %s", INDEFINITE_PATH, toJsonArray(something));
+                    .isInstanceOf(AssertionError.class)
+                    .hasMessage("Expected no values at JSON Path \"%s\" but found %s", INDEFINITE_PATH, toJsonArray(something));
         }
     }
 
@@ -459,8 +459,8 @@ class JsonPathRequestMatchersTest {
 
         try (client) {
             filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.json(dto)).close())
-                .isInstanceOf(AssertionError.class)
-                .hasMessage("Expected a string at JSON Path \"%s\" but found 0", DEFINITE_PATH);
+                    .isInstanceOf(AssertionError.class)
+                    .hasMessage("Expected a string at JSON Path \"%s\" but found 0", DEFINITE_PATH);
         }
     }
 
@@ -491,8 +491,8 @@ class JsonPathRequestMatchersTest {
 
         try (client) {
             filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.json(dto)).close())
-                .isInstanceOf(AssertionError.class)
-                .hasMessage("Expected a boolean at JSON Path \"%s\" but found {}", DEFINITE_PATH);
+                    .isInstanceOf(AssertionError.class)
+                    .hasMessage("Expected a boolean at JSON Path \"%s\" but found {}", DEFINITE_PATH);
         }
     }
 
@@ -523,8 +523,8 @@ class JsonPathRequestMatchersTest {
 
         try (client) {
             filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.json(dto)).close())
-                .isInstanceOf(AssertionError.class)
-                .hasMessage("Expected a number at JSON Path \"%s\" but found []", DEFINITE_PATH);
+                    .isInstanceOf(AssertionError.class)
+                    .hasMessage("Expected a number at JSON Path \"%s\" but found []", DEFINITE_PATH);
         }
     }
 
@@ -555,8 +555,8 @@ class JsonPathRequestMatchersTest {
 
         try (client) {
             filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.json(dto)).close())
-                .isInstanceOf(AssertionError.class)
-                .hasMessage("Expected an array at JSON Path \"%s\" but found true", DEFINITE_PATH);
+                    .isInstanceOf(AssertionError.class)
+                    .hasMessage("Expected an array at JSON Path \"%s\" but found true", DEFINITE_PATH);
         }
     }
 
@@ -587,8 +587,8 @@ class JsonPathRequestMatchersTest {
 
         try (client) {
             filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.json(dto)).close())
-                .isInstanceOf(AssertionError.class)
-                .hasMessage("Expected a map at JSON Path \"%s\" but found 'hello'", DEFINITE_PATH);
+                    .isInstanceOf(AssertionError.class)
+                    .hasMessage("Expected a map at JSON Path \"%s\" but found 'hello'", DEFINITE_PATH);
         }
     }
 
@@ -601,8 +601,8 @@ class JsonPathRequestMatchersTest {
 
         try (client) {
             filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.json("<dto></dto>")).close())
-                .isInstanceOf(JsonPathException.class)
-                .hasMessageContaining("This is not a json object according to the JsonProvider:");
+                    .isInstanceOf(JsonPathException.class)
+                    .hasMessageContaining("This is not a json object according to the JsonProvider:");
         }
     }
 

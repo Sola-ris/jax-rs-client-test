@@ -88,9 +88,9 @@ public abstract class RequestExpectationManager {
         long unsatisfied = countUnsatisfiedExpectations();
         if (unsatisfied != 0) {
             String builder = "Further request(s) expected leaving "
-                + unsatisfied
-                + " unsatisfied expectation(s).\n"
-                + getRequestDetails();
+                    + unsatisfied
+                    + " unsatisfied expectation(s).\n"
+                    + getRequestDetails();
             throw new AssertionError(builder);
         }
     }
@@ -127,22 +127,20 @@ public abstract class RequestExpectationManager {
 
         if (!failedRequests.isEmpty()) {
             throw new AssertionError("Some requests did not execute successfully.\n" +
-                failedRequests.entrySet().stream()
-                    .map(entry -> "Failed request:\n" + contextToString(entry.getKey()) + "\n" + entry.getValue())
-                    .collect(Collectors.joining("\n", "\n", "")));
+                    failedRequests.entrySet().stream()
+                            .map(entry -> "Failed request:\n" + contextToString(entry.getKey()) + "\n" + entry.getValue())
+                            .collect(Collectors.joining("\n", "\n", "")));
         }
 
         return expectations.stream()
-            .filter(expectation -> !expectation.isSatisfied())
-            .count();
+                .filter(expectation -> !expectation.isSatisfied())
+                .count();
     }
 
     AssertionError createUnexpectedRequestError(ClientRequestContext requestContext) {
         String method = requestContext.getMethod();
         URI uri = requestContext.getUri();
-        return new AssertionError(
-            "No further requests expected: HTTP " + method + " " + uri + "\n" + getRequestDetails()
-        );
+        return new AssertionError("No further requests expected: HTTP " + method + " " + uri + "\n" + getRequestDetails());
     }
 
     private String getRequestDetails() {

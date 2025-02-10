@@ -32,11 +32,11 @@ class OrderedRequestExpectationManagerTest {
     @Test
     void testUnexpectedRequest() {
         assertThatThrownBy(() -> manager.validateRequest(new MockClientRequestContext(GET, "/hello")).close())
-            .isInstanceOf(AssertionError.class)
-            .hasMessage("""
-                No further requests expected: HTTP GET /hello
-                0 request(s) executed.
-                """);
+                .isInstanceOf(AssertionError.class)
+                .hasMessage("""
+                        No further requests expected: HTTP GET /hello
+                        0 request(s) executed.
+                        """);
     }
 
     @Test
@@ -59,13 +59,13 @@ class OrderedRequestExpectationManagerTest {
         manager.validateRequest(new MockClientRequestContext(GET, "/goodbye")).close();
 
         assertThatThrownBy(() -> manager.validateRequest(new MockClientRequestContext(GET, "/uhm")).close())
-            .isInstanceOf(AssertionError.class)
-            .hasMessage("""
-                No further requests expected: HTTP GET /uhm
-                2 request(s) executed:
-                GET /hello
-                GET /goodbye
-                """);
+                .isInstanceOf(AssertionError.class)
+                .hasMessage("""
+                        No further requests expected: HTTP GET /uhm
+                        2 request(s) executed:
+                        GET /hello
+                        GET /goodbye
+                        """);
     }
 
     @Test
@@ -76,12 +76,12 @@ class OrderedRequestExpectationManagerTest {
         this.manager.validateRequest(new MockClientRequestContext(GET, "/hello")).close();
 
         assertThatThrownBy(manager::verify)
-            .isInstanceOf(AssertionError.class)
-            .hasMessage("""
-                Further request(s) expected leaving 1 unsatisfied expectation(s).
-                1 request(s) executed:
-                GET /hello
-                """);
+                .isInstanceOf(AssertionError.class)
+                .hasMessage("""
+                        Further request(s) expected leaving 1 unsatisfied expectation(s).
+                        1 request(s) executed:
+                        GET /hello
+                        """);
     }
 
     @Test
@@ -110,15 +110,15 @@ class OrderedRequestExpectationManagerTest {
         manager.validateRequest(new MockClientRequestContext(GET, "/goodbye")).close();
 
         assertThatThrownBy(() -> manager.validateRequest(new MockClientRequestContext(GET, "/hello")).close())
-            .isInstanceOf(AssertionError.class)
-            .hasMessage("""
-                No further requests expected: HTTP GET /hello
-                4 request(s) executed:
-                GET /hello
-                GET /goodbye
-                GET /hello
-                GET /goodbye
-                """);
+                .isInstanceOf(AssertionError.class)
+                .hasMessage("""
+                        No further requests expected: HTTP GET /hello
+                        4 request(s) executed:
+                        GET /hello
+                        GET /goodbye
+                        GET /hello
+                        GET /goodbye
+                        """);
     }
 
     @Test
@@ -131,14 +131,14 @@ class OrderedRequestExpectationManagerTest {
         manager.validateRequest(new MockClientRequestContext(GET, "/hello")).close();
 
         assertThatThrownBy(manager::verify)
-            .isInstanceOf(AssertionError.class)
-            .hasMessage("""
-                Further request(s) expected leaving 1 unsatisfied expectation(s).
-                3 request(s) executed:
-                GET /hello
-                GET /goodbye
-                GET /hello
-                """);
+                .isInstanceOf(AssertionError.class)
+                .hasMessage("""
+                        Further request(s) expected leaving 1 unsatisfied expectation(s).
+                        3 request(s) executed:
+                        GET /hello
+                        GET /goodbye
+                        GET /hello
+                        """);
     }
 
     @Test
@@ -147,8 +147,8 @@ class OrderedRequestExpectationManagerTest {
         manager.expectRequest(times(2), requestTo("/goodbye")).andExpect(method(GET)).andRespond(withSuccess());
 
         assertThatThrownBy(() -> manager.validateRequest(new MockClientRequestContext(POST, "/goodbye")).close())
-            .isInstanceOf(AssertionError.class)
-            .hasMessage("Unexpected Request. expected: </hello> but was: </goodbye>");
+                .isInstanceOf(AssertionError.class)
+                .hasMessage("Unexpected Request. expected: </hello> but was: </goodbye>");
     }
 
     @Test
@@ -179,15 +179,15 @@ class OrderedRequestExpectationManagerTest {
     @Test
     void testSequentialRequestsWithExceptionOnFirstRequest() {
         manager.expectRequest(once(), requestTo("/failure"))
-            .andExpect(method(GET))
-            .andRespond(withException(new SocketException("Connection Reset")));
+                .andExpect(method(GET))
+                .andRespond(withException(new SocketException("Connection Reset")));
         manager.expectRequest(once(), requestTo("/hello"))
-            .andExpect(method(POST))
-            .andRespond(withSuccess());
+                .andExpect(method(POST))
+                .andRespond(withSuccess());
 
         assertThatThrownBy(() -> manager.validateRequest(new MockClientRequestContext(GET, "/failure")).close())
-            .isInstanceOf(SocketException.class)
-            .hasMessage("Connection Reset");
+                .isInstanceOf(SocketException.class)
+                .hasMessage("Connection Reset");
 
         assertThatCode(() -> {
             manager.validateRequest(new MockClientRequestContext(POST, "/hello")).close();

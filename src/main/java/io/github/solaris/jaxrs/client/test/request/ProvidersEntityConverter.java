@@ -57,10 +57,10 @@ public final class ProvidersEntityConverter extends EntityConverter {
     @SuppressWarnings("unchecked")
     private <T> T convertEntity(ClientRequestContext requestContext, Class<T> type, Type genericType) throws IOException {
         MessageBodyWriter<Object> writer = (MessageBodyWriter<Object>) providers.getMessageBodyWriter(
-            requestContext.getEntityClass(),
-            requestContext.getEntityType(),
-            requestContext.getEntityAnnotations(),
-            requestContext.getMediaType()
+                requestContext.getEntityClass(),
+                requestContext.getEntityType(),
+                requestContext.getEntityAnnotations(),
+                requestContext.getMediaType()
         );
 
         if (writer == null) {
@@ -69,20 +69,20 @@ public final class ProvidersEntityConverter extends EntityConverter {
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         writer.writeTo(
-            requestContext.getEntity(),
-            requestContext.getEntityClass(),
-            requestContext.getEntityType(),
-            requestContext.getEntityAnnotations(),
-            requestContext.getMediaType(),
-            requestContext.getHeaders(),
-            outputStream
+                requestContext.getEntity(),
+                requestContext.getEntityClass(),
+                requestContext.getEntityType(),
+                requestContext.getEntityAnnotations(),
+                requestContext.getMediaType(),
+                requestContext.getHeaders(),
+                outputStream
         );
 
         MessageBodyReader<T> reader = providers.getMessageBodyReader(
-            type,
-            genericType,
-            ANNOTATIONS,
-            requestContext.getMediaType()
+                type,
+                genericType,
+                ANNOTATIONS,
+                requestContext.getMediaType()
         );
 
         if (reader == null) {
@@ -91,12 +91,12 @@ public final class ProvidersEntityConverter extends EntityConverter {
 
         ByteArrayInputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray());
         return reader.readFrom(
-            type,
-            genericType,
-            ANNOTATIONS,
-            requestContext.getMediaType(),
-            requestContext.getStringHeaders(),
-            inputStream
+                type,
+                genericType,
+                ANNOTATIONS,
+                requestContext.getMediaType(),
+                requestContext.getStringHeaders(),
+                inputStream
         );
     }
 }

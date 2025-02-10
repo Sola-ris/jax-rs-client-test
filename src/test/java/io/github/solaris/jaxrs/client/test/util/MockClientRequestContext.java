@@ -23,7 +23,7 @@ import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.Response;
 
 public record MockClientRequestContext(
-    String method, URI uri, MultivaluedMap<String, String> stringHeaders, MediaType mediaType) implements ClientRequestContext {
+        String method, URI uri, MultivaluedMap<String, String> stringHeaders, MediaType mediaType) implements ClientRequestContext {
 
     public MockClientRequestContext(MultivaluedMap<String, String> stringHeaders) {
         this(null, null, stringHeaders, null);

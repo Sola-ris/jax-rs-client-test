@@ -52,7 +52,7 @@ public abstract sealed class EntityConverterAssert {
         }
 
         private <T> RequestMatcher asserter(
-            Object expectedEntity, int times, ThrowingBiFunction<EntityConverter, ClientRequestContext, T> conversionFunction) {
+                Object expectedEntity, int times, ThrowingBiFunction<EntityConverter, ClientRequestContext, T> conversionFunction) {
             return request -> {
                 Client client = ClientBuilder.newClient();
                 try (MockedStatic<ClientBuilder> builderMock = Mockito.mockStatic(ClientBuilder.class)) {
@@ -60,8 +60,8 @@ public abstract sealed class EntityConverterAssert {
 
                     EntityConverter converter = EntityConverter.fromRequestContext(request);
                     assertThat(converter)
-                        .isNotNull()
-                        .isInstanceOf(ClientEntityConverter.class);
+                            .isNotNull()
+                            .isInstanceOf(ClientEntityConverter.class);
                     T actualEntity = conversionFunction.apply(converter, request);
                     assertThat(actualEntity).isEqualTo(expectedEntity);
 
@@ -80,23 +80,23 @@ public abstract sealed class EntityConverterAssert {
                 EntityConverter converter = EntityConverter.fromRequestContext(request);
 
                 assertThat(converter)
-                    .isNotNull()
-                    .isInstanceOf(ProvidersEntityConverter.class);
+                        .isNotNull()
+                        .isInstanceOf(ProvidersEntityConverter.class);
 
                 String entityString = recreateConverterWithSpy(converter).convertEntity(request, String.class);
 
                 assertThat(entityString).isEqualTo(expectedEntity);
 
                 verify(providersSpy, times(times)).getMessageBodyWriter(
-                    request.getEntityClass(),
-                    request.getEntityType(),
-                    request.getEntityAnnotations(),
-                    request.getMediaType());
+                        request.getEntityClass(),
+                        request.getEntityType(),
+                        request.getEntityAnnotations(),
+                        request.getMediaType());
                 verify(providersSpy, times(times)).getMessageBodyReader(
-                    String.class,
-                    String.class,
-                    request.getEntityAnnotations(),
-                    request.getMediaType());
+                        String.class,
+                        String.class,
+                        request.getEntityAnnotations(),
+                        request.getMediaType());
             };
         }
 
@@ -106,31 +106,31 @@ public abstract sealed class EntityConverterAssert {
                 EntityConverter converter = EntityConverter.fromRequestContext(request);
 
                 assertThat(converter)
-                    .isNotNull()
-                    .isInstanceOf(ProvidersEntityConverter.class);
+                        .isNotNull()
+                        .isInstanceOf(ProvidersEntityConverter.class);
 
                 MultivaluedMap<String, String> entityMap = recreateConverterWithSpy(converter).convertEntity(request, GENERIC_TYPE);
 
                 assertThat(entityMap).isEqualTo(expectedEntity);
 
                 verify(providersSpy, times(times)).getMessageBodyWriter(
-                    request.getEntityClass(),
-                    request.getEntityType(),
-                    request.getEntityAnnotations(),
-                    request.getMediaType());
+                        request.getEntityClass(),
+                        request.getEntityType(),
+                        request.getEntityAnnotations(),
+                        request.getMediaType());
                 verify(providersSpy, times(times)).getMessageBodyReader(
-                    GENERIC_TYPE.getRawType(),
-                    GENERIC_TYPE.getType(),
-                    request.getEntityAnnotations(),
-                    request.getMediaType());
+                        GENERIC_TYPE.getRawType(),
+                        GENERIC_TYPE.getType(),
+                        request.getEntityAnnotations(),
+                        request.getMediaType());
             };
         }
 
         @Override
         public void assertConversionFailure(ThrowingCallable throwingCallable) {
             assertThatThrownBy(throwingCallable)
-                .isInstanceOf(ProcessingException.class)
-                .hasMessageMatching("^Unable to obtain MessageBody(Reader|Writer) for type=class.+? and genericType=.*$");
+                    .isInstanceOf(ProcessingException.class)
+                    .hasMessageMatching("^Unable to obtain MessageBody(Reader|Writer) for type=class.+? and genericType=.*$");
         }
 
         private ProvidersEntityConverter recreateConverterWithSpy(EntityConverter converter) {
