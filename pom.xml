@@ -8,6 +8,38 @@
     <artifactId>jax-rs-client-test</artifactId>
     <version>0.0.1-SNAPSHOT</version>
 
+    <name>JAX-RS Client Test</name>
+    <url>https://github.com/Sola-ris/jax-rs-client-test</url>
+    <description>
+        A library for testing classes that rely on a JAX-RS Client without starting a full server or relying on mocking libraries.
+    </description>
+
+    <licenses>
+        <license>
+            <name>Apache-2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>Sola-ris</name>
+            <email>190788035+sola-ris@users.noreply.github.com</email>
+        </developer>
+    </developers>
+
+    <scm>
+        <url>https://github.com/Sola-ris/jax-rs-client-test</url>
+        <connection>scm:git:git://github.com/Sola-ris/jax-rs-client-test.git</connection>
+        <developerConnection>scm:git:git://github.com/Sola-ris/jax-rs-client-test.git</developerConnection>
+    </scm>
+
+    <issueManagement>
+        <system>GitHub Issues</system>
+        <url>https://github.com/Sola-ris/jax-rs-client-test/issues</url>
+    </issueManagement>
+
     <properties>
         <maven.compiler.release>17</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
