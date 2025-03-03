@@ -1,8 +1,8 @@
 package io.github.solaris.jaxrs.client.test.util.extension;
 
-import static io.github.solaris.jaxrs.client.test.util.JaxRsVendor.CXF;
-import static io.github.solaris.jaxrs.client.test.util.JaxRsVendor.JERSEY;
-import static io.github.solaris.jaxrs.client.test.util.JaxRsVendor.RESTEASY_REACTIVE;
+import static io.github.solaris.jaxrs.client.test.util.extension.JaxRsVendor.CXF;
+import static io.github.solaris.jaxrs.client.test.util.extension.JaxRsVendor.JERSEY;
+import static io.github.solaris.jaxrs.client.test.util.extension.JaxRsVendor.RESTEASY_REACTIVE;
 
 import java.lang.reflect.Method;
 
@@ -25,7 +25,6 @@ import io.github.solaris.jaxrs.client.test.util.EntityConverterAssert.ProvidersE
 import io.github.solaris.jaxrs.client.test.util.FilterExceptionAssert;
 import io.github.solaris.jaxrs.client.test.util.FilterExceptionAssert.CxfFilterExceptionAssert;
 import io.github.solaris.jaxrs.client.test.util.FilterExceptionAssert.DefaultFilterExceptionAssert;
-import io.github.solaris.jaxrs.client.test.util.JaxRsVendor;
 
 class JaxRsVendorTestExtension implements InvocationInterceptor, ParameterResolver {
     private final JaxRsVendor vendor;

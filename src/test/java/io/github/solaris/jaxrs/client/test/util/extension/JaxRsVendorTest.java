@@ -11,8 +11,6 @@ import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.parallel.Execution;
 
-import io.github.solaris.jaxrs.client.test.util.JaxRsVendor;
-
 @TestTemplate
 @Target(METHOD)
 @Retention(RUNTIME)

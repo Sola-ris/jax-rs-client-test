@@ -8,7 +8,7 @@ import static io.github.solaris.jaxrs.client.test.response.MockResponseCreators.
 import static io.github.solaris.jaxrs.client.test.response.MockResponseCreators.withSuccess;
 import static io.github.solaris.jaxrs.client.test.server.RequestOrder.STRICT;
 import static io.github.solaris.jaxrs.client.test.server.RequestOrder.UNORDERED;
-import static io.github.solaris.jaxrs.client.test.util.JaxRsVendor.CXF;
+import static io.github.solaris.jaxrs.client.test.util.extension.JaxRsVendor.CXF;
 import static jakarta.ws.rs.core.Response.Status.OK;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;

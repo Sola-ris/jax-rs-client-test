@@ -1,4 +1,4 @@
-package io.github.solaris.jaxrs.client.test.util;
+package io.github.solaris.jaxrs.client.test.util.extension;
 
 import java.util.List;
 
@@ -49,7 +49,8 @@ public enum JaxRsVendor {
     private final Class<? extends ClientBuilder> clientBuilderClass;
     private final Class<? extends RestClientBuilderResolver> restClientBuilderResolverClass;
     private final Class<? extends InjectionManagerFactory> injectionManagerFactoryClass;
-    private final VendorClassLoader vendorClassLoader;
+
+    private final ClassLoader vendorClassLoader;
 
     JaxRsVendor(
             Class<? extends RuntimeDelegate> runtimeDelegateClass,
@@ -89,7 +90,7 @@ public enum JaxRsVendor {
         return injectionManagerFactoryClass;
     }
 
-    public ClassLoader getVendorClassLoader() {
+    ClassLoader getVendorClassLoader() {
         return vendorClassLoader;
     }
 }

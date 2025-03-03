@@ -1,7 +1,7 @@
 package io.github.solaris.jaxrs.client.test.request;
 
 import static io.github.solaris.jaxrs.client.test.response.MockResponseCreators.withSuccess;
-import static io.github.solaris.jaxrs.client.test.util.JaxRsVendor.JERSEY;
+import static io.github.solaris.jaxrs.client.test.util.extension.JaxRsVendor.JERSEY;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;

@@ -1,6 +1,6 @@
 package io.github.solaris.jaxrs.client.test.response;
 
-import static io.github.solaris.jaxrs.client.test.util.JaxRsVendor.CXF;
+import static io.github.solaris.jaxrs.client.test.util.extension.JaxRsVendor.CXF;
 import static jakarta.ws.rs.core.HttpHeaders.RETRY_AFTER;
 import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON_TYPE;
 import static jakarta.ws.rs.core.Response.Status.ACCEPTED;

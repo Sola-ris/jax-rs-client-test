@@ -1,14 +1,14 @@
 package io.github.solaris.jaxrs.client.test.request;
 
 import static io.github.solaris.jaxrs.client.test.response.MockResponseCreators.withSuccess;
-import static io.github.solaris.jaxrs.client.test.util.JaxRsVendor.CXF;
-import static io.github.solaris.jaxrs.client.test.util.JaxRsVendor.JERSEY;
-import static io.github.solaris.jaxrs.client.test.util.JaxRsVendor.RESTEASY_REACTIVE;
 import static io.github.solaris.jaxrs.client.test.util.MultiParts.LIST_CONTENT;
 import static io.github.solaris.jaxrs.client.test.util.MultiParts.PLAIN_CONTENT;
 import static io.github.solaris.jaxrs.client.test.util.MultiParts.jsonPart;
 import static io.github.solaris.jaxrs.client.test.util.MultiParts.listPart;
 import static io.github.solaris.jaxrs.client.test.util.MultiParts.plainPart;
+import static io.github.solaris.jaxrs.client.test.util.extension.JaxRsVendor.CXF;
+import static io.github.solaris.jaxrs.client.test.util.extension.JaxRsVendor.JERSEY;
+import static io.github.solaris.jaxrs.client.test.util.extension.JaxRsVendor.RESTEASY_REACTIVE;
 import static jakarta.ws.rs.core.HttpHeaders.CONTENT_TYPE;
 import static jakarta.ws.rs.core.MediaType.APPLICATION_FORM_URLENCODED_TYPE;
 import static jakarta.ws.rs.core.MediaType.MULTIPART_FORM_DATA;

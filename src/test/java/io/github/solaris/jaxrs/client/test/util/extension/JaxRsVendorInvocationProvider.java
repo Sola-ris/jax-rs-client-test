@@ -1,7 +1,7 @@
 package io.github.solaris.jaxrs.client.test.util.extension;
 
-import static io.github.solaris.jaxrs.client.test.util.JaxRsVendor.RESTEASY_REACTIVE;
-import static io.github.solaris.jaxrs.client.test.util.JaxRsVendor.VENDORS;
+import static io.github.solaris.jaxrs.client.test.util.extension.JaxRsVendor.RESTEASY_REACTIVE;
+import static io.github.solaris.jaxrs.client.test.util.extension.JaxRsVendor.VENDORS;
 import static java.util.Collections.singletonList;
 
 import java.util.Arrays;
@@ -13,8 +13,6 @@ import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.TestTemplateInvocationContext;
 import org.junit.jupiter.api.extension.TestTemplateInvocationContextProvider;
 import org.junit.platform.commons.support.AnnotationSupport;
-
-import io.github.solaris.jaxrs.client.test.util.JaxRsVendor;
 
 class JaxRsVendorInvocationProvider implements TestTemplateInvocationContextProvider {
 
