@@ -46,7 +46,7 @@
 
         <version.jersey>3.1.10</version.jersey>
         <version.quarkus>3.19.2</version.quarkus>
-        <version.resteasy>6.2.11.Final</version.resteasy>
+        <version.resteasy>6.2.12.Final</version.resteasy>
     </properties>
 
     <dependencyManagement>
