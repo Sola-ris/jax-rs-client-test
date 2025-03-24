@@ -2,7 +2,6 @@ package io.github.solaris.jaxrs.client.test.util.extension;
 
 import static io.github.solaris.jaxrs.client.test.util.extension.JaxRsVendor.CXF;
 import static io.github.solaris.jaxrs.client.test.util.extension.JaxRsVendor.JERSEY;
-import static io.github.solaris.jaxrs.client.test.util.extension.JaxRsVendor.RESTEASY_REACTIVE;
 
 import java.lang.reflect.Method;
 
@@ -64,7 +63,7 @@ class JaxRsVendorTestExtension implements InvocationInterceptor, ParameterResolv
             }
             return new DefaultFilterExceptionAssert();
         } else if (EntityConverterAssert.class.isAssignableFrom(parameterContext.getParameter().getType())) {
-            if (vendor == JERSEY || vendor == RESTEASY_REACTIVE) {
+            if (vendor == JERSEY) {
                 return new ClientEntityConverterAssert();
             }
             return new ProvidersEntityConverterAssert();
