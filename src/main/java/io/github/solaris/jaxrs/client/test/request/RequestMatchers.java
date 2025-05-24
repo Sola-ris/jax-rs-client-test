@@ -1,6 +1,7 @@
 package io.github.solaris.jaxrs.client.test.request;
 
 import static io.github.solaris.jaxrs.client.test.internal.Assertions.assertEqual;
+import static io.github.solaris.jaxrs.client.test.internal.Assertions.assertTrue;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import java.net.URI;
@@ -67,7 +68,11 @@ public final class RequestMatchers {
     public static RequestMatcher queryParam(String name, String... expectedValues) {
         return request -> {
             MultivaluedMap<String, String> queryParams = getQueryParams(request.getUri());
-            assertCount("QueryParam", name, queryParams, expectedValues.length);
+
+            String message = "Expected QueryParam <" + name + ">";
+            assertTrue(message + " to exist but was null", queryParams.get(name) != null);
+            assertTrue(message + " to have at least <" + expectedValues.length + "> values but found " + queryParams.get(name),
+                    expectedValues.length <= queryParams.get(name).size());
 
             for (int i = 0; i < expectedValues.length; i++) {
                 assertEqual("QueryParam [name=" + name + ", position=" + i + "]", expectedValues[i], queryParams.get(name).get(i));
@@ -86,9 +91,13 @@ public final class RequestMatchers {
      */
     public static RequestMatcher header(String name, String... expectedValues) {
         return request -> {
-            assertCount("header", name, request.getStringHeaders(), expectedValues.length);
-
             List<String> actualValues = request.getStringHeaders().get(name);
+
+            String message = "Expected header <" + name + ">";
+            assertTrue(message + " to exist but was null", actualValues != null);
+            assertTrue(message + " to have at least <" + expectedValues.length + "> values but found " + actualValues,
+                    expectedValues.length <= actualValues.size());
+
             for (int i = 0; i < expectedValues.length; i++) {
                 assertEqual("Request header [name=" + name + ", position=" + i + "]", expectedValues[i], actualValues.get(i));
             }
@@ -160,16 +169,5 @@ public final class RequestMatchers {
                 .map(query -> URLDecoder.decode(query, UTF_8))
                 .map(query -> query.split("="))
                 .collect(MultivaluedHashMap::new, (map, query) -> map.add(query[0], query[1]), MultivaluedMap::putAll);
-    }
-
-    private static void assertCount(String valueType, String name, MultivaluedMap<String, String> map, int count) {
-        List<String> values = map.get(name);
-        String message = "Expected " + valueType + " <" + name + ">";
-        if (values == null) {
-            throw new AssertionError(message + " to exist but was null");
-        }
-        if (count > values.size()) {
-            throw new AssertionError(message + " to have at least <" + count + "> values but found " + values);
-        }
     }
 }

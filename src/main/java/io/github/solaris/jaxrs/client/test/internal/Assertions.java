@@ -16,6 +16,7 @@ public class Assertions {
         }
     }
 
+    @Contract("_, false -> fail")
     public static void assertTrue(String message, boolean condition) {
         if (!condition) {
             throw new AssertionError(message);

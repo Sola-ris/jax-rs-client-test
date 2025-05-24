@@ -262,6 +262,36 @@
                 <version>3.14.0</version>
                 <executions>
                     <execution>
+                        <id>default-compile</id>
+                        <configuration>
+                            <compilerArgs>
+                                <arg>-XDcompilePolicy=simple</arg>
+                                <arg>
+                                    -Xplugin:ErrorProne \
+                                    -XepDisableAllChecks \
+                                    -Xep:NullAway:ERROR \
+                                    -XepOpt:NullAway:JSpecifyMode=true \
+                                    -XepOpt:NullAway:OnlyNullMarked=true \
+                                    -XepOpt:NullAway:CheckContracts=true \
+                                    -XepOpt:NullAway:CustomContractAnnotations=io.github.solaris.jaxrs.client.test.internal.Contract
+                                </arg>
+                                <arg>--should-stop=ifError=FLOW</arg>
+                            </compilerArgs>
+                            <annotationProcessorPaths>
+                                <annotationProcessorPath>
+                                    <groupId>com.google.errorprone</groupId>
+                                    <artifactId>error_prone_core</artifactId>
+                                    <version>2.38.0</version>
+                                </annotationProcessorPath>
+                                <annotationProcessorPath>
+                                    <groupId>com.uber.nullaway</groupId>
+                                    <artifactId>nullaway</artifactId>
+                                    <version>0.12.7</version>
+                                </annotationProcessorPath>
+                            </annotationProcessorPaths>
+                        </configuration>
+                    </execution>
+                    <execution>
                         <id>default-testCompile</id>
                         <configuration>
                             <useModulePath>false</useModulePath>
