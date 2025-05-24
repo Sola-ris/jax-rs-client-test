@@ -31,6 +31,7 @@ import jakarta.ws.rs.core.GenericEntity;
 import jakarta.ws.rs.core.MediaType;
 
 import io.github.solaris.jaxrs.client.test.server.MockRestServer;
+import io.github.solaris.jaxrs.client.test.util.Dto;
 import io.github.solaris.jaxrs.client.test.util.FilterExceptionAssert;
 import io.github.solaris.jaxrs.client.test.util.MockClientRequestContext;
 import io.github.solaris.jaxrs.client.test.util.MultiParts.PartsBuffer;
@@ -444,6 +445,4 @@ class EntityRequestMatchersTest {
                     .hasMessage("Expected %s to contain all of %s", partsBuffer.get().actual(), partsBuffer.get().expected());
         }
     }
-
-    private record Dto(boolean flag) {}
 }

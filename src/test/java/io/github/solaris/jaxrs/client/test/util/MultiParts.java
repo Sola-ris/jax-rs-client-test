@@ -94,7 +94,5 @@ public final class MultiParts {
         };
     }
 
-    public record Dto(boolean flag) {}
-
     public record PartsBuffer(List<EntityPart> expected, List<EntityPart> actual) {}
 }

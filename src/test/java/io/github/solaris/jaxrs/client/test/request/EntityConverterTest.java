@@ -31,6 +31,7 @@ import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.Response;
 
 import io.github.solaris.jaxrs.client.test.server.MockRestServer;
+import io.github.solaris.jaxrs.client.test.util.Dto;
 import io.github.solaris.jaxrs.client.test.util.EntityConverterAssert;
 import io.github.solaris.jaxrs.client.test.util.extension.JaxRsVendorTest;
 
@@ -328,6 +329,4 @@ class EntityConverterTest {
                     .doesNotThrowAnyException();
         }
     }
-
-    private record Dto(boolean flag) {}
 }
