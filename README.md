@@ -9,7 +9,7 @@ Heavily inspired by Spring's [Client testing infrastructure](https://docs.spring
     * [Basic Usage](#basic-usage)
     * [Repeated requests](#repeated-requests)
     * [Request ordering](#request-ordering)
-    * [Mixing stubs and real requests](#mixing-stubs-and-real-requests)
+    * [Mixing stubs and real requests](#mixing-stubs-and-real-responses)
     * [Request matchers](#request-matchers)
         * [Matching the request entity](#matching-the-request-entity)
         * [Matching `multipart/form-data` (`EntityPart`)](#matching-multipartform-data-entitypart)
@@ -26,7 +26,9 @@ Heavily inspired by Spring's [Client testing infrastructure](https://docs.spring
 ### Basic Usage
 
 The idea is to declare the expected requests and provide "mock" or "stub" responses so the code can be tested in isolation,
-i.e. without starting a server. The following example shows how to do so with a `Client`:
+i.e. without starting a server.
+
+The following example shows how to do so with a `Client`:
 
 [@formatter:off]: #
 ```java
@@ -51,6 +53,7 @@ can be used to verify that all the expected requests were indeed executed.
 
 Unless specified otherwise, ech expected request is expected to be executed exactly once. The `expect` method of the `MockRestServer` provides an
 overload that accepts an `ExpectedCount` argument that specifies a range count (e.g. once, between, min, max, etc.) for the given request expectation.
+
 The following example shows how to do so with a `WebTarget`:
 
 [@formatter:off]: #
@@ -71,7 +74,7 @@ server.verify();
 
 ### Request ordering
 
-By default, the first invocation of each expected request is expected to occur in order of declaration.
+By default, only the first invocation of each expected request is expected to occur in order of declaration.
 This behavior can be changed by passing the desired `RequestOrder` to `withRequestOrder` when building the server.
 
 ```java
@@ -91,7 +94,7 @@ The following options are available:
 * STRICT
     * Expect the minimum amount of expected requests to occur in order of declaration. Subsequent requests may occur in any order.
 
-### Mixing stubs and real requests
+### Mixing stubs and real responses
 
 In some tests it may be necessary to mock only some of the requests and call an actual remote service or others.
 This can be done through an `ExecutingResponseCreator`:
@@ -140,10 +143,11 @@ JAX-RS Client Test comes with a number of built-in `RequestMacher` implementatio
 * JsonPathRequestMatchers
     * Matchers that evaluate a JsonPath expression against the request body
 * XpathRequestMatchers
-    * Matchers that evaluate a XPath expression against the request body
+    * Matchers that evaluate an XPath expression against the request body
 
 Custom request matchers can be implemented as a lambda and can access the current `ClientRequestContext`.
 All implementations must throw an `AssertionError` if the incoming request does not match and return if it does.
+
 For example:
 
 [@formatter:off]: #
@@ -161,7 +165,9 @@ RequestMatcher myMatcher = request -> {
 When implementing a `RequestMatcher`, the entity can be accessed via `ClientRequestContext#getEntity`.
 If the matcher requires a different representation of the entity, e.g. a JSON String instead of POJO, it can be converted via an `EntityConverter`,
 which can be obtained by calling `EntityConverter#fromRequestContext`. The `EntityConverter` has the same capabilities as the client that made the
-request, so if the client has a provider that can handle POJO -> JSON String conversion, the `EntityConverter` can do it as well. For example:
+request, so if the client has a provider that can handle POJO -> JSON String conversion, the `EntityConverter` can do it as well.
+
+For example:
 
 [@formatter:off]: #
 ```java
@@ -171,14 +177,14 @@ RequestMatcher myMatcher = request -> {
     // Assuming the MediaType is application/json
     String jsonString = converter.convertEntity(request, String.class);
     
-    // assetions on the string
+    // Assertions on the string
 };
 ```
 [@formatter:on]: #
 
 #### Matching `multipart/form-data` (`EntityPart`)
 
-`EntityPart` hase certain limitations that require it to be handled separately from other request entities:
+`EntityPart` has certain limitations that require it to be handled separately from other request entities:
 
 * It is `InputStream` based, meaning its contents can only be accessed once
 * Implementations are not required to override `equals`, preventing comparison with another `EntityPart`

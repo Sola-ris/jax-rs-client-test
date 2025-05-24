@@ -80,7 +80,7 @@ public final class EntityRequestMatchers {
      * <p>Convert the request entity into a {@link Form} and assert that it contains the given subset.</p>
      * <p>If the given subset contains more values for a key than the request, an {@link AssertionError} will be thrown.</p>
      * <p>
-     * For each key in the expected subset, the n<sup>th</sup> value will be compared to the n<sup>th</sup> of the request {@code Form}.
+     * For each key in the expected subset, the n<sup>th</sup> value will be compared to the n<sup>th</sup> value of the request {@code Form}.
      * Any additional values for the key in the request {@code Form} will be ignored.
      * </p>
      *

@@ -119,7 +119,7 @@ public final class RequestMatchers {
     /**
      * Access to request body matchers using a <a href="https://github.com/jayway/JsonPath">JsonPath</a> expression
      * to inspect a specific subset of the body.
-     * <p>The JSON path expression can be parameterized using using formatting specifiers as defined in{@link String#format(String, Object...)}</p>
+     * <p>The JSON path expression can be parameterized using formatting specifiers as defined in{@link String#format(String, Object...)}</p>
      *
      * @param expression The JSON path expression, possibly parameterized
      * @param args       Arguments to parameterize the JSON path expression with
@@ -131,7 +131,7 @@ public final class RequestMatchers {
     /**
      * Access to request body matchers using an {@link javax.xml.xpath.XPath XPath} expression
      * to inspect a specific subset of the body.
-     * <p>The XPath path expression can be parameterized using using formatting specifiers as defined in{@link String#format(String, Object...)}</p>
+     * <p>The XPath path expression can be parameterized using formatting specifiers as defined in{@link String#format(String, Object...)}</p>
      *
      * @param expression The XPath path expression, possibly parameterized
      * @param args       Arguments to parameterize the XPath path expression with
@@ -144,7 +144,7 @@ public final class RequestMatchers {
     /**
      * Access to request body matchers using a <b>namespace-aware</b> {@link javax.xml.xpath.XPath XPath} expression
      * to inspect a specific subset of the body.
-     * <p>The XPath path expression can be parameterized using using formatting specifiers as defined in{@link String#format(String, Object...)}</p>
+     * <p>The XPath path expression can be parameterized using formatting specifiers as defined in{@link String#format(String, Object...)}</p>
      *
      * @param expression The XPath path expression, possibly parameterized
      * @param namespaces The namespaces referenced in the XPath expression

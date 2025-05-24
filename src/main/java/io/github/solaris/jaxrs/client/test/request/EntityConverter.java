@@ -38,7 +38,7 @@ public abstract sealed class EntityConverter permits ClientEntityConverter, Prov
 
     /**
      * Obtain the {@code EntityConverter} from the current {@link ClientRequestContext} while inside a {@code RequestMatcher}.
-     * <p>Will throw an {@link IllegalStateException} when called outside of a {@code RequestMatcher}.</p>
+     * <p>Will throw an {@link IllegalStateException} when called outside a {@code RequestMatcher}.</p>
      *
      * @param requestContext The current request
      * @return The {@code EntityConverter} instance
@@ -53,7 +53,7 @@ public abstract sealed class EntityConverter permits ClientEntityConverter, Prov
 
     /**
      * <p>Buffer the given {@code List<EntityPart>} to allow for repeated accessing of the part's contents.</p>
-     * <p>The buffered {@code EntityParts} implement {@code equals}, so their equality can be asserted inside of a {@code RequestMatcher}.</p>
+     * <p>The buffered {@code EntityParts} implement {@code equals}, so their equality can be asserted inside a {@code RequestMatcher}.</p>
      *
      * @param entityParts The {@code EntityParts} to buffer
      * @return The buffered {@code EntityParts}
@@ -73,7 +73,7 @@ public abstract sealed class EntityConverter permits ClientEntityConverter, Prov
      * Buffer the request entity of type {@code List<EntityPart>} to allow for repeated accessing
      * of the part's contents and set it as the request entity.
      * </p>
-     * <p>The buffered {@code EntityParts} implement {@code equals}, so their equality can be asserted inside of a {@code RequestMatcher}.</p>
+     * <p>The buffered {@code EntityParts} implement {@code equals}, so their equality can be asserted inside a {@code RequestMatcher}.</p>
      *
      * @param requestContext The current request
      * @return The buffered request entity
