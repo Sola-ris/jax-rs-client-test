@@ -149,6 +149,13 @@ class RequestMatchersTest {
     }
 
     @Test
+    void testHeader_headerMissing() {
+        assertThatThrownBy(() -> RequestMatchers.header(ACCEPT, APPLICATION_JSON).match(new MockClientRequestContext(new MultivaluedHashMap<>())))
+                .isInstanceOf(AssertionError.class)
+                .hasMessage("Expected header <%s> to exist but was null", ACCEPT);
+    }
+
+    @Test
     void testHeader_countMismatch() {
         MultivaluedMap<String, String> headers = new MultivaluedHashMap<>();
         headers.putSingle(ACCEPT, APPLICATION_JSON);
