@@ -19,6 +19,8 @@ import jakarta.ws.rs.core.MultivaluedMap;
  * Static factory methods for the built-in {@link RequestMatcher} implementations.
  */
 public final class RequestMatchers {
+    private static final MultivaluedMap<String, String> EMPTY_QUERY_PARAMS = new MultivaluedHashMap<>();
+
     private RequestMatchers() {}
 
     /**
@@ -165,9 +167,13 @@ public final class RequestMatchers {
     }
 
     private static MultivaluedMap<String, String> getQueryParams(URI uri) {
+        if (uri.getQuery() == null) {
+            return EMPTY_QUERY_PARAMS;
+        }
         return Arrays.stream(uri.getQuery().split("&"))
                 .map(query -> URLDecoder.decode(query, UTF_8))
-                .map(query -> query.split("="))
-                .collect(MultivaluedHashMap::new, (map, query) -> map.add(query[0], query[1]), MultivaluedMap::putAll);
+                .filter(query -> !"".equals(query))
+                .map(query -> query.split("=", 2))
+                .collect(MultivaluedHashMap::new, (map, query) -> map.add(query[0], query.length == 2 ? query[1] : ""), MultivaluedMap::putAll);
     }
 }

@@ -71,9 +71,46 @@ class RequestMatchersTest {
     }
 
     @Test
+    void testQueryParam_noValue() {
+        URI uri = URI.create("local.host?greeting");
+        assertThatCode(() -> RequestMatchers.queryParam("greeting", "").match(new MockClientRequestContext(uri)))
+                .doesNotThrowAnyException();
+    }
+
+    @Test
+    void testQueryParam_noValueWithEqualsSign() {
+        URI uri = URI.create("local.host?greeting=");
+        assertThatCode(() -> RequestMatchers.queryParam("greeting", "").match(new MockClientRequestContext(uri)))
+                .doesNotThrowAnyException();
+    }
+
+    @Test
+    void testQueryParam_equalsSignInValue() {
+        URI uri = URI.create("local.host?greeting=hello=salutations&sendoff=farewell");
+        assertThatCode(() -> RequestMatchers.queryParam("greeting", "hello=salutations").match(new MockClientRequestContext(uri)))
+                .doesNotThrowAnyException();
+    }
+
+    @Test
     void testQueryParam_paramMissing() {
         URI uri = URI.create("local.host?greeting=hello&greeting=salutations");
         assertThatThrownBy(() -> RequestMatchers.queryParam("sendoff", "goodbye", "farewell").match(new MockClientRequestContext(uri)))
+                .isInstanceOf(AssertionError.class)
+                .hasMessage("Expected QueryParam <sendoff> to exist but was null");
+    }
+
+    @Test
+    void testQueryParam_paramMissing_noQuerySegment() {
+        URI uri = URI.create("local.host");
+        assertThatThrownBy(() -> RequestMatchers.queryParam("sendoff", "goodbye").match(new MockClientRequestContext(uri)))
+                .isInstanceOf(AssertionError.class)
+                .hasMessage("Expected QueryParam <sendoff> to exist but was null");
+    }
+
+    @Test
+    void testQueryParam_paramMissing_emptyQuerySegment() {
+        URI uri = URI.create("local.host?");
+        assertThatThrownBy(() -> RequestMatchers.queryParam("sendoff", "goodbye").match(new MockClientRequestContext(uri)))
                 .isInstanceOf(AssertionError.class)
                 .hasMessage("Expected QueryParam <sendoff> to exist but was null");
     }
