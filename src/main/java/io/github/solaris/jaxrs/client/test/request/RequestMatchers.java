@@ -9,6 +9,7 @@ import java.net.URLDecoder;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.xml.xpath.XPathExpressionException;
 
@@ -78,6 +79,35 @@ public final class RequestMatchers {
 
             for (int i = 0; i < expectedValues.length; i++) {
                 assertEqual("QueryParam [name=" + name + ", position=" + i + "]", expectedValues[i], queryParams.get(name).get(i));
+            }
+        };
+    }
+
+    /**
+     * Assert that the given query parameter is not present in the request URI.
+     *
+     * @param name The name of query parameter
+     */
+    public static RequestMatcher queryParamDoesNotExist(String name) {
+        return request -> {
+            List<String> queryParamsValues = getQueryParams(request.getUri()).get(name);
+            if (queryParamsValues != null) {
+                throw new AssertionError("Expected QueryParam <" + name + "> to not exist, but it exists with values: " + queryParamsValues);
+            }
+        };
+    }
+
+    /**
+     * Assert that the given number of query parameters are present in the request URI.
+     *
+     * @param expectedCount The expected number of query parameters
+     */
+    public static RequestMatcher queryParamCount(int expectedCount) {
+        return request -> {
+            Set<String> queryParamNames = getQueryParams(request.getUri()).keySet();
+            int actualSize = queryParamNames.size();
+            if (expectedCount != actualSize) {
+                throw new AssertionError("Expected %s QueryParams but found %s: %s".formatted(expectedCount, actualSize, queryParamNames));
             }
         };
     }
