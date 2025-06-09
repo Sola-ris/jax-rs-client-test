@@ -26,6 +26,8 @@ public final class ClientEntityConverter extends EntityConverter {
     private static final URI LOCALHOST = URI.create("http://localhost");
     private static final RoundTripFilter ROUND_TRIP_FILTER = new RoundTripFilter();
 
+    public ClientEntityConverter() {}
+
     @Override
     @SuppressWarnings("unchecked")
     public <T> T convertEntity(ClientRequestContext requestContext, Class<T> type) {

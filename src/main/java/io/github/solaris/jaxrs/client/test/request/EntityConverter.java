@@ -36,6 +36,8 @@ import org.jspecify.annotations.Nullable;
  */
 public abstract sealed class EntityConverter permits ClientEntityConverter, ProvidersEntityConverter {
 
+    EntityConverter() {}
+
     /**
      * Obtain the {@code EntityConverter} from the current {@link ClientRequestContext} while inside a {@code RequestMatcher}.
      * <p>Will throw an {@link IllegalStateException} when called outside a {@code RequestMatcher}.</p>

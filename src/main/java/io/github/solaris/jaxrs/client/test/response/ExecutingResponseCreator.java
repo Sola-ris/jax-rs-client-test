@@ -30,6 +30,7 @@ public class ExecutingResponseCreator implements ResponseCreator {
      * Create an instance with a {@link Client} obtained through {@link ClientBuilder#newClient()}.
      * The {@code Client} is registered to a {@link java.lang.ref.Cleaner Cleaner} and closed once it goes out of scope.
      */
+    @SuppressWarnings("this-escape")
     public ExecutingResponseCreator() {
         this.client = ClientBuilder.newClient();
         ClientCleaner.register(this, client);

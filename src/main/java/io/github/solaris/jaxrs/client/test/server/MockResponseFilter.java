@@ -34,6 +34,8 @@ public final class MockResponseFilter implements ClientRequestFilter {
     @Context
     private @Nullable Providers providers;
 
+    public MockResponseFilter() {}
+
     @Override
     public void filter(ClientRequestContext requestContext) throws IOException {
         EntityConverter converter = getProvidersEntityConverter(requestContext).orElseGet(ClientEntityConverter::new);

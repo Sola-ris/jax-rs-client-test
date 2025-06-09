@@ -264,7 +264,9 @@
                     <execution>
                         <id>default-compile</id>
                         <configuration>
+                            <failOnWarning>true</failOnWarning>
                             <compilerArgs>
+                                <arg>-Xlint:all,-requires-automatic</arg>
                                 <arg>-XDcompilePolicy=simple</arg>
                                 <arg>
                                     -Xplugin:ErrorProne \
