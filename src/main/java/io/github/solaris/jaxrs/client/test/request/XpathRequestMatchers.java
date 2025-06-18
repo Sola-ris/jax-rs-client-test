@@ -180,6 +180,7 @@ public class XpathRequestMatchers {
      * Changes:
      *     <ul>
      *         <li>Replaced org.springframework.util.Assert.notNull with {@link java.util.Objects#requireNonNull requireNonNull}</li>
+     *         <li>Removed @Nullable from getPrefix</li>
      *         <li>
      *             Removed methods:
      *             <ul>
@@ -236,7 +237,6 @@ public class XpathRequestMatchers {
         }
 
         @Override
-//        @Nullable
         public String getPrefix(String namespaceUri) {
             throw new UnsupportedOperationException();
         }
