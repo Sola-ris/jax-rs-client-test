@@ -220,7 +220,6 @@ public class XpathRequestMatchers {
         private final Map<String, Set<String>> namespaceUriToPrefixes = new HashMap<>();
         private String defaultNamespaceUri = "";
 
-
         @Override
         public String getNamespaceURI(String prefix) {
             requireNonNull(prefix, "'prefix' must not be null");

@@ -175,7 +175,6 @@ class RequestMatchersTest {
                 .doesNotThrowAnyException();
     }
 
-
     @Test
     void testQueryParamCount_repeatedQueryParam() {
         URI uri = URI.create("local.host?greeting=hello&greeting=salutations");
