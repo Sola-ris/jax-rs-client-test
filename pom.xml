@@ -280,16 +280,16 @@
                                 <arg>--should-stop=ifError=FLOW</arg>
                             </compilerArgs>
                             <annotationProcessorPaths>
-                                <annotationProcessorPath>
+                                <path>
                                     <groupId>com.google.errorprone</groupId>
                                     <artifactId>error_prone_core</artifactId>
                                     <version>2.38.0</version>
-                                </annotationProcessorPath>
-                                <annotationProcessorPath>
+                                </path>
+                                <path>
                                     <groupId>com.uber.nullaway</groupId>
                                     <artifactId>nullaway</artifactId>
                                     <version>0.12.7</version>
-                                </annotationProcessorPath>
+                                </path>
                             </annotationProcessorPaths>
                         </configuration>
                     </execution>
