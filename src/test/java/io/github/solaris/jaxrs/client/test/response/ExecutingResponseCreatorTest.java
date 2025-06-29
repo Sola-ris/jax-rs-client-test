@@ -10,6 +10,7 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.net.ServerSocket;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +23,7 @@ import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.core.MultivaluedHashMap;
 import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.UriBuilder;
 
 import org.jspecify.annotations.NullUnmarked;
 import org.junit.jupiter.api.AfterAll;
@@ -38,14 +40,24 @@ import io.github.solaris.jaxrs.client.test.util.extension.JaxRsVendorTest;
 @NullUnmarked
 class ExecutingResponseCreatorTest {
     private static final AssertableHandler HANDLER = new AssertableHandler();
-    private static final URI REQUEST_URI = URI.create("http://localhost:8080/hello");
     private static final String REQUEST_BODY = "{\"hello\": true}";
 
+    private static URI requestUri;
     private static HttpServer httpServer;
 
     @BeforeAll
     static void startServer() throws IOException {
-        httpServer = HttpServer.create(new InetSocketAddress(8080), 0);
+        int port;
+        try (ServerSocket socket = new ServerSocket(0)) {
+            port = socket.getLocalPort();
+        }
+
+        requestUri = UriBuilder.fromUri("http://localhost")
+                .port(port)
+                .path("hello")
+                .build();
+
+        httpServer = HttpServer.create(new InetSocketAddress(port), 0);
         httpServer.createContext("/hello", HANDLER);
         httpServer.setExecutor(null);
         httpServer.start();
@@ -90,12 +102,12 @@ class ExecutingResponseCreatorTest {
         ClientBuilder builder = ClientBuilder.newBuilder();
         MockRestServer mockServer = MockRestServer.bindTo(builder).build();
 
-        mockServer.expect(requestTo(REQUEST_URI)).andRespond(responseCreator);
+        mockServer.expect(requestTo(requestUri)).andRespond(responseCreator);
         mockServer.expect(requestTo("/goodbye")).andRespond(withSuccess());
 
         assertThatCode(() -> {
             try (Client client = builder.build()) {
-                Response serverResponse = client.target(REQUEST_URI)
+                Response serverResponse = client.target(requestUri)
                         .register(headerCaptor)
                         .request()
                         .header("X-Custom", "Custom-X")
@@ -112,7 +124,7 @@ class ExecutingResponseCreatorTest {
 
         // Implementations add / compute additional headers
         assertThat(HANDLER.headers).containsAllEntriesOf(headerCaptor.headers);
-        assertThat(HANDLER.requestUri).isEqualTo(REQUEST_URI);
+        assertThat(HANDLER.requestUri).isEqualTo(requestUri);
         assertThat(HANDLER.body).isEqualTo(REQUEST_BODY);
     }
 
@@ -121,12 +133,12 @@ class ExecutingResponseCreatorTest {
         ClientBuilder builder = ClientBuilder.newBuilder();
         MockRestServer mockServer = MockRestServer.bindTo(builder).build();
 
-        mockServer.expect(requestTo(REQUEST_URI)).andRespond(responseCreator);
+        mockServer.expect(requestTo(requestUri)).andRespond(responseCreator);
         mockServer.expect(requestTo("/goodbye")).andRespond(withSuccess());
 
         assertThatCode(() -> {
             try (Client client = builder.build()) {
-                Response serverResponse = client.target(REQUEST_URI)
+                Response serverResponse = client.target(requestUri)
                         .register(headerCaptor)
                         .request()
                         .header("X-Custom", "Custom-X")
@@ -143,7 +155,7 @@ class ExecutingResponseCreatorTest {
 
         // Implementations add / compute additional headers
         assertThat(HANDLER.headers).containsAllEntriesOf(headerCaptor.headers);
-        assertThat(HANDLER.requestUri).isEqualTo(REQUEST_URI);
+        assertThat(HANDLER.requestUri).isEqualTo(requestUri);
     }
 
     private static class AssertableHandler implements HttpHandler {
@@ -156,8 +168,11 @@ class ExecutingResponseCreatorTest {
             for (Map.Entry<String, List<String>> header : exchange.getRequestHeaders().entrySet()) {
                 headers.addAll(header.getKey().toLowerCase(), header.getValue());
             }
-            requestUri = URI.create(
-                    "http://" + exchange.getLocalAddress().getHostName() + ":" + exchange.getLocalAddress().getPort() + exchange.getRequestURI());
+
+            requestUri = UriBuilder.fromUri("http://" + exchange.getRequestURI())
+                    .host(exchange.getLocalAddress().getHostName())
+                    .port(exchange.getLocalAddress().getPort())
+                    .build();
             body = new String(exchange.getRequestBody().readAllBytes(), UTF_8);
 
             exchange.sendResponseHeaders(OK.getStatusCode(), 0);
