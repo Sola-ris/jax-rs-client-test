@@ -197,13 +197,15 @@ public final class RequestMatchers {
     }
 
     private static MultivaluedMap<String, String> getQueryParams(URI uri) {
-        if (uri.getQuery() == null) {
+        if (uri.getRawQuery() == null || uri.getRawQuery().isEmpty()) {
             return EMPTY_QUERY_PARAMS;
         }
-        return Arrays.stream(uri.getQuery().split("&"))
-                .map(query -> URLDecoder.decode(query, UTF_8))
-                .filter(query -> !"".equals(query))
+
+        return Arrays.stream(uri.getRawQuery().split("&"))
                 .map(query -> query.split("=", 2))
-                .collect(MultivaluedHashMap::new, (map, query) -> map.add(query[0], query.length == 2 ? query[1] : ""), MultivaluedMap::putAll);
+                .collect(MultivaluedHashMap::new, (map, query) -> map.add(
+                        URLDecoder.decode(query[0], UTF_8),
+                        query.length == 2 ? URLDecoder.decode(query[1], UTF_8) : ""
+                ), MultivaluedMap::putAll);
     }
 }

@@ -5,10 +5,12 @@ import static jakarta.ws.rs.HttpMethod.PATCH;
 import static jakarta.ws.rs.core.HttpHeaders.ACCEPT;
 import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
 import static jakarta.ws.rs.core.MediaType.APPLICATION_XML;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.net.URI;
+import java.net.URLEncoder;
 import java.util.List;
 
 import jakarta.ws.rs.core.MultivaluedHashMap;
@@ -92,6 +94,38 @@ class RequestMatchersTest {
     }
 
     @Test
+    void testQueryParam_equalsSignInValue_encoded() {
+        String encodedEqualsSign = URLEncoder.encode("=", UTF_8);
+        URI uri = URI.create("local.host?greeting=hello" + encodedEqualsSign + "salutations&sendoff=farewell");
+        assertThatCode(() -> RequestMatchers.queryParam("greeting", "hello=salutations").match(new MockClientRequestContext(uri)))
+                .doesNotThrowAnyException();
+    }
+
+    @Test
+    void testQueryParam_equalsSignInName_encoded() {
+        String encodedEqualsSign = URLEncoder.encode("=", UTF_8);
+        URI uri = URI.create("local.host?gree" + encodedEqualsSign + "ting=hello&sendoff=farewell");
+        assertThatCode(() -> RequestMatchers.queryParam("gree=ting", "hello").match(new MockClientRequestContext(uri)))
+                .doesNotThrowAnyException();
+    }
+
+    @Test
+    void testQueryParam_ampersandInName_encoded() {
+        String ampersandEncoded = URLEncoder.encode("&", UTF_8);
+        URI uri = URI.create("local.host?gree" + ampersandEncoded + "ting=hello");
+        assertThatCode(() -> RequestMatchers.queryParam("gree&ting", "hello").match(new MockClientRequestContext(uri)))
+                .doesNotThrowAnyException();
+    }
+
+    @Test
+    void testQueryParam_ampersandInValue_encoded() {
+        String ampersandEncoded = URLEncoder.encode("&", UTF_8);
+        URI uri = URI.create("local.host?greeting=hel" + ampersandEncoded + "lo");
+        assertThatCode(() -> RequestMatchers.queryParam("greeting", "hel&lo").match(new MockClientRequestContext(uri)))
+                .doesNotThrowAnyException();
+    }
+
+    @Test
     void testQueryParam_paramMissing() {
         URI uri = URI.create("local.host?greeting=hello&greeting=salutations");
         assertThatThrownBy(() -> RequestMatchers.queryParam("sendoff", "goodbye", "farewell").match(new MockClientRequestContext(uri)))
@@ -171,6 +205,13 @@ class RequestMatchersTest {
     @Test
     void testQueryParamCount_emptyQuerySegment() {
         URI uri = URI.create("local.host?");
+        assertThatCode(() -> RequestMatchers.queryParamCount(0).match(new MockClientRequestContext(uri)))
+                .doesNotThrowAnyException();
+    }
+
+    @Test
+    void testQueryParamCount_blankQuery_encoded() {
+        URI uri = URI.create("local.host&" + URLEncoder.encode(" \t", UTF_8));
         assertThatCode(() -> RequestMatchers.queryParamCount(0).match(new MockClientRequestContext(uri)))
                 .doesNotThrowAnyException();
     }
