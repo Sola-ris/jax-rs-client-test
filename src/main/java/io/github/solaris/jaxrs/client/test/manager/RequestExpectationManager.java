@@ -27,8 +27,6 @@ public abstract class RequestExpectationManager {
     private final List<ClientRequestContext> requests = new ArrayList<>();
     private final Map<ClientRequestContext, Throwable> failedRequests = new LinkedHashMap<>();
 
-    private boolean expectationsDeclared = false;
-
     RequestExpectationManager() {}
 
     abstract void expectationsDeclared();
@@ -44,7 +42,7 @@ public abstract class RequestExpectationManager {
      * @see io.github.solaris.jaxrs.client.test.server.MockRestServer#expect(ExpectedCount, RequestMatcher) MockRestServer.expect(ExpectedCount, RequestMatcher)
      */
     public ResponseActions expectRequest(ExpectedCount count, RequestMatcher requestMatcher) {
-        if (expectationsDeclared) {
+        if (!requests.isEmpty()) {
             throw new IllegalStateException("Cannot declare further expectations after the first request.");
         }
 
@@ -64,7 +62,6 @@ public abstract class RequestExpectationManager {
         RequestExpectation expectation;
         synchronized (requests) {
             if (requests.isEmpty()) {
-                expectationsDeclared = true;
                 expectationsDeclared();
             }
 
@@ -117,7 +114,6 @@ public abstract class RequestExpectationManager {
         requests.clear();
         expectations.clear();
         failedRequests.clear();
-        expectationsDeclared = false;
     }
 
     private long countUnsatisfiedExpectations() {
