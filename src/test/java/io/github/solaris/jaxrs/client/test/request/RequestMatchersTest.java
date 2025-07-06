@@ -73,6 +73,13 @@ class RequestMatchersTest {
     }
 
     @Test
+    void testQueryPram_testExists() {
+        URI uri = URI.create("local.host?greeting=hello");
+        assertThatCode(() -> RequestMatchers.queryParam("greeting").match(new MockClientRequestContext(uri)))
+                .doesNotThrowAnyException();
+    }
+
+    @Test
     void testQueryParam_noValue() {
         URI uri = URI.create("local.host?greeting");
         assertThatCode(() -> RequestMatchers.queryParam("greeting", "").match(new MockClientRequestContext(uri)))
@@ -237,6 +244,15 @@ class RequestMatchersTest {
         headers.put(ACCEPT, List.of(APPLICATION_JSON, APPLICATION_XML));
 
         assertThatCode(() -> RequestMatchers.header(ACCEPT, APPLICATION_JSON, APPLICATION_XML).match(new MockClientRequestContext(headers)))
+                .doesNotThrowAnyException();
+    }
+
+    @Test
+    void testHeader_testExists() {
+        MultivaluedMap<String, String> headers = new MultivaluedHashMap<>();
+        headers.put(ACCEPT, List.of(APPLICATION_JSON, APPLICATION_XML));
+
+        assertThatCode(() -> RequestMatchers.header(ACCEPT).match(new MockClientRequestContext(headers)))
                 .doesNotThrowAnyException();
     }
 
