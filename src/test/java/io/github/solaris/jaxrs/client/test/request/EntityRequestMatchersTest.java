@@ -122,21 +122,19 @@ class EntityRequestMatchersTest {
     }
 
     @JaxRsVendorTest
-    void testString(FilterExceptionAssert filterExceptionAssert) {
+    void testString() {
         Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         Dto dto = new Dto(true);
-        Dto otherDto = new Dto(false);
 
-        server.expect(RequestMatchers.entity().isEqualTo(dto)).andRespond(withSuccess());
+        server.expect(RequestMatchers.entity().string(dto.toString())).andRespond(withSuccess());
 
         try (client) {
-            filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello")
+            assertThatCode(() -> client.target("/hello")
                             .request()
-                            .post(Entity.entity(otherDto, TEXT_PLAIN_TYPE)).close())
-                    .isInstanceOf(AssertionError.class)
-                    .hasMessage("Entity expected: <%s> but was: <%s>", dto, otherDto);
+                            .post(Entity.entity(dto.toString(), TEXT_PLAIN_TYPE)).close())
+                    .doesNotThrowAnyException();
         }
     }
 
