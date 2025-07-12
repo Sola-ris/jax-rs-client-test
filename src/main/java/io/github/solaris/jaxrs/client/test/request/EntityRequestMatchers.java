@@ -11,6 +11,8 @@ import jakarta.ws.rs.core.Form;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.MultivaluedMap;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * Factory for {@link RequestMatcher} implementations related to the request {@code entity}.
  * <p>Accessed via {@link RequestMatchers#entity()}.</p>
@@ -46,7 +48,7 @@ public final class EntityRequestMatchers {
      *
      * @param expected The expected request entity
      */
-    public RequestMatcher isEqualTo(Object expected) {
+    public RequestMatcher isEqualTo(@Nullable Object expected) {
         return request -> assertEqual("Entity", expected, request.getEntity());
     }
 

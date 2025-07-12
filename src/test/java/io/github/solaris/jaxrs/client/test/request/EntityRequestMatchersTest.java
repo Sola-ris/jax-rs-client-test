@@ -107,6 +107,19 @@ class EntityRequestMatchersTest {
     }
 
     @JaxRsVendorTest
+    void testIsEqualTo_null() {
+        Client client = ClientBuilder.newClient();
+        MockRestServer server = MockRestServer.bindTo(client).build();
+
+        server.expect(RequestMatchers.entity().isEqualTo(null)).andRespond(withSuccess());
+
+        try (client) {
+            assertThatCode(() -> client.target("").request().get().close())
+                    .doesNotThrowAnyException();
+        }
+    }
+
+    @JaxRsVendorTest
     void testIsEqualTo_noMatch() {
         Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
