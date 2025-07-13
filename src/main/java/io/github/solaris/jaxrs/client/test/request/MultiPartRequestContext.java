@@ -76,6 +76,11 @@ record MultiPartRequestContext(Object entity, Type entityType, MultivaluedMap<St
         return new Annotation[0];
     }
 
+    @Override
+    public boolean hasEntity() {
+        return true;
+    }
+
     //<editor-fold desc="UnsupportedOperationExceptions">
     @Override
     public Object getProperty(String name) {
@@ -144,11 +149,6 @@ record MultiPartRequestContext(Object entity, Type entityType, MultivaluedMap<St
 
     @Override
     public Map<String, Cookie> getCookies() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public boolean hasEntity() {
         throw new UnsupportedOperationException();
     }
 

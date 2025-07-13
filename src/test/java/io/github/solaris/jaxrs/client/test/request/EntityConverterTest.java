@@ -33,6 +33,7 @@ import jakarta.ws.rs.core.Response;
 import io.github.solaris.jaxrs.client.test.server.MockRestServer;
 import io.github.solaris.jaxrs.client.test.util.Dto;
 import io.github.solaris.jaxrs.client.test.util.EntityConverterAssert;
+import io.github.solaris.jaxrs.client.test.util.FilterExceptionAssert;
 import io.github.solaris.jaxrs.client.test.util.extension.JaxRsVendorTest;
 
 class EntityConverterTest {
@@ -74,6 +75,23 @@ class EntityConverterTest {
     }
 
     @JaxRsVendorTest
+    void testConvertEntity_type_noEntityPresent(FilterExceptionAssert filterExceptionAssert) {
+        Client client = ClientBuilder.newClient();
+        MockRestServer server = MockRestServer.bindTo(client).build();
+
+        server.expect(request -> {
+            EntityConverter converter = EntityConverter.fromRequestContext(request);
+            converter.convertEntity(request, String.class);
+        }).andRespond(withSuccess());
+
+        try (client) {
+            filterExceptionAssert.assertThatThrownBy(() -> client.target("").request().get().close())
+                    .isInstanceOf(AssertionError.class)
+                    .hasMessage("Request contains no entity to convert.");
+        }
+    }
+
+    @JaxRsVendorTest
     void testConvertEntity_genericType(EntityConverterAssert converterAssert) {
         Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
@@ -107,6 +125,23 @@ class EntityConverterTest {
                     assertThat(response.getStatusInfo().toEnum()).isEqualTo(OK);
                 }
             }).doesNotThrowAnyException();
+        }
+    }
+
+    @JaxRsVendorTest
+    void testConvertEntity_genericType_noEntityPresent(FilterExceptionAssert filterExceptionAssert) {
+        Client client = ClientBuilder.newClient();
+        MockRestServer server = MockRestServer.bindTo(client).build();
+
+        server.expect(request -> {
+            EntityConverter converter = EntityConverter.fromRequestContext(request);
+            converter.convertEntity(request, new GenericType<MultivaluedMap<String, String>>() {});
+        }).andRespond(withSuccess());
+
+        try (client) {
+            filterExceptionAssert.assertThatThrownBy(() -> client.target("").request().get().close())
+                    .isInstanceOf(AssertionError.class)
+                    .hasMessage("Request contains no entity to convert.");
         }
     }
 
@@ -327,6 +362,23 @@ class EntityConverterTest {
                             .post(Entity.entity(new GenericEntity<>(List.of(plainPart())) {}, MULTIPART_FORM_DATA_TYPE))
                             .close())
                     .doesNotThrowAnyException();
+        }
+    }
+
+    @JaxRsVendorTest(skipFor = {JERSEY, CXF, RESTEASY_REACTIVE})
+    void testBufferMultipartRequest_notMultiPartFormData(FilterExceptionAssert filterExceptionAssert) {
+        Client client = ClientBuilder.newClient();
+        MockRestServer server = MockRestServer.bindTo(client).build();
+
+        server.expect(request -> {
+            EntityConverter converter = EntityConverter.fromRequestContext(request);
+            converter.bufferMultipartRequest(request);
+        }).andRespond(withSuccess());
+
+        try (client) {
+            filterExceptionAssert.assertThatThrownBy(() -> client.target("").request().post(Entity.json(new Dto("hello"))).close())
+                    .isInstanceOf(AssertionError.class)
+                    .hasMessage("MediaType must be %s", MULTIPART_FORM_DATA);
         }
     }
 }

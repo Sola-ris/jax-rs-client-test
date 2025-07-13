@@ -31,6 +31,7 @@ public final class ClientEntityConverter extends EntityConverter {
     @Override
     @SuppressWarnings("unchecked")
     public <T> T convertEntity(ClientRequestContext requestContext, Class<T> type) {
+        assertEntityPresent(requestContext);
         if (canShortCircuit(requestContext, type, null)) {
             return (T) requestContext.getEntity();
         }
@@ -43,6 +44,7 @@ public final class ClientEntityConverter extends EntityConverter {
     @Override
     @SuppressWarnings("unchecked")
     public <T> T convertEntity(ClientRequestContext requestContext, GenericType<T> genericType) {
+        assertEntityPresent(requestContext);
         if (canShortCircuit(requestContext, genericType.getRawType(), genericType.getType())) {
             return (T) requestContext.getEntity();
         }
