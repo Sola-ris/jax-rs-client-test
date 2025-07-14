@@ -394,6 +394,7 @@
                     <systemPropertyVariables>
                         <quarkus.native.builder-image>commandline</quarkus.native.builder-image>
                         <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
+                        <junit.platform.discovery.issue.severity.critical>INFO</junit.platform.discovery.issue.severity.critical>
                     </systemPropertyVariables>
                     <consoleOutputReporter implementation="org.apache.maven.plugin.surefire.extensions.junit5.JUnit5ConsoleOutputReporter">
                         <usePhrasedFileName>false</usePhrasedFileName>
