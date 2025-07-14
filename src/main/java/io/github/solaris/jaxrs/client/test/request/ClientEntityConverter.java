@@ -20,7 +20,11 @@ import io.github.solaris.jaxrs.client.test.internal.ClientCleaner;
 /**
  * Fallback {@link EntityConverter} that indirectly uses the available JAX-RS {@link jakarta.ws.rs.ext.Providers Providers}
  * through a {@link Client} to convert the entity.
- * <p>Must not be directly instantiated, use {@link EntityConverter#fromRequestContext(ClientRequestContext)}.</p>
+ *
+ * <h2>DISCLAIMER</h2>
+ *
+ * <p><strong>This class must not be directly instantiated and may change without warning!</strong></p>
+ * <p>To obtain an {@link EntityConverter}, use {@link EntityConverter#fromRequestContext(ClientRequestContext)}.</p>
  */
 public final class ClientEntityConverter extends EntityConverter {
     private static final URI LOCALHOST = URI.create("http://localhost");

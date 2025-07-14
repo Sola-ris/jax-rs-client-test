@@ -19,7 +19,11 @@ import jakarta.ws.rs.ext.Providers;
 
 /**
  * {@link EntityConverter} that directly uses the available JAX-RS {@link Providers} to convert the entity.
- * <p>Must not be directly instantiated, use {@link EntityConverter#fromRequestContext(ClientRequestContext)}.</p>
+ *
+ * <h2>DISCLAIMER</h2>
+ *
+ * <p><strong>This class must not be directly instantiated and may change without warning!</strong></p>
+ * <p>To obtain an {@link EntityConverter}, use {@link EntityConverter#fromRequestContext(ClientRequestContext)}.</p>
  */
 public final class ProvidersEntityConverter extends EntityConverter {
     private static final Annotation[] ANNOTATIONS = new Annotation[]{};
