@@ -374,7 +374,7 @@
                         </goals>
                         <configuration>
                             <excludes>
-                                <exclude>**/MultiPartRequestContext.class</exclude>
+                                <exclude>**/RequestContextStub.class</exclude>
                             </excludes>
                         </configuration>
                     </execution>

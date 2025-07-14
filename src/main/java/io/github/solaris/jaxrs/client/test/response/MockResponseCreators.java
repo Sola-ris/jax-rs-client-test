@@ -25,8 +25,6 @@ import jakarta.ws.rs.core.Response.Status;
 import jakarta.ws.rs.core.Response.Status.Family;
 import jakarta.ws.rs.core.Response.StatusType;
 
-import org.jspecify.annotations.Nullable;
-
 /**
  * Factory methods for {@link ResponseCreator ResponseCreators} with a given status code.
  *
@@ -46,11 +44,12 @@ public final class MockResponseCreators {
      * {@code ResponseCreator} for status code 200 ({@link jakarta.ws.rs.core.Response.Status#OK OK}) and a response body.
      *
      * @param entity    The response entity
-     * @param mediaType The {@code Content-Type} of the entity (possibly {@code null})
+     * @param mediaType The {@code Content-Type} of the entity
      */
-    public static MockResponseCreator withSuccess(Object entity, @Nullable MediaType mediaType) {
-        MockResponseCreator responseCreator = new MockResponseCreator(OK).entity(entity);
-        return mediaType == null ? responseCreator : responseCreator.mediaType(mediaType);
+    public static MockResponseCreator withSuccess(Object entity, MediaType mediaType) {
+        return new MockResponseCreator(OK)
+                .entity(entity)
+                .mediaType(mediaType);
     }
 
     /**

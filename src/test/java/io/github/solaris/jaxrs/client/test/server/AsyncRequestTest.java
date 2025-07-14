@@ -25,6 +25,7 @@ import jakarta.ws.rs.core.Response;
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
 import org.junit.jupiter.api.Nested;
 
+import io.github.solaris.jaxrs.client.test.util.ConfiguredClientSupplier;
 import io.github.solaris.jaxrs.client.test.util.Dto;
 import io.github.solaris.jaxrs.client.test.util.GreetingSendoffClient;
 import io.github.solaris.jaxrs.client.test.util.extension.JaxRsVendorTest;
@@ -72,8 +73,8 @@ class AsyncRequestTest {
     }
 
     @JaxRsVendorTest
-    void testInvokeAsyncWithCallback_success() {
-        Client client = ClientBuilder.newClient();
+    void testInvokeAsyncWithCallback_success(ConfiguredClientSupplier clientSupplier) {
+        Client client = clientSupplier.get();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         server.expect(method(GET)).andRespond(withSuccess(BODY, APPLICATION_JSON_TYPE));
