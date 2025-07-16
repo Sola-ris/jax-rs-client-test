@@ -1,5 +1,6 @@
 package io.github.solaris.jaxrs.client.test.response;
 
+import static io.github.solaris.jaxrs.client.test.internal.ArgumentValidator.validateNotNull;
 import static jakarta.ws.rs.core.HttpHeaders.CONTENT_TYPE;
 
 import java.io.IOException;
@@ -36,6 +37,7 @@ public class MockResponseCreator implements ResponseCreator {
     private final List<Variant> variants = new ArrayList<>();
 
     MockResponseCreator(StatusType status) {
+        validateNotNull(status, "'status' must not be null.");
         this.status = status;
     }
 
@@ -51,6 +53,7 @@ public class MockResponseCreator implements ResponseCreator {
      * Set the {@code Content-Type} header to the given {@link MediaType}
      */
     public MockResponseCreator mediaType(MediaType mediaType) {
+        validateNotNull(mediaType, "'mediaType' must not be null.");
         headers.putSingle(CONTENT_TYPE, mediaType);
         return this;
     }
@@ -59,6 +62,8 @@ public class MockResponseCreator implements ResponseCreator {
      * Add a Header with one or more values to the response.
      */
     public MockResponseCreator header(String name, Object... values) {
+        validateNotNull(name, "'name' must not be null.");
+        validateNotNull(values, "'values' must not be null.");
         for (Object value : values) {
             headers.add(name, value);
         }
@@ -69,6 +74,7 @@ public class MockResponseCreator implements ResponseCreator {
      * Add one or more {@link NewCookie NewCookies} to the response.
      */
     public MockResponseCreator cookies(NewCookie... cookies) {
+        validateNotNull(cookies, "'cookies' must not be null.");
         this.cookies.addAll(Arrays.asList(cookies));
         return this;
     }
@@ -77,6 +83,7 @@ public class MockResponseCreator implements ResponseCreator {
      * Add one or more {@link Link Links} to the response.
      */
     public MockResponseCreator links(Link... links) {
+        validateNotNull(links, "'links' must not be null.");
         this.links.addAll(Arrays.asList(links));
         return this;
     }
@@ -85,6 +92,7 @@ public class MockResponseCreator implements ResponseCreator {
      * Add one or more {@link Variant Variants} to the response.
      */
     public MockResponseCreator variants(Variant... variants) {
+        validateNotNull(variants, "'variants' must not be null.");
         this.variants.addAll(Arrays.asList(variants));
         return this;
     }

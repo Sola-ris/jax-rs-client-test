@@ -5,9 +5,11 @@ import static io.github.solaris.jaxrs.client.test.util.extension.JaxRsVendor.JER
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.params.provider.Arguments.argumentSet;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import javax.xml.transform.TransformerException;
 import javax.xml.xpath.XPathExpressionException;
@@ -19,7 +21,11 @@ import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlElementWrapper;
 import jakarta.xml.bind.annotation.XmlRootElement;
 
+import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.jspecify.annotations.NullUnmarked;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.xml.sax.SAXParseException;
 
 import io.github.solaris.jaxrs.client.test.server.MockRestServer;
@@ -381,6 +387,28 @@ class XpathRequestMatchersTest {
                 .cause()
                 .isInstanceOf(TransformerException.class)
                 .hasMessage("Prefix must resolve to a namespace: greeting");
+    }
+
+    @ParameterizedTest
+    @MethodSource("invalidArguments")
+    void testArgumentValidation(ThrowingCallable callable, String exceptionMessage) {
+        assertThatThrownBy(callable)
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage(exceptionMessage);
+    }
+
+    @SuppressWarnings({"DataFlowIssue", "ResultOfMethodCallIgnored"})
+    private static Stream<Arguments> invalidArguments() {
+        return Stream.of(
+                argumentSet("testExpression_null",
+                        (ThrowingCallable) () -> RequestMatchers.xpath(null), "XPath expression must not be null or blank."),
+                argumentSet("testExpression_blank",
+                        (ThrowingCallable) () -> RequestMatchers.xpath(" \t\n"), "XPath expression must not be null or blank."),
+                argumentSet("testString_null",
+                        (ThrowingCallable) () -> RequestMatchers.xpath("/xmlDto/str").string(null), "'expectedString' must not be null."),
+                argumentSet("testNumber_null",
+                        (ThrowingCallable) () -> RequestMatchers.xpath("/xmlDto/str").number(null), "'expectedNumber' must not be null.")
+        );
     }
 
     @NullUnmarked

@@ -192,6 +192,14 @@ class MockResponseCreatorsTest {
                 .hasMessage("Connection Reset");
     }
 
+    @Test
+    @SuppressWarnings("DataFlowIssue")
+    void testException_null() {
+        assertThatThrownBy(() -> MockResponseCreators.withException(null))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("'ioe' must not be null.");
+    }
+
     @Nested
     @RunInQuarkus
     class WithEntity {

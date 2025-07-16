@@ -30,10 +30,14 @@ import jakarta.ws.rs.core.GenericType;
 import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.Response;
 
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+
 import io.github.solaris.jaxrs.client.test.server.MockRestServer;
 import io.github.solaris.jaxrs.client.test.util.Dto;
 import io.github.solaris.jaxrs.client.test.util.EntityConverterAssert;
 import io.github.solaris.jaxrs.client.test.util.FilterExceptionAssert;
+import io.github.solaris.jaxrs.client.test.util.FilterExceptionAssert.DefaultFilterExceptionAssert;
 import io.github.solaris.jaxrs.client.test.util.extension.JaxRsVendorTest;
 
 class EntityConverterTest {
@@ -379,6 +383,101 @@ class EntityConverterTest {
             filterExceptionAssert.assertThatThrownBy(() -> client.target("").request().post(Entity.json(new Dto("hello"))).close())
                     .isInstanceOf(AssertionError.class)
                     .hasMessage("MediaType must be %s", MULTIPART_FORM_DATA);
+        }
+    }
+
+
+    @Nested
+    @SuppressWarnings("DataFlowIssue")
+    class ArgumentValidation {
+        @Test
+        void testFromRequestContext_converterUnobtainable() {
+            Client client = ClientBuilder.newClient();
+            MockRestServer server = MockRestServer.bindTo(client).build();
+
+            server.expect(request -> {
+                request.setProperty(EntityConverter.class.getName(), "hello");
+                EntityConverter.fromRequestContext(request);
+            });
+
+            try (client) {
+                new DefaultFilterExceptionAssert().assertThatThrownBy(() -> client.target("").request().get().close())
+                        .isInstanceOf(IllegalStateException.class)
+                        .hasMessage("Unable to obtain EntityConverter from RequestContext.");
+            }
+        }
+
+        @Test
+        void testFromRequestContext_requestNull() {
+            RequestMatcher matcher = request -> EntityConverter.fromRequestContext(null);
+            validateArguments(new DefaultFilterExceptionAssert(), matcher, "'requestContext' must ot be null.");
+        }
+
+        @JaxRsVendorTest
+        void testConvertEntity_type_requestNull(FilterExceptionAssert filterExceptionAssert) {
+            RequestMatcher matcher = request -> {
+                EntityConverter converter = EntityConverter.fromRequestContext(request);
+                converter.convertEntity(null, String.class);
+            };
+            validateArguments(filterExceptionAssert, matcher, "'requestContext' must ot be null.");
+        }
+
+        @JaxRsVendorTest
+        void testConvertEntity_type_typeNull(FilterExceptionAssert filterExceptionAssert) {
+            RequestMatcher matcher = request -> {
+                EntityConverter converter = EntityConverter.fromRequestContext(request);
+                converter.convertEntity(request, (Class<?>) null);
+            };
+            validateArguments(filterExceptionAssert, matcher, "'type' must ot be null.");
+        }
+
+        @JaxRsVendorTest
+        void testConvertEntity_genericType_requestNull(FilterExceptionAssert filterExceptionAssert) {
+            RequestMatcher matcher = request -> {
+                EntityConverter converter = EntityConverter.fromRequestContext(request);
+                converter.convertEntity(null, new GenericType<>() {});
+            };
+            validateArguments(filterExceptionAssert, matcher, "'requestContext' must ot be null.");
+        }
+
+        @JaxRsVendorTest
+        void testConvertEntity_genericType_genericTypeNull(FilterExceptionAssert filterExceptionAssert) {
+            RequestMatcher matcher = request -> {
+                EntityConverter converter = EntityConverter.fromRequestContext(request);
+                converter.convertEntity(request, (GenericType<?>) null);
+            };
+            validateArguments(filterExceptionAssert, matcher, "'genericType' must ot be null.");
+        }
+
+        @Test
+        void testBufferExpectedMultipart_null() {
+            RequestMatcher matcher = request -> {
+                EntityConverter converter = EntityConverter.fromRequestContext(request);
+                converter.bufferExpectedMultipart(null);
+            };
+            validateArguments(new DefaultFilterExceptionAssert(), matcher, "'expectedParts' must ot be null.");
+        }
+
+        @Test
+        void testBufferMultipartRequest_null() {
+            RequestMatcher matcher = request -> {
+                EntityConverter converter = EntityConverter.fromRequestContext(request);
+                converter.bufferMultipartRequest(null);
+            };
+            validateArguments(new DefaultFilterExceptionAssert(), matcher, "'requestContext' must ot be null.");
+        }
+
+        private static void validateArguments(FilterExceptionAssert filterExceptionAssert, RequestMatcher matcher, String exceptionMessage) {
+            Client client = ClientBuilder.newClient();
+            MockRestServer server = MockRestServer.bindTo(client).build();
+
+            server.expect(matcher);
+
+            try (client) {
+                filterExceptionAssert.assertThatThrownBy(() -> client.target("").request().get().close())
+                        .isInstanceOf(IllegalArgumentException.class)
+                        .hasMessage(exceptionMessage);
+            }
         }
     }
 }

@@ -1,5 +1,6 @@
 package io.github.solaris.jaxrs.client.test.request;
 
+import static io.github.solaris.jaxrs.client.test.internal.ArgumentValidator.validateNotBlank;
 import static io.github.solaris.jaxrs.client.test.internal.Assertions.assertEqual;
 import static io.github.solaris.jaxrs.client.test.internal.Assertions.assertTrue;
 
@@ -26,6 +27,7 @@ public class JsonPathRequestMatchers {
     private final JsonPath jsonPath;
 
     JsonPathRequestMatchers(String expression, Object... args) {
+        validateNotBlank(expression, "JsonPath expression must not be null or blank.");
         this.expression = expression.formatted(args);
         this.jsonPath = JsonPath.compile(this.expression);
     }

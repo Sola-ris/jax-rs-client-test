@@ -3,6 +3,7 @@ package io.github.solaris.jaxrs.client.test.server;
 import static io.github.solaris.jaxrs.client.test.request.ExpectedCount.max;
 import static io.github.solaris.jaxrs.client.test.request.ExpectedCount.min;
 import static io.github.solaris.jaxrs.client.test.request.ExpectedCount.times;
+import static io.github.solaris.jaxrs.client.test.request.RequestMatchers.anything;
 import static io.github.solaris.jaxrs.client.test.request.RequestMatchers.requestTo;
 import static io.github.solaris.jaxrs.client.test.response.MockResponseCreators.withException;
 import static io.github.solaris.jaxrs.client.test.response.MockResponseCreators.withSuccess;
@@ -13,10 +14,12 @@ import static jakarta.ws.rs.core.Response.Status.OK;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.params.provider.Arguments.argumentSet;
 
 import java.net.SocketException;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.stream.Stream;
 
 import jakarta.ws.rs.ProcessingException;
 import jakarta.ws.rs.client.Client;
@@ -24,8 +27,12 @@ import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.client.WebTarget;
 
 import org.assertj.core.api.Assertions;
+import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import io.github.solaris.jaxrs.client.test.util.FilterExceptionAssert;
 import io.github.solaris.jaxrs.client.test.util.GreetingSendoffClient;
@@ -33,6 +40,40 @@ import io.github.solaris.jaxrs.client.test.util.extension.JaxRsVendorTest;
 import io.github.solaris.jaxrs.client.test.util.extension.RunInQuarkus;
 
 class MockRestServerTest {
+
+    @ParameterizedTest
+    @MethodSource("invalidArguments")
+    void testArgumentValidation(ThrowingCallable callable, String exceptionMessage) {
+        assertThatThrownBy(callable)
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage(exceptionMessage);
+    }
+
+    @SuppressWarnings("DataFlowIssue")
+    private static Stream<Arguments> invalidArguments() {
+        return Stream.of(
+                argumentSet("testBind_null",
+                        (ThrowingCallable) () -> MockRestServer.bindTo(null), "JAX-RS client component must be null."),
+                argumentSet("testBuild_order_null",
+                        (ThrowingCallable) () -> MockRestServer.bindTo(ClientBuilder.newClient()).withRequestOrder(null),
+                        "'order' must not be null."),
+                argumentSet("testVerify_timeout_null",
+                        (ThrowingCallable) () -> MockRestServer.bindTo(ClientBuilder.newClient()).build().verify(null),
+                        "'timeout' must not be null."),
+                argumentSet("testExpect_expectedCount_null",
+                        (ThrowingCallable) () -> MockRestServer.bindTo(ClientBuilder.newClient()).build().expect(null, null),
+                        "'expectedCount' must not be null."),
+                argumentSet("testExpect_requestMatcher_null",
+                        (ThrowingCallable) () -> MockRestServer.bindTo(ClientBuilder.newClient()).build().expect(null),
+                        "'requestMatcher' must not be null."),
+                argumentSet("testExpect_secondRequestMatcher_null",
+                        (ThrowingCallable) () -> MockRestServer.bindTo(ClientBuilder.newClient()).build().expect(anything()).andExpect(null),
+                        "'requestMatcher' must not be null."),
+                argumentSet("testRespond_null",
+                        (ThrowingCallable) () -> MockRestServer.bindTo(ClientBuilder.newClient()).build().expect(anything()).andRespond(null),
+                        "'responseCreator' must not be null.")
+        );
+    }
 
     @Nested
     class BindClientBuilder {

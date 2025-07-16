@@ -7,6 +7,7 @@ import static jakarta.ws.rs.core.Response.Status.OK;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -29,6 +30,7 @@ import org.jspecify.annotations.NullUnmarked;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -95,6 +97,14 @@ class ExecutingResponseCreatorTest {
         try (Client client = ClientBuilder.newClient()) {
             testResponseCreatorWithoutBody(new ExecutingResponseCreator(client));
         }
+    }
+
+    @Test
+    @SuppressWarnings("DataFlowIssue")
+    void testCustomClient_null() {
+        assertThatThrownBy(() -> new ExecutingResponseCreator(null))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("'client' must not be null.");
     }
 
     private static void testResponseCreator(ExecutingResponseCreator responseCreator) {

@@ -1,5 +1,6 @@
 package io.github.solaris.jaxrs.client.test.response;
 
+import static io.github.solaris.jaxrs.client.test.internal.ArgumentValidator.validateNotNull;
 import static jakarta.ws.rs.core.HttpHeaders.LOCATION;
 import static jakarta.ws.rs.core.HttpHeaders.RETRY_AFTER;
 import static jakarta.ws.rs.core.Response.Status.ACCEPTED;
@@ -170,6 +171,7 @@ public final class MockResponseCreators {
      * @param ioe The {@code IOException} to throw
      */
     public static ResponseCreator withException(IOException ioe) {
+        validateNotNull(ioe, "'ioe' must not be null.");
         return request -> {
             throw ioe;
         };

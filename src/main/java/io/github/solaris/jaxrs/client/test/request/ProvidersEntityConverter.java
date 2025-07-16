@@ -1,5 +1,6 @@
 package io.github.solaris.jaxrs.client.test.request;
 
+import static io.github.solaris.jaxrs.client.test.internal.ArgumentValidator.validateNotNull;
 import static io.github.solaris.jaxrs.client.test.request.MultiPartRequestContext.ENTITY_PARTS;
 
 import java.io.ByteArrayInputStream;
@@ -37,7 +38,10 @@ public final class ProvidersEntityConverter extends EntityConverter {
     @Override
     @SuppressWarnings("unchecked")
     public <T> T convertEntity(ClientRequestContext requestContext, Class<T> type) throws IOException {
+        validateNotNull(requestContext, "'requestContext' must ot be null.");
+        validateNotNull(type, "'type' must ot be null.");
         assertEntityPresent(requestContext);
+
         if (canShortCircuit(requestContext, type, null)) {
             return (T) requestContext.getEntity();
         }
@@ -47,6 +51,9 @@ public final class ProvidersEntityConverter extends EntityConverter {
     @Override
     @SuppressWarnings("unchecked")
     public <T> T convertEntity(ClientRequestContext requestContext, GenericType<T> genericType) throws IOException {
+        validateNotNull(requestContext, "'requestContext' must ot be null.");
+        validateNotNull(genericType, "'genericType' must ot be null.");
+
         assertEntityPresent(requestContext);
         if (canShortCircuit(requestContext, genericType.getRawType(), genericType.getType())) {
             return (T) requestContext.getEntity();

@@ -1,5 +1,7 @@
 package io.github.solaris.jaxrs.client.test.request;
 
+import static io.github.solaris.jaxrs.client.test.internal.ArgumentValidator.validateNotBlank;
+import static io.github.solaris.jaxrs.client.test.internal.ArgumentValidator.validateNotNull;
 import static io.github.solaris.jaxrs.client.test.internal.Assertions.assertEqual;
 import static io.github.solaris.jaxrs.client.test.internal.Assertions.assertTrue;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -45,6 +47,7 @@ public class XpathRequestMatchers {
     private final boolean namespaceAware;
 
     XpathRequestMatchers(String expression, @Nullable Map<String, String> namespaces, Object... args) throws XPathExpressionException {
+        validateNotBlank(expression, "XPath expression must not be null or blank.");
         this.expression = expression.formatted(args);
         this.xPathExpression = compile(this.expression, namespaces);
         this.namespaceAware = !(namespaces == null || namespaces.isEmpty());
@@ -129,6 +132,7 @@ public class XpathRequestMatchers {
      * @param expectedString The expected String value
      */
     public RequestMatcher string(String expectedString) {
+        validateNotNull(expectedString, "'expectedString' must not be null.");
         return (XpathRequestMatcher) request -> {
             String actualString = evaluate(request, String.class);
             assertEqual("XPath " + expression, expectedString, actualString);
@@ -141,6 +145,7 @@ public class XpathRequestMatchers {
      * @param expectedNumber The expected numeric value
      */
     public RequestMatcher number(Double expectedNumber) {
+        validateNotNull(expectedNumber, "'expectedNumber' must not be null.");
         return (XpathRequestMatcher) request -> {
             Double actualNumber = evaluate(request, Double.class);
             assertEqual("XPath " + expression, expectedNumber, actualNumber);

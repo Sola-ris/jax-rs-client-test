@@ -18,10 +18,12 @@ import static jakarta.ws.rs.core.MediaType.MULTIPART_FORM_DATA_TYPE;
 import static jakarta.ws.rs.core.MediaType.TEXT_PLAIN_TYPE;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.params.provider.Arguments.argumentSet;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Stream;
 
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.ClientBuilder;
@@ -29,6 +31,11 @@ import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.core.Form;
 import jakarta.ws.rs.core.GenericEntity;
 import jakarta.ws.rs.core.MediaType;
+
+import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import io.github.solaris.jaxrs.client.test.server.MockRestServer;
 import io.github.solaris.jaxrs.client.test.util.Dto;
@@ -455,5 +462,34 @@ class EntityRequestMatchersTest {
                     .isInstanceOf(AssertionError.class)
                     .hasMessage("Expected %s to contain all of %s", partsBuffer.get().actual(), partsBuffer.get().expected());
         }
+    }
+
+    @ParameterizedTest
+    @MethodSource("invalidArguments")
+    void testArgumentValidation(ThrowingCallable callable, String exceptionMessage) {
+        assertThatThrownBy(callable)
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage(exceptionMessage);
+    }
+
+    @SuppressWarnings({"DataFlowIssue", "ResultOfMethodCallIgnored"})
+    private static Stream<Arguments> invalidArguments() {
+        return Stream.of(
+                argumentSet("testMediaType_null",
+                        (ThrowingCallable) () -> RequestMatchers.entity().mediaType((MediaType) null), "'mediaType' must not be null."),
+                argumentSet("testHeader_string_null",
+                        (ThrowingCallable) () -> RequestMatchers.entity().mediaType((String) null), "'mediaType' must not be null."),
+                argumentSet("testString_null",
+                        (ThrowingCallable) () -> RequestMatchers.entity().string(null), "'expectedString' must not be null."),
+                argumentSet("testForm_null",
+                        (ThrowingCallable) () -> RequestMatchers.entity().form(null), "'expectedForm' must not be null."),
+                argumentSet("testFormContains_null",
+                        (ThrowingCallable) () -> RequestMatchers.entity().formContains(null), "'expectedForm' must not be null."),
+                argumentSet("testMultipartForm_null",
+                        (ThrowingCallable) () -> RequestMatchers.entity().multipartForm(null), "'expectedEntityParts' must not be null."),
+                argumentSet("testMultipartFormContains_null",
+                        (ThrowingCallable) () -> RequestMatchers.entity().multipartFormContains(null), "'expectedEntityParts' must not be null.")
+
+        );
     }
 }

@@ -25,7 +25,9 @@ import static java.util.Locale.ENGLISH;
 import static java.util.Locale.FRENCH;
 import static java.util.Locale.GERMAN;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.InstanceOfAssertFactories.LIST;
+import static org.junit.jupiter.params.provider.Arguments.argumentSet;
 
 import java.io.IOException;
 import java.time.Instant;
@@ -33,6 +35,7 @@ import java.time.Year;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.ClientBuilder;
@@ -43,6 +46,11 @@ import jakarta.ws.rs.core.NewCookie;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriBuilder;
 import jakarta.ws.rs.core.Variant;
+
+import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import io.github.solaris.jaxrs.client.test.server.MockRestServer;
 import io.github.solaris.jaxrs.client.test.util.ConfiguredClientSupplier;
@@ -210,5 +218,32 @@ class MockResponseCreatorTest {
         try (Response response = new MockResponseCreator(OK).header(LAST_MODIFIED, lastModified).createResponse(new MockClientRequestContext())) {
             assertThat(response.getLastModified()).isEqualTo(lastModified);
         }
+    }
+
+    @ParameterizedTest
+    @MethodSource("invalidArguments")
+    void testArgumentValidation(ThrowingCallable callable, String exceptionMessage) {
+        assertThatThrownBy(callable)
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage(exceptionMessage);
+    }
+
+    @SuppressWarnings("DataFlowIssue")
+    private static Stream<Arguments> invalidArguments() {
+        return Stream.of(
+                argumentSet("testMediaType_null",
+                        (ThrowingCallable) () -> new MockResponseCreator(OK).mediaType(null), "'mediaType' must not be null."),
+                argumentSet("testHeader_name_null",
+                        (ThrowingCallable) () -> new MockResponseCreator(OK).header(null), "'name' must not be null."),
+                argumentSet("testHeader_values_null",
+                        (ThrowingCallable) () -> new MockResponseCreator(OK).header(ACCEPT, (Object[]) null), "'values' must not be null."),
+                argumentSet("testCookies_null",
+                        (ThrowingCallable) () -> new MockResponseCreator(OK).cookies((NewCookie[]) null), "'cookies' must not be null."),
+                argumentSet("testLinks_null",
+                        (ThrowingCallable) () -> new MockResponseCreator(OK).links((Link[]) null), "'links' must not be null."),
+                argumentSet("testVariants_null",
+                        (ThrowingCallable) () -> new MockResponseCreator(OK).variants((Variant[]) null), "'variants' must not be null.")
+
+                );
     }
 }

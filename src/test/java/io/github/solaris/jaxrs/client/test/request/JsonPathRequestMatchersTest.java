@@ -2,12 +2,20 @@ package io.github.solaris.jaxrs.client.test.request;
 
 import static io.github.solaris.jaxrs.client.test.response.MockResponseCreators.withSuccess;
 import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.params.provider.Arguments.argumentSet;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.Entity;
+
+import org.assertj.core.api.ThrowableAssert;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import com.jayway.jsonpath.JsonPathException;
 
@@ -603,6 +611,24 @@ class JsonPathRequestMatchersTest {
                     .isInstanceOf(JsonPathException.class)
                     .hasMessageContaining("This is not a json object according to the JsonProvider:");
         }
+    }
+
+    @ParameterizedTest
+    @MethodSource("invalidArguments")
+    void testArgumentValidation(ThrowableAssert.ThrowingCallable callable, String exceptionMessage) {
+        assertThatThrownBy(callable)
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage(exceptionMessage);
+    }
+
+    @SuppressWarnings("DataFlowIssue")
+    private static Stream<Arguments> invalidArguments() {
+        return Stream.of(
+                argumentSet("testExpression_null",
+                        (ThrowableAssert.ThrowingCallable) () -> RequestMatchers.jsonPath(null), "JsonPath expression must not be null or blank."),
+                argumentSet("testExpression_blank",
+                        (ThrowableAssert.ThrowingCallable) () -> RequestMatchers.jsonPath(" \t\n"), "JsonPath expression must not be null or blank.")
+        );
     }
 
     // JSONArray and AbstractCollection have a different toString()

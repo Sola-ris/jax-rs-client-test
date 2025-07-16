@@ -8,15 +8,21 @@ import static jakarta.ws.rs.core.MediaType.APPLICATION_XML;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.params.provider.Arguments.argumentSet;
 
 import java.net.URI;
 import java.net.URLEncoder;
 import java.util.List;
+import java.util.stream.Stream;
 
 import jakarta.ws.rs.core.MultivaluedHashMap;
 import jakarta.ws.rs.core.MultivaluedMap;
 
+import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import io.github.solaris.jaxrs.client.test.util.MockClientRequestContext;
 
@@ -306,5 +312,37 @@ class RequestMatchersTest {
         assertThatThrownBy(() -> RequestMatchers.headerDoesNotExist(ACCEPT).match(new MockClientRequestContext(headers)))
                 .isInstanceOf(AssertionError.class)
                 .hasMessage("Expected header <%s> to not exist, but it exists with values: %s", ACCEPT, headers.get(ACCEPT));
+    }
+
+    @ParameterizedTest
+    @MethodSource("invalidArguments")
+    void testArgumentValidation(ThrowingCallable callable, String exceptionMessage) {
+        assertThatThrownBy(callable)
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage(exceptionMessage);
+    }
+
+    @SuppressWarnings({"DataFlowIssue", "ResultOfMethodCallIgnored"})
+    private static Stream<Arguments> invalidArguments() {
+        return Stream.of(
+                argumentSet("testHttpMethod_null",
+                        (ThrowingCallable) () -> RequestMatchers.method(null), "'httpMethod' must not be null."),
+                argumentSet("testRequestTo_uriNull",
+                        (ThrowingCallable) () -> RequestMatchers.requestTo((String) null), "'uri' must not be null."),
+                argumentSet("testRequestTo_stringNull",
+                        (ThrowingCallable) () -> RequestMatchers.requestTo((URI) null), "'uri' must not be null."),
+                argumentSet("testQueryParam_nameNull",
+                        (ThrowingCallable) () -> RequestMatchers.queryParam(null), "'name' must not be null."),
+                argumentSet("testQueryParam_valuesNull",
+                        (ThrowingCallable) () -> RequestMatchers.queryParam("greeting", (String[]) null), "'expectedValues' must not be null."),
+                argumentSet("testQueryParamDoesNotExist_null",
+                        (ThrowingCallable) () -> RequestMatchers.queryParamDoesNotExist(null), "'name' must not be null."),
+                argumentSet("testHeader_nameNull",
+                        (ThrowingCallable) () -> RequestMatchers.header(null), "'name' must not be null."),
+                argumentSet("testHeader_valuesNull",
+                        (ThrowingCallable) () -> RequestMatchers.header(ACCEPT, (String[]) null), "'expectedValues' must not be null."),
+                argumentSet("testHeaderDoesNotExist_null",
+                        (ThrowingCallable) () -> RequestMatchers.headerDoesNotExist(null), "'name' must not be null.")
+        );
     }
 }

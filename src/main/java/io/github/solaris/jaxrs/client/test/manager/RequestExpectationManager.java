@@ -1,5 +1,7 @@
 package io.github.solaris.jaxrs.client.test.manager;
 
+import static io.github.solaris.jaxrs.client.test.internal.ArgumentValidator.validateNotNull;
+
 import java.io.IOException;
 import java.net.URI;
 import java.time.Duration;
@@ -96,6 +98,7 @@ public abstract class RequestExpectationManager {
      * @see io.github.solaris.jaxrs.client.test.server.MockRestServer#verify(Duration) MockRestServer.verify(Duration)
      */
     public void verify(Duration timeout) {
+        validateNotNull(timeout, "'timeout' must not be null.");
         Instant end = Instant.now().plus(timeout);
         do {
             if (countUnsatisfiedExpectations() == 0) {
