@@ -21,8 +21,7 @@ import com.jayway.jsonpath.JsonPath;
  * Requires an Entity Provider for {@code application/json} to be present and registered with the JAX-RS client component that executed the request.
  * </p>
  */
-public class JsonPathRequestMatchers {
-
+public final class JsonPathRequestMatchers {
     private final String expression;
     private final JsonPath jsonPath;
 

@@ -41,7 +41,7 @@ import org.xml.sax.InputSource;
  * Requires an Entity Provider for {@code application/xml} to be present and registered with the JAX-RS client component that executed the request.
  * </p>
  */
-public class XpathRequestMatchers {
+public final class XpathRequestMatchers {
     private final String expression;
     private final XPathExpression xPathExpression;
     private final boolean namespaceAware;
