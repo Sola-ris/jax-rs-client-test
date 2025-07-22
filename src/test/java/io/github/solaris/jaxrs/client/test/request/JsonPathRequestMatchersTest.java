@@ -83,6 +83,19 @@ class JsonPathRequestMatchersTest {
     }
 
     @JaxRsVendorTest
+    void testValue_null(ConfiguredClientSupplier clientSupplier) {
+        Client client = clientSupplier.get();
+        MockRestServer server = MockRestServer.bindTo(client).build();
+
+        server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).value(null)).andRespond(withSuccess());
+
+        Dto dto = new Dto(null);
+
+        assertThatCode(() -> client.target("/hello").request().post(Entity.json(dto)).close())
+                .doesNotThrowAnyException();
+    }
+
+    @JaxRsVendorTest
     void testValue_noMatch(ConfiguredClientSupplier clientSupplier, FilterExceptionAssert filterExceptionAssert) {
         Client client = clientSupplier.get();
         MockRestServer server = MockRestServer.bindTo(client).build();
