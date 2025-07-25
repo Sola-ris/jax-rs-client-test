@@ -444,6 +444,23 @@
                     </execution>
                 </executions>
             </plugin>
+
+            <plugin>
+                <groupId>org.cyclonedx</groupId>
+                <artifactId>cyclonedx-maven-plugin</artifactId>
+                <version>2.9.1</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>makeBom</goal>
+                        </goals>
+                        <configuration>
+                            <skipNotDeployed>false</skipNotDeployed>
+                            <includeSystemScope>false</includeSystemScope>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 </project>
