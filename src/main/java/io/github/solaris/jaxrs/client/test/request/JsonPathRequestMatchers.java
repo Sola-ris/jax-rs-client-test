@@ -7,12 +7,18 @@ import static io.github.solaris.jaxrs.client.test.internal.Assertions.assertTrue
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 import jakarta.ws.rs.client.ClientRequestContext;
 
 import org.jspecify.annotations.Nullable;
 
+import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.spi.mapper.GsonMappingProvider;
+import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
+import com.jayway.jsonpath.spi.mapper.JakartaMappingProvider;
+import com.jayway.jsonpath.spi.mapper.MappingProvider;
 
 /**
  * Factory for {@link RequestMatcher} implementations that use a <a href="https://github.com/jayway/JsonPath">JsonPath</a> expression.
@@ -22,6 +28,14 @@ import com.jayway.jsonpath.JsonPath;
  * </p>
  */
 public final class JsonPathRequestMatchers {
+    // Putting JakartaMappingProvider::new into this list causes NoClassDefFoundErrors
+    // if the JSON Binding API is not present
+    private static final List<Supplier<MappingProvider>> RECORD_PROVIDERS = List.of(
+            JsonPathRequestMatchers::jacksonProvider,
+            JsonPathRequestMatchers::gsonProvider,
+            JsonPathRequestMatchers::jakartaProvider
+    );
+
     private final String expression;
     private final JsonPath jsonPath;
 
@@ -41,6 +55,16 @@ public final class JsonPathRequestMatchers {
      * If the JsonPath expression is not {@linkplain JsonPath#isDefinite() definite}
      * and evaluates to an array containing <b>multiple</b> values, an {@link AssertionError} will be thrown.
      * </p>
+     * <h4>Note:</h4>
+     * If {@code expectedValue} is a {@code record}, a JSON implementation capable of mapping from and to them
+     * must be available at runtime.
+     * <p>
+     * Supported implementations:
+     * <ul>
+     *     <li>Jackson</li>
+     *     <li>GSON</li>
+     *     <li>Jakarta JSON Binding</li>
+     * </ul>
      *
      * @param expectedValue The expected value, possibly {@code null}
      */
@@ -226,10 +250,37 @@ public final class JsonPathRequestMatchers {
 
     private <T> T evaluate(String jsonString, Class<T> type) {
         try {
-            return JsonPath.parse(jsonString).read(expression, type);
+            if (type.isRecord()) {
+                return JsonPath.parse(jsonString, getRecordConfiguration()).read(expression, type);
+            } else {
+                return JsonPath.parse(jsonString).read(expression, type);
+            }
         } catch (Throwable t) {
             throw new AssertionError("Failed to evaluate JSON path \"" + expression + "\" with type " + type, t);
         }
+    }
+
+    private static Configuration getRecordConfiguration() {
+        for (Supplier<MappingProvider> providerSupplier : RECORD_PROVIDERS) {
+            try {
+                return Configuration.defaultConfiguration().mappingProvider(providerSupplier.get());
+            } catch (NoClassDefFoundError e) {
+                // Try the next one
+            }
+        }
+        throw new IllegalStateException("Unable to load a MappingProvider capable of handling records.");
+    }
+
+    private static MappingProvider jacksonProvider() {
+        return new JacksonMappingProvider();
+    }
+
+    private static MappingProvider gsonProvider() {
+        return new GsonMappingProvider();
+    }
+
+    private static MappingProvider jakartaProvider() {
+        return new JakartaMappingProvider();
     }
 
     private String createFailureMessage(String description, @Nullable Object value) {
