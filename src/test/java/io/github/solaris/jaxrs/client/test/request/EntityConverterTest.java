@@ -410,7 +410,7 @@ class EntityConverterTest {
         @Test
         void testFromRequestContext_requestNull() {
             RequestMatcher matcher = request -> EntityConverter.fromRequestContext(null);
-            validateArguments(new DefaultFilterExceptionAssert(), matcher, "'requestContext' must ot be null.");
+            validateArguments(new DefaultFilterExceptionAssert(), matcher, "'requestContext' must not be null.");
         }
 
         @JaxRsVendorTest
@@ -419,7 +419,7 @@ class EntityConverterTest {
                 EntityConverter converter = EntityConverter.fromRequestContext(request);
                 converter.convertEntity(null, String.class);
             };
-            validateArguments(filterExceptionAssert, matcher, "'requestContext' must ot be null.");
+            validateArguments(filterExceptionAssert, matcher, "'requestContext' must not be null.");
         }
 
         @JaxRsVendorTest
@@ -428,7 +428,7 @@ class EntityConverterTest {
                 EntityConverter converter = EntityConverter.fromRequestContext(request);
                 converter.convertEntity(request, (Class<?>) null);
             };
-            validateArguments(filterExceptionAssert, matcher, "'type' must ot be null.");
+            validateArguments(filterExceptionAssert, matcher, "'type' must not be null.");
         }
 
         @JaxRsVendorTest
@@ -437,7 +437,7 @@ class EntityConverterTest {
                 EntityConverter converter = EntityConverter.fromRequestContext(request);
                 converter.convertEntity(null, new GenericType<>() {});
             };
-            validateArguments(filterExceptionAssert, matcher, "'requestContext' must ot be null.");
+            validateArguments(filterExceptionAssert, matcher, "'requestContext' must not be null.");
         }
 
         @JaxRsVendorTest
@@ -446,7 +446,7 @@ class EntityConverterTest {
                 EntityConverter converter = EntityConverter.fromRequestContext(request);
                 converter.convertEntity(request, (GenericType<?>) null);
             };
-            validateArguments(filterExceptionAssert, matcher, "'genericType' must ot be null.");
+            validateArguments(filterExceptionAssert, matcher, "'genericType' must not be null.");
         }
 
         @Test
@@ -455,7 +455,7 @@ class EntityConverterTest {
                 EntityConverter converter = EntityConverter.fromRequestContext(request);
                 converter.bufferExpectedMultipart(null);
             };
-            validateArguments(new DefaultFilterExceptionAssert(), matcher, "'expectedParts' must ot be null.");
+            validateArguments(new DefaultFilterExceptionAssert(), matcher, "'expectedParts' must not be null.");
         }
 
         @Test
@@ -464,7 +464,7 @@ class EntityConverterTest {
                 EntityConverter converter = EntityConverter.fromRequestContext(request);
                 converter.bufferMultipartRequest(null);
             };
-            validateArguments(new DefaultFilterExceptionAssert(), matcher, "'requestContext' must ot be null.");
+            validateArguments(new DefaultFilterExceptionAssert(), matcher, "'requestContext' must not be null.");
         }
 
         private static void validateArguments(FilterExceptionAssert filterExceptionAssert, RequestMatcher matcher, String exceptionMessage) {

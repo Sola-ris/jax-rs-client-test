@@ -48,7 +48,7 @@ public abstract sealed class EntityConverter permits ClientEntityConverter, Prov
      * @return The {@code EntityConverter} instance
      */
     public static EntityConverter fromRequestContext(ClientRequestContext requestContext) {
-        validateNotNull(requestContext, "'requestContext' must ot be null.");
+        validateNotNull(requestContext, "'requestContext' must not be null.");
         if (requestContext.getProperty(EntityConverter.class.getName()) instanceof EntityConverter entityConverter) {
             return entityConverter;
         }
@@ -65,7 +65,7 @@ public abstract sealed class EntityConverter permits ClientEntityConverter, Prov
      * @throws IOException If an I/O error occurs during buffering
      */
     public List<EntityPart> bufferExpectedMultipart(List<EntityPart> entityParts) throws IOException {
-        validateNotNull(entityParts, "'expectedParts' must ot be null.");
+        validateNotNull(entityParts, "'expectedParts' must not be null.");
         List<EntityPart> bufferedParts = new ArrayList<>();
         for (EntityPart entityPart : serializeEntityParts(new MultiPartRequestContext(entityParts))) {
             bufferedParts.add(new BufferedEntityPart(entityPart, this));
@@ -139,7 +139,7 @@ public abstract sealed class EntityConverter permits ClientEntityConverter, Prov
     }
 
     static void assertMultiPartEntityPresent(ClientRequestContext requestContext) {
-        validateNotNull(requestContext, "'requestContext' must ot be null.");
+        validateNotNull(requestContext, "'requestContext' must not be null.");
         assertEntityPresent(requestContext);
         if (!MULTIPART_FORM_DATA_TYPE.equals(requestContext.getMediaType())) {
             throw new AssertionError("MediaType must be " + MULTIPART_FORM_DATA);
