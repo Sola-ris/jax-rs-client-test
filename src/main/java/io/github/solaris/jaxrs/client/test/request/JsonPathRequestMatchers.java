@@ -1,20 +1,24 @@
 package io.github.solaris.jaxrs.client.test.request;
 
 import static io.github.solaris.jaxrs.client.test.internal.ArgumentValidator.validateNotBlank;
+import static io.github.solaris.jaxrs.client.test.internal.ArgumentValidator.validateNotNull;
 import static io.github.solaris.jaxrs.client.test.internal.Assertions.assertEqual;
 import static io.github.solaris.jaxrs.client.test.internal.Assertions.assertTrue;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
 import jakarta.ws.rs.client.ClientRequestContext;
+import jakarta.ws.rs.core.GenericType;
 
 import org.jspecify.annotations.Nullable;
 
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.TypeRef;
 import com.jayway.jsonpath.spi.mapper.GsonMappingProvider;
 import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
 import com.jayway.jsonpath.spi.mapper.JakartaMappingProvider;
@@ -30,7 +34,7 @@ import com.jayway.jsonpath.spi.mapper.MappingProvider;
 public final class JsonPathRequestMatchers {
     // Putting JakartaMappingProvider::new into this list causes NoClassDefFoundErrors
     // if the JSON Binding API is not present
-    private static final List<Supplier<MappingProvider>> RECORD_PROVIDERS = List.of(
+    private static final List<Supplier<MappingProvider>> RECORD_AND_GENERIC_TYPE_PROVIDERS = List.of(
             JsonPathRequestMatchers::jacksonProvider,
             JsonPathRequestMatchers::gsonProvider,
             JsonPathRequestMatchers::jakartaProvider
@@ -224,6 +228,63 @@ public final class JsonPathRequestMatchers {
         };
     }
 
+    /**
+     * Evaluate the JsonPath expression, convert it into {@code targetType} and assert the resulting value with the supplied assertion
+     *
+     * @param valueAssertion An arbitrary assertion with which to assert the resulting value
+     * @param targetType     The expected type of the resulting value
+     * @param <T>            The expected type of the resulting value. Possibly null.
+     *                       <h4>Note:</h4>
+     *                       If {@code <T>} is a {@code record}, a JSON implementation capable of mapping from and to them
+     *                       must be available at runtime.
+     *                       <p>
+     *                       Supported implementations:
+     *                       <ul>
+     *                           <li>Jackson</li>
+     *                           <li>GSON</li>
+     *                           <li>Jakarta JSON Binding</li>
+     *                       </ul>
+     */
+    public <T extends @Nullable Object> RequestMatcher valueSatisfies(ThrowingConsumer<T> valueAssertion, Class<T> targetType) {
+        validateNotNull(valueAssertion, "'valueAssertion' must not be null.");
+        validateNotNull(targetType, "'targetType' must not be null.");
+        return request -> {
+            try {
+                valueAssertion.accept(evaluate(getJsonString(request), targetType));
+            } catch (Exception e) {
+                throw new AssertionError(e);
+            }
+        };
+    }
+
+    /**
+     * Evaluate the JsonPath expression, convert it into {@code targetType} and assert the resulting value with the supplied assertion
+     *
+     * @param valueAssertion An arbitrary assertion with which to assert the resulting value
+     * @param targetType     The expected generic type of the resulting value
+     * @param <T>            The expected generic type of the resulting value. Possibly null.
+     *                       <h4>Note:</h4>
+     *                       A JSON implementation capable of mapping from and to generic types must be available at runtime.
+     *                       <p>
+     *                       Supported implementations:
+     *                       <ul>
+     *                           <li>Jackson</li>
+     *                           <li>GSON</li>
+     *                           <li>Jakarta JSON Binding</li>
+     *                       </ul>
+     */
+    public <T extends @Nullable Object> RequestMatcher valueSatisfies(ThrowingConsumer<T> valueAssertion, GenericType<T> targetType) {
+        validateNotNull(valueAssertion, "'valueAssertion' must not be null.");
+        validateNotNull(targetType, "'targetType' must not be null.");
+        return request -> {
+            try {
+                valueAssertion.accept(evaluate(getJsonString(request), targetType));
+            } catch (Exception e) {
+                throw new AssertionError(e);
+            }
+        };
+    }
+
     private Object assertExistsAndGet(String jsonString) {
         Object value = evaluate(jsonString);
         String message = "Found no value for JSON path \"" + expression + "\"";
@@ -248,10 +309,10 @@ public final class JsonPathRequestMatchers {
         }
     }
 
-    private <T> T evaluate(String jsonString, Class<T> type) {
+    private <T> @Nullable T evaluate(String jsonString, Class<T> type) {
         try {
             if (type.isRecord()) {
-                return JsonPath.parse(jsonString, getRecordConfiguration()).read(expression, type);
+                return JsonPath.parse(jsonString, getConfiguration("records")).read(expression, type);
             } else {
                 return JsonPath.parse(jsonString).read(expression, type);
             }
@@ -260,15 +321,23 @@ public final class JsonPathRequestMatchers {
         }
     }
 
-    private static Configuration getRecordConfiguration() {
-        for (Supplier<MappingProvider> providerSupplier : RECORD_PROVIDERS) {
+    private <T> @Nullable T evaluate(String jsonString, GenericType<T> type) {
+        try {
+            return JsonPath.parse(jsonString, getConfiguration("GenericTypes")).read(expression, new TypeRefAdapter<>(type));
+        } catch (Throwable t) {
+            throw new AssertionError("Failed to evaluate JSON path \"" + expression + "\" with type " + type, t);
+        }
+    }
+
+    private static Configuration getConfiguration(String message) {
+        for (Supplier<MappingProvider> providerSupplier : RECORD_AND_GENERIC_TYPE_PROVIDERS) {
             try {
                 return Configuration.defaultConfiguration().mappingProvider(providerSupplier.get());
             } catch (NoClassDefFoundError e) {
                 // Try the next one
             }
         }
-        throw new IllegalStateException("Unable to load a MappingProvider capable of handling records.");
+        throw new IllegalStateException("Unable to load a MappingProvider capable of handling %s.".formatted(message));
     }
 
     private static MappingProvider jacksonProvider() {
@@ -291,5 +360,18 @@ public final class JsonPathRequestMatchers {
     private static String getJsonString(ClientRequestContext requestContext) throws IOException {
         EntityConverter converter = EntityConverter.fromRequestContext(requestContext);
         return converter.convertEntity(requestContext, String.class);
+    }
+
+    private static final class TypeRefAdapter<T> extends TypeRef<T> {
+        private final Type type;
+
+        private TypeRefAdapter(GenericType<T> genericType) {
+            this.type = genericType.getType();
+        }
+
+        @Override
+        public Type getType() {
+            return type;
+        }
     }
 }

@@ -6,6 +6,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.params.provider.Arguments.argumentSet;
+import static org.w3c.dom.Node.ELEMENT_NODE;
+import static org.w3c.dom.Node.TEXT_NODE;
 
 import java.util.List;
 import java.util.Map;
@@ -26,6 +28,7 @@ import org.jspecify.annotations.NullUnmarked;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.w3c.dom.Node;
 import org.xml.sax.SAXParseException;
 
 import io.github.solaris.jaxrs.client.test.server.MockRestServer;
@@ -352,6 +355,85 @@ class XpathRequestMatchersTest {
                 .hasMessage("XPath /xmlDto/bool expected: <false> but was: <true>");
     }
 
+    @JaxRsVendorTest(skipFor = JERSEY)
+    @SuppressWarnings("DataFlowIssue")
+    void testValueSatisfies() throws XPathExpressionException {
+        Client client = ClientBuilder.newClient();
+        MockRestServer server = MockRestServer.bindTo(client).build();
+
+        server.expect(RequestMatchers.xpath("/xmlDto/str").valueSatisfies(node -> assertThat(node)
+                                .isNotNull()
+                                .satisfies(
+                                        n -> assertThat(n.getNodeType()).isEqualTo(ELEMENT_NODE),
+                                        n -> assertThat(n.hasChildNodes()).isTrue(),
+                                        n -> assertThat(n.getChildNodes().getLength()).isEqualTo(1),
+                                        n -> assertThat(n.getFirstChild()).satisfies(
+                                                cn -> assertThat(cn.getNodeType()).isEqualTo(TEXT_NODE),
+                                                cn -> assertThat(cn.getTextContent()).isEqualTo("hello")
+                                        )
+                                ),
+                        Node.class))
+                .andRespond(withSuccess());
+
+        XmlDto xmlDto = new XmlDto();
+        xmlDto.str = "hello";
+
+        assertThatCode(() -> {
+            try (client) {
+                client.target("/hello").request().post(Entity.xml(xmlDto)).close();
+            }
+        }).doesNotThrowAnyException();
+    }
+
+    @JaxRsVendorTest(skipFor = JERSEY)
+    void testValueSatisfies_doesNot(FilterExceptionAssert filterExceptionAssert) throws XPathExpressionException {
+        Client client = ClientBuilder.newClient();
+        MockRestServer server = MockRestServer.bindTo(client).build();
+
+        server.expect(RequestMatchers.xpath("/xmlDto/str")
+                        .valueSatisfies(s -> assertThat(s).isNotNull().contains("bye"), String.class))
+                .andRespond(withSuccess());
+
+        XmlDto xmlDto = new XmlDto();
+        xmlDto.str = "hello";
+
+        filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.xml(xmlDto)).close())
+                .isInstanceOf(AssertionError.class)
+                .hasMessageContainingAll("Expecting actual:", "\"hello\"", "to contain:", "\"bye\"");
+    }
+
+    @JaxRsVendorTest(skipFor = JERSEY)
+    @SuppressWarnings("DataFlowIssue")
+    void testValueSatisfies_null() throws XPathExpressionException {
+        Client client = ClientBuilder.newClient();
+        MockRestServer server = MockRestServer.bindTo(client).build();
+
+        server.expect(RequestMatchers.xpath("/xmlDto/str").valueSatisfies(node -> assertThat(node).isNull(), Node.class))
+                .andRespond(withSuccess());
+
+        XmlDto xmlDto = new XmlDto();
+
+        assertThatCode(() -> client.target("/hello").request().post(Entity.xml(xmlDto)).close()).doesNotThrowAnyException();
+    }
+
+    @JaxRsVendorTest(skipFor = JERSEY)
+    void testValueSatisfies_unexpectedTargetType(FilterExceptionAssert filterExceptionAssert) throws XPathExpressionException {
+        Client client = ClientBuilder.newClient();
+        MockRestServer server = MockRestServer.bindTo(client).build();
+
+        server.expect(RequestMatchers.xpath("/xmlDto/str")
+                        .valueSatisfies(xmlDto -> {}, XmlDto.class))
+                .andRespond(withSuccess());
+
+        XmlDto xmlDto = new XmlDto();
+        xmlDto.str = "hello";
+
+        filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.xml(xmlDto)).close())
+                .isInstanceOf(AssertionError.class)
+                .hasCauseInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Unexpected targetType");
+    }
+
     @JaxRsVendorTest
     void testInvalidXml(FilterExceptionAssert filterExceptionAssert) throws XPathExpressionException {
         Client client = ClientBuilder.newClient();
@@ -407,7 +489,11 @@ class XpathRequestMatchersTest {
                 argumentSet("testString_null",
                         (ThrowingCallable) () -> RequestMatchers.xpath("/xmlDto/str").string(null), "'expectedString' must not be null."),
                 argumentSet("testNumber_null",
-                        (ThrowingCallable) () -> RequestMatchers.xpath("/xmlDto/str").number(null), "'expectedNumber' must not be null.")
+                        (ThrowingCallable) () -> RequestMatchers.xpath("/xmlDto/str").number(null), "'expectedNumber' must not be null."),
+                argumentSet("testValueSatisfies_valueAssertionNull",
+                        (ThrowingCallable) () -> RequestMatchers.xpath("/xmlDto/str").valueSatisfies(null, null), "'valueAssertion' must not be null."),
+                argumentSet("testValueSatisfies_targetTypeNull",
+                        (ThrowingCallable) () -> RequestMatchers.xpath("/xmlDto/str").valueSatisfies(__ -> {}, null), "'targetType' must not be null.")
         );
     }
 

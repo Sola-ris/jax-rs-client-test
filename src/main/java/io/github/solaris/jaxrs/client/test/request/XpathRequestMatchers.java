@@ -164,6 +164,26 @@ public final class XpathRequestMatchers {
         };
     }
 
+    /**
+     * Evaluate the XPath expression, convert it into {@code targetType} and assert the resulting value with the supplied assertion
+     *
+     * @param valueAssertion An arbitrary assertion with which to assert the resulting value
+     * @param targetType     The expected type of the resulting value
+     * @param <T>            The expected type of the resulting value. Possibly null. Supported values:
+     *                       <ul>
+     *                          <li>{@link Node} ({@link XPathConstants#NODE})</li>
+     *                          <li>{@link NodeList} ({@link XPathConstants#NODESET})</li>
+     *                          <li>{@link String} ({@link XPathConstants#STRING})</li>
+     *                          <li>{@link Double} ({@link XPathConstants#NUMBER})</li>
+     *                          <li>{@link Boolean} ({@link XPathConstants#BOOLEAN})</li>
+     *                       </ul>
+     */
+    public <T extends @Nullable Object> RequestMatcher valueSatisfies(ThrowingConsumer<T> valueAssertion, Class<T> targetType) {
+        validateNotNull(valueAssertion, "'valueAssertion' must not be null.");
+        validateNotNull(targetType, "'targetType' must not be null.");
+        return (XpathRequestMatcher) request -> valueAssertion.accept(evaluate(request, targetType));
+    }
+
     @FunctionalInterface
     private interface XpathRequestMatcher extends RequestMatcher {
 

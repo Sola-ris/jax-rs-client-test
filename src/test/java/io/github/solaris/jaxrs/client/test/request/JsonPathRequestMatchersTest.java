@@ -1,16 +1,20 @@
 package io.github.solaris.jaxrs.client.test.request;
 
 import static io.github.solaris.jaxrs.client.test.response.MockResponseCreators.withSuccess;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.InstanceOfAssertFactories.STRING;
 import static org.junit.jupiter.params.provider.Arguments.argumentSet;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.core.GenericType;
 
 import org.assertj.core.api.ThrowableAssert;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -626,6 +630,174 @@ class JsonPathRequestMatchersTest {
     }
 
     @JaxRsVendorTest
+    @SuppressWarnings("DataFlowIssue")
+    void testsValueSatisfies(ConfiguredClientSupplier clientSupplier) {
+        Client client = clientSupplier.get();
+        MockRestServer server = MockRestServer.bindTo(client).build();
+
+        server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).valueSatisfies(value -> assertThat(value)
+                                .isNotNull()
+                                .extracting(Dto::something, STRING)
+                                .contains("ell"),
+                        Dto.class))
+                .andRespond(withSuccess());
+
+        Dto dto = new Dto(new Dto("hello"));
+
+        assertThatCode(() -> client.target("/hello").request().post(Entity.json(dto)).close())
+                .doesNotThrowAnyException();
+    }
+
+    @JaxRsVendorTest
+    void testsValueSatisfies_doesNot(ConfiguredClientSupplier clientSupplier, FilterExceptionAssert filterExceptionAssert) {
+        Client client = clientSupplier.get();
+        MockRestServer server = MockRestServer.bindTo(client).build();
+
+        server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).valueSatisfies(value -> assertThat(value)
+                                .isNotNull()
+                                .contains("bye"),
+                        String.class))
+                .andRespond(withSuccess());
+
+        Dto dto = new Dto("hello");
+
+        try (client) {
+            filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.json(dto)).close())
+                    .isInstanceOf(AssertionError.class)
+                    .hasMessageContainingAll("Expecting actual:", "\"hello\"", "to contain:", "\"bye\"");
+        }
+    }
+
+    @JaxRsVendorTest
+    void testsValueSatisfies_incompatibleType(ConfiguredClientSupplier clientSupplier, FilterExceptionAssert filterExceptionAssert) {
+        Client client = clientSupplier.get();
+        MockRestServer server = MockRestServer.bindTo(client).build();
+
+        server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).valueSatisfies(value -> {}, Dto.class)).andRespond(withSuccess());
+
+        Dto dto = new Dto("hello");
+
+        try (client) {
+            filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.json(dto)).close())
+                    .isInstanceOf(AssertionError.class)
+                    .hasMessage("Failed to evaluate JSON path \"%s\" with type %s", DEFINITE_PATH, Dto.class.toString());
+        }
+    }
+
+    @JaxRsVendorTest
+    void testsValueSatisfies_exceptionInMatcher(ConfiguredClientSupplier clientSupplier, FilterExceptionAssert filterExceptionAssert) {
+        Client client = clientSupplier.get();
+        MockRestServer server = MockRestServer.bindTo(client).build();
+
+        server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).valueSatisfies(value -> {throw new IOException("I/O Error");}, Dto.class))
+                .andRespond(withSuccess());
+
+        Dto dto = new Dto(new Dto("hello"));
+
+        try (client) {
+            filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.json(dto)).close())
+                    .isInstanceOf(AssertionError.class)
+                    .cause()
+                    .isInstanceOf(IOException.class)
+                    .hasMessage("I/O Error");
+        }
+    }
+
+    @JaxRsVendorTest
+    void testsValueSatisfies_genericType(ConfiguredClientSupplier clientSupplier) {
+        Client client = clientSupplier.get();
+        MockRestServer server = MockRestServer.bindTo(client).build();
+
+        server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).valueSatisfies(value -> assertThat(value)
+                                .isNotNull()
+                                .hasSize(2)
+                                .containsExactly(
+                                        new Dto("hello"),
+                                        new Dto("goodbye")
+                                ),
+                        new GenericType<List<Dto>>() {}))
+                .andRespond(withSuccess());
+
+        Dto dto = new Dto(List.of(new Dto("hello"), new Dto("goodbye")));
+
+        assertThatCode(() -> client.target("/hello").request().post(Entity.json(dto)).close())
+                .doesNotThrowAnyException();
+    }
+
+    @JaxRsVendorTest
+    void testsValueSatisfies_genericType_doesNot(ConfiguredClientSupplier clientSupplier, FilterExceptionAssert filterExceptionAssert) {
+        Client client = clientSupplier.get();
+        MockRestServer server = MockRestServer.bindTo(client).build();
+
+        server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).valueSatisfies(value -> assertThat(value)
+                                .isNotNull()
+                                .hasSize(2)
+                                .containsExactly(
+                                        new Dto("greetings"),
+                                        new Dto("farewell")
+                                ),
+                        new GenericType<List<Dto>>() {}))
+                .andRespond(withSuccess());
+
+        List<Dto> something = List.of(new Dto("hello"), new Dto("goodbye"));
+        Dto dto = new Dto(something);
+
+        try (client) {
+            filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.json(dto)).close())
+                    .isInstanceOf(AssertionError.class)
+                    .hasMessageContainingAll(
+                            "Expecting actual:",
+                            something.toString(),
+                            "to contain exactly (and in same order):",
+                            "but some elements were not found:",
+                            something.toString(),
+                            "and others were not expected:",
+                            "[Dto[something=hello], Dto[something=goodbye]]"
+                    );
+        }
+    }
+
+    @JaxRsVendorTest
+    void testsValueSatisfies_genericType_incompatibleType(ConfiguredClientSupplier clientSupplier, FilterExceptionAssert filterExceptionAssert) {
+        Client client = clientSupplier.get();
+        MockRestServer server = MockRestServer.bindTo(client).build();
+
+        GenericType<Map<String, Dto>> type = new GenericType<>() {};
+
+        server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).valueSatisfies(value -> {}, type))
+                .andRespond(withSuccess());
+
+        Dto dto = new Dto("hello");
+
+        try (client) {
+            filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.json(dto)).close())
+                    .isInstanceOf(AssertionError.class)
+                    .hasMessage("Failed to evaluate JSON path \"%s\" with type %s", DEFINITE_PATH, type);
+        }
+    }
+
+    @JaxRsVendorTest
+    void testsValueSatisfies_genericType_exceptionInMatcher(ConfiguredClientSupplier clientSupplier, FilterExceptionAssert filterExceptionAssert) {
+        Client client = clientSupplier.get();
+        MockRestServer server = MockRestServer.bindTo(client).build();
+
+        server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).valueSatisfies(
+                value -> {throw new IOException("I/O Error");},
+                        new GenericType<List<Dto>>() {}))
+                .andRespond(withSuccess());
+
+        Dto dto = new Dto(List.of(new Dto("hello"), new Dto("goodbye")));
+
+        try (client) {
+            filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.json(dto)).close())
+                    .isInstanceOf(AssertionError.class)
+                    .cause()
+                    .isInstanceOf(IOException.class)
+                    .hasMessage("I/O Error");
+        }
+    }
+
+    @JaxRsVendorTest
     void testInvalidJson(ConfiguredClientSupplier clientSupplier, FilterExceptionAssert filterExceptionAssert) {
         Client client = clientSupplier.get();
         MockRestServer server = MockRestServer.bindTo(client).build();
@@ -653,7 +825,15 @@ class JsonPathRequestMatchersTest {
                 argumentSet("testExpression_null",
                         (ThrowableAssert.ThrowingCallable) () -> RequestMatchers.jsonPath(null), "JsonPath expression must not be null or blank."),
                 argumentSet("testExpression_blank",
-                        (ThrowableAssert.ThrowingCallable) () -> RequestMatchers.jsonPath(" \t\n"), "JsonPath expression must not be null or blank.")
+                        (ThrowableAssert.ThrowingCallable) () -> RequestMatchers.jsonPath(" \t\n"), "JsonPath expression must not be null or blank."),
+                argumentSet("testValueSatisfies_consumerNull",
+                        (ThrowableAssert.ThrowingCallable) () -> RequestMatchers.jsonPath(DEFINITE_PATH).valueSatisfies(null, String.class), "'valueAssertion' must not be null."),
+                argumentSet("testValueSatisfies_targetTypeNull",
+                        (ThrowableAssert.ThrowingCallable) () -> RequestMatchers.jsonPath(DEFINITE_PATH).valueSatisfies(__ -> {}, (Class<?>) null), "'targetType' must not be null."),
+                argumentSet("testValueSatisfies_genericType_consumerNull",
+                        (ThrowableAssert.ThrowingCallable) () -> RequestMatchers.jsonPath(DEFINITE_PATH).valueSatisfies(null, new GenericType<>() {}), "'valueAssertion' must not be null."),
+                argumentSet("testValueSatisfies_genericType_targetTypeNull",
+                        (ThrowableAssert.ThrowingCallable) () -> RequestMatchers.jsonPath(DEFINITE_PATH).valueSatisfies(__ -> {}, (GenericType<?>) null), "'targetType' must not be null.")
         );
     }
 
