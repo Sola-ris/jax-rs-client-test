@@ -21,6 +21,18 @@ Heavily inspired by Spring's [Client testing infrastructure](https://docs.spring
 * JDK 17 or higher
 * JAX-RS (Jakarta RESTful Web Services) 3.1
 
+## Maven coordinates
+
+[@formatter:off]: #
+```xml
+<dependency>
+    <groupId>io.github.sola-ris</groupId>
+    <artifactId>jax-rs-client-test</artifactId>
+    <version>0.1.0</version>
+</dependency>
+```
+[@formatter:on]: #
+
 ## Usage Guide
 
 ### Basic Usage
