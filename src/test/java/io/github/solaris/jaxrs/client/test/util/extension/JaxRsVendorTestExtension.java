@@ -23,6 +23,7 @@ import io.github.solaris.jaxrs.client.test.util.EntityConverterAssert.ClientEnti
 import io.github.solaris.jaxrs.client.test.util.EntityConverterAssert.ProvidersEntityConverterAssert;
 import io.github.solaris.jaxrs.client.test.util.FilterExceptionAssert;
 import io.github.solaris.jaxrs.client.test.util.FilterExceptionAssert.CxfFilterExceptionAssert;
+import io.github.solaris.jaxrs.client.test.util.FilterExceptionAssert.CxfMicroProfileFilterExceptionAssert;
 import io.github.solaris.jaxrs.client.test.util.FilterExceptionAssert.DefaultFilterExceptionAssert;
 
 class JaxRsVendorTestExtension implements InvocationInterceptor, ParameterResolver {
@@ -59,6 +60,9 @@ class JaxRsVendorTestExtension implements InvocationInterceptor, ParameterResolv
     public Object resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
         if (FilterExceptionAssert.class.isAssignableFrom(parameterContext.getParameter().getType())) {
             if (vendor == CXF) {
+                if (extensionContext.getRequiredTestClass().getName().contains("MicroProfile")) {
+                    return new CxfMicroProfileFilterExceptionAssert();
+                }
                 return new CxfFilterExceptionAssert();
             }
             return new DefaultFilterExceptionAssert();

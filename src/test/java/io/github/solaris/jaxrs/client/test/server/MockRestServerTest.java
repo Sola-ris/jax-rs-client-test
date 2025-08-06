@@ -9,7 +9,6 @@ import static io.github.solaris.jaxrs.client.test.response.MockResponseCreators.
 import static io.github.solaris.jaxrs.client.test.response.MockResponseCreators.withSuccess;
 import static io.github.solaris.jaxrs.client.test.server.RequestOrder.STRICT;
 import static io.github.solaris.jaxrs.client.test.server.RequestOrder.UNORDERED;
-import static io.github.solaris.jaxrs.client.test.util.extension.JaxRsVendor.CXF;
 import static jakarta.ws.rs.core.Response.Status.OK;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
@@ -1169,7 +1168,7 @@ class MockRestServerTest {
     @RunInQuarkus
     class BindMicroProfileRestClientBuilder {
 
-        @JaxRsVendorTest(skipFor = CXF)
+        @JaxRsVendorTest
         void testOrderedExpectations() {
             RestClientBuilder restClientBuilder = RestClientBuilder.newBuilder().baseUri("http://localhost");
             MockRestServer server = MockRestServer.bindTo(restClientBuilder).build();
@@ -1187,7 +1186,7 @@ class MockRestServerTest {
             server.verify();
         }
 
-        @JaxRsVendorTest(skipFor = CXF)
+        @JaxRsVendorTest
         void testUnorderedExpectations() {
             RestClientBuilder restClientBuilder = RestClientBuilder.newBuilder().baseUri("http://localhost");
             MockRestServer server = MockRestServer.bindTo(restClientBuilder).withRequestOrder(UNORDERED).build();
@@ -1205,7 +1204,7 @@ class MockRestServerTest {
             server.verify();
         }
 
-        @JaxRsVendorTest(skipFor = CXF)
+        @JaxRsVendorTest
         void testStrictExpectations() {
             RestClientBuilder restClientBuilder = RestClientBuilder.newBuilder().baseUri("http://localhost");
             MockRestServer server = MockRestServer.bindTo(restClientBuilder).withRequestOrder(STRICT).build();
@@ -1224,7 +1223,7 @@ class MockRestServerTest {
             server.verify();
         }
 
-        @JaxRsVendorTest(skipFor = CXF)
+        @JaxRsVendorTest
         void testOrderedExpectations_requestsOutOfOrder(FilterExceptionAssert filterExceptionAssert) throws Exception {
             RestClientBuilder restClientBuilder = RestClientBuilder.newBuilder().baseUri("http://localhost");
             MockRestServer server = MockRestServer.bindTo(restClientBuilder).build();
@@ -1239,7 +1238,7 @@ class MockRestServerTest {
             }
         }
 
-        @JaxRsVendorTest(skipFor = CXF)
+        @JaxRsVendorTest
         void testStrictExpectations_firstRequestUnsatisfied(FilterExceptionAssert filterExceptionAssert) throws Exception {
             RestClientBuilder restClientBuilder = RestClientBuilder.newBuilder().baseUri("http://localhost");
             MockRestServer server = MockRestServer.bindTo(restClientBuilder).withRequestOrder(STRICT).build();
@@ -1255,7 +1254,7 @@ class MockRestServerTest {
             }
         }
 
-        @JaxRsVendorTest(skipFor = CXF)
+        @JaxRsVendorTest
         void testReset(FilterExceptionAssert filterExceptionAssert) throws Exception {
             RestClientBuilder restClientBuilder = RestClientBuilder.newBuilder().baseUri("http://localhost");
             MockRestServer server = MockRestServer.bindTo(restClientBuilder).build();
@@ -1285,7 +1284,7 @@ class MockRestServerTest {
             }
         }
 
-        @JaxRsVendorTest(skipFor = CXF)
+        @JaxRsVendorTest
         void testReset_unordered(FilterExceptionAssert filterExceptionAssert) throws Exception {
             RestClientBuilder restClientBuilder = RestClientBuilder.newBuilder().baseUri("http://localhost");
             MockRestServer server = MockRestServer.bindTo(restClientBuilder).build();
@@ -1315,7 +1314,7 @@ class MockRestServerTest {
             }
         }
 
-        @JaxRsVendorTest(skipFor = CXF)
+        @JaxRsVendorTest
         void testReset_strict(FilterExceptionAssert filterExceptionAssert) throws Exception {
             RestClientBuilder restClientBuilder = RestClientBuilder.newBuilder().baseUri("http://localhost");
             MockRestServer server = MockRestServer.bindTo(restClientBuilder).build();
@@ -1345,7 +1344,7 @@ class MockRestServerTest {
             }
         }
 
-        @JaxRsVendorTest(skipFor = CXF)
+        @JaxRsVendorTest
         void testUnsatisfiedExpectation() throws Exception {
             RestClientBuilder restClientBuilder = RestClientBuilder.newBuilder().baseUri("http://localhost");
             MockRestServer server = MockRestServer.bindTo(restClientBuilder).build();
@@ -1366,7 +1365,7 @@ class MockRestServerTest {
             }
         }
 
-        @JaxRsVendorTest(skipFor = CXF)
+        @JaxRsVendorTest
         void testMultipleBuilds() throws Exception {
             RestClientBuilder restClientBuilder = RestClientBuilder.newBuilder().baseUri("http://localhost");
             MockRestServerBuilder serverBuilder = MockRestServer.bindTo(restClientBuilder);
@@ -1407,7 +1406,7 @@ class MockRestServerTest {
             }
         }
 
-        @JaxRsVendorTest(skipFor = CXF)
+        @JaxRsVendorTest
         void testVerifyWithTimeout() throws Exception {
             RestClientBuilder restClientBuilder = RestClientBuilder.newBuilder().baseUri("http://localhost");
             MockRestServer server = MockRestServer.bindTo(restClientBuilder).build();
@@ -1447,7 +1446,7 @@ class MockRestServerTest {
             }
         }
 
-        @JaxRsVendorTest(skipFor = CXF)
+        @JaxRsVendorTest
         void testVerifyFailsAfterRequestFailure(FilterExceptionAssert filterExceptionAssert) throws Exception {
             RestClientBuilder restClientBuilder = RestClientBuilder.newBuilder().baseUri("http://localhost");
             MockRestServer server = MockRestServer.bindTo(restClientBuilder).build();
@@ -1466,7 +1465,7 @@ class MockRestServerTest {
                     .hasMessageStartingWith("Some requests did not execute successfully.");
         }
 
-        @JaxRsVendorTest(skipFor = CXF)
+        @JaxRsVendorTest
         void testFailuresClearedAfterReset(FilterExceptionAssert filterExceptionAssert) throws Exception {
             RestClientBuilder restClientBuilder = RestClientBuilder.newBuilder().baseUri("http://localhost");
             MockRestServer server = MockRestServer.bindTo(restClientBuilder).build();
@@ -1490,7 +1489,7 @@ class MockRestServerTest {
             }
         }
 
-        @JaxRsVendorTest(skipFor = CXF)
+        @JaxRsVendorTest
         void testFollowUpRequestAfterFailure(FilterExceptionAssert filterExceptionAssert) throws Exception {
             RestClientBuilder restClientBuilder = RestClientBuilder.newBuilder().baseUri("http://localhost");
             MockRestServer server = MockRestServer.bindTo(restClientBuilder).build();

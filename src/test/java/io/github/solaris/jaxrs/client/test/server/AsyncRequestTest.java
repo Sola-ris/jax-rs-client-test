@@ -4,7 +4,6 @@ import static io.github.solaris.jaxrs.client.test.request.RequestMatchers.method
 import static io.github.solaris.jaxrs.client.test.request.RequestMatchers.requestTo;
 import static io.github.solaris.jaxrs.client.test.response.MockResponseCreators.withException;
 import static io.github.solaris.jaxrs.client.test.response.MockResponseCreators.withSuccess;
-import static io.github.solaris.jaxrs.client.test.util.extension.JaxRsVendor.CXF;
 import static jakarta.ws.rs.HttpMethod.GET;
 import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON_TYPE;
 import static jakarta.ws.rs.core.Response.Status.OK;
@@ -141,7 +140,7 @@ class AsyncRequestTest {
     @RunInQuarkus
     class MicroProfileRestClient {
 
-        @JaxRsVendorTest(skipFor = CXF)
+        @JaxRsVendorTest
         void testInvokeMpRestClientAsync_success() throws Exception {
             RestClientBuilder builder = RestClientBuilder.newBuilder().baseUri("http://localhost");
             MockRestServer server = MockRestServer.bindTo(builder).build();
@@ -154,7 +153,7 @@ class AsyncRequestTest {
             }
         }
 
-        @JaxRsVendorTest(skipFor = CXF)
+        @JaxRsVendorTest
         void testInvokeMpRestClientAsync_failure() throws Exception {
             RestClientBuilder builder = RestClientBuilder.newBuilder().baseUri("http://localhost");
             MockRestServer server = MockRestServer.bindTo(builder).build();
