@@ -24,6 +24,13 @@ updates:
         update-types:
           - minor
           - patch
+      cxf:
+        patterns:
+          - "version.cxf"
+          - "org.apache.cxf:*"
+        update-types:
+          - minor
+          - patch
       quarkus:
         patterns:
           - "version.quarkus"
