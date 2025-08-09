@@ -348,7 +348,6 @@ class EntityRequestMatchersTest {
                 .param("greeting", "salutations")
                 .param("greeting", "hello");
 
-
         server.expect(RequestMatchers.entity().formContains(subset)).andRespond(withSuccess());
 
         try (client) {

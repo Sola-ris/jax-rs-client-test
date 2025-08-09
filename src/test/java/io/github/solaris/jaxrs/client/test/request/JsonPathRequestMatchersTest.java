@@ -274,7 +274,6 @@ class JsonPathRequestMatchersTest {
         }).doesNotThrowAnyException();
     }
 
-
     @JaxRsVendorTest
     void testDoesNotExist_nullValue(ConfiguredClientSupplier clientSupplier) {
         Client client = clientSupplier.get();
@@ -689,7 +688,7 @@ class JsonPathRequestMatchersTest {
         Client client = clientSupplier.get();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
-        server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).valueSatisfies(value -> {throw new IOException("I/O Error");}, Dto.class))
+        server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).valueSatisfies(value -> throwIoException(), Dto.class))
                 .andRespond(withSuccess());
 
         Dto dto = new Dto(new Dto("hello"));
@@ -781,9 +780,7 @@ class JsonPathRequestMatchersTest {
         Client client = clientSupplier.get();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
-        server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).valueSatisfies(
-                value -> {throw new IOException("I/O Error");},
-                        new GenericType<List<Dto>>() {}))
+        server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).valueSatisfies(value -> throwIoException(), new GenericType<List<Dto>>() {}))
                 .andRespond(withSuccess());
 
         Dto dto = new Dto(List.of(new Dto("hello"), new Dto("goodbye")));
@@ -846,5 +843,9 @@ class JsonPathRequestMatchersTest {
         JSONArray array = new JSONArray();
         array.addAll(list);
         return array;
+    }
+
+    private static void throwIoException() throws IOException {
+        throw new IOException("I/O Error");
     }
 }

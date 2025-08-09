@@ -386,7 +386,6 @@ class EntityConverterTest {
         }
     }
 
-
     @Nested
     @SuppressWarnings("DataFlowIssue")
     class ArgumentValidation {

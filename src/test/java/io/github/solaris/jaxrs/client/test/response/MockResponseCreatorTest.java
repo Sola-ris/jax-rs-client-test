@@ -243,7 +243,6 @@ class MockResponseCreatorTest {
                         (ThrowingCallable) () -> new MockResponseCreator(OK).links((Link[]) null), "'links' must not be null."),
                 argumentSet("testVariants_null",
                         (ThrowingCallable) () -> new MockResponseCreator(OK).variants((Variant[]) null), "'variants' must not be null.")
-
                 );
     }
 }
