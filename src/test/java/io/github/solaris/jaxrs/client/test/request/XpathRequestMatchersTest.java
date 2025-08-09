@@ -1,7 +1,6 @@
 package io.github.solaris.jaxrs.client.test.request;
 
 import static io.github.solaris.jaxrs.client.test.response.MockResponseCreators.withSuccess;
-import static io.github.solaris.jaxrs.client.test.util.extension.JaxRsVendor.JERSEY;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -53,8 +52,7 @@ class XpathRequestMatchersTest {
                 <greeting xml:lang='de'>hallo</greeting>
             </xmlDto>""";
 
-    // Jersey without HK2 throws an NPE when trying to obtain the XML string using the ClientEntityConverter
-    @JaxRsVendorTest(skipFor = JERSEY)
+    @JaxRsVendorTest
     void testExists() throws XPathExpressionException {
         Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
@@ -115,7 +113,7 @@ class XpathRequestMatchersTest {
         }).doesNotThrowAnyException();
     }
 
-    @JaxRsVendorTest(skipFor = JERSEY)
+    @JaxRsVendorTest
     void testExists_doesNot(FilterExceptionAssert filterExceptionAssert) throws XPathExpressionException {
         Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
@@ -131,7 +129,7 @@ class XpathRequestMatchersTest {
                 .hasMessage("XPath /xmlEntity does not exist");
     }
 
-    @JaxRsVendorTest(skipFor = JERSEY)
+    @JaxRsVendorTest
     void testDoesNotExist() throws XPathExpressionException {
         Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
@@ -145,7 +143,7 @@ class XpathRequestMatchersTest {
         }).doesNotThrowAnyException();
     }
 
-    @JaxRsVendorTest(skipFor = JERSEY)
+    @JaxRsVendorTest
     void testDoesNotExist_does(FilterExceptionAssert filterExceptionAssert) throws XPathExpressionException {
         Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
@@ -161,7 +159,7 @@ class XpathRequestMatchersTest {
                 .hasMessage("XPath /xmlDto does exist");
     }
 
-    @JaxRsVendorTest(skipFor = JERSEY)
+    @JaxRsVendorTest
     void testNodeCount() throws XPathExpressionException {
         Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
@@ -177,7 +175,7 @@ class XpathRequestMatchersTest {
         }).doesNotThrowAnyException();
     }
 
-    @JaxRsVendorTest(skipFor = JERSEY)
+    @JaxRsVendorTest
     void testNodeCount_noMatch(FilterExceptionAssert filterExceptionAssert) throws XPathExpressionException {
         Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
@@ -195,7 +193,7 @@ class XpathRequestMatchersTest {
                 .hasMessage("NodeCount for XPath /xmlDto/nodes expected: <2> but was: <1>");
     }
 
-    @JaxRsVendorTest(skipFor = JERSEY)
+    @JaxRsVendorTest
     void testString() throws XPathExpressionException {
         Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
@@ -212,7 +210,7 @@ class XpathRequestMatchersTest {
         }).doesNotThrowAnyException();
     }
 
-    @JaxRsVendorTest(skipFor = JERSEY)
+    @JaxRsVendorTest
     void testString_coerceNumber() throws XPathExpressionException {
         Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
@@ -229,7 +227,7 @@ class XpathRequestMatchersTest {
         }).doesNotThrowAnyException();
     }
 
-    @JaxRsVendorTest(skipFor = JERSEY)
+    @JaxRsVendorTest
     void testString_noMatch(FilterExceptionAssert filterExceptionAssert) throws XPathExpressionException {
         Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
@@ -247,7 +245,7 @@ class XpathRequestMatchersTest {
                 .hasMessage("XPath /xmlDto/str expected: <hello> but was: <goodbye>");
     }
 
-    @JaxRsVendorTest(skipFor = JERSEY)
+    @JaxRsVendorTest
     void testNumber() throws XPathExpressionException {
         Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
@@ -264,7 +262,7 @@ class XpathRequestMatchersTest {
         }).doesNotThrowAnyException();
     }
 
-    @JaxRsVendorTest(skipFor = JERSEY)
+    @JaxRsVendorTest
     void testNumber_coerceString() throws XPathExpressionException {
         Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
@@ -281,7 +279,7 @@ class XpathRequestMatchersTest {
         }).doesNotThrowAnyException();
     }
 
-    @JaxRsVendorTest(skipFor = JERSEY)
+    @JaxRsVendorTest
     void testNumber_noMatch(FilterExceptionAssert filterExceptionAssert) throws XPathExpressionException {
         Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
@@ -300,7 +298,7 @@ class XpathRequestMatchersTest {
                 .hasMessage("XPath /xmlDto/num expected: <1.0> but was: <2.0>");
     }
 
-    @JaxRsVendorTest(skipFor = JERSEY)
+    @JaxRsVendorTest
     void testNumber_notANumber(FilterExceptionAssert filterExceptionAssert) throws XPathExpressionException {
         Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
@@ -319,7 +317,7 @@ class XpathRequestMatchersTest {
                 .hasMessage("XPath /xmlDto/str expected: <1.0> but was: <NaN>");
     }
 
-    @JaxRsVendorTest(skipFor = JERSEY)
+    @JaxRsVendorTest
     void testBooleanValue() throws XPathExpressionException {
         Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
@@ -336,7 +334,7 @@ class XpathRequestMatchersTest {
         }).doesNotThrowAnyException();
     }
 
-    @JaxRsVendorTest(skipFor = JERSEY)
+    @JaxRsVendorTest
     void testBooleanValue_noMatch(FilterExceptionAssert filterExceptionAssert) throws XPathExpressionException {
         Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
@@ -355,7 +353,7 @@ class XpathRequestMatchersTest {
                 .hasMessage("XPath /xmlDto/bool expected: <false> but was: <true>");
     }
 
-    @JaxRsVendorTest(skipFor = JERSEY)
+    @JaxRsVendorTest
     @SuppressWarnings("DataFlowIssue")
     void testValueSatisfies() throws XPathExpressionException {
         Client client = ClientBuilder.newClient();
@@ -385,7 +383,7 @@ class XpathRequestMatchersTest {
         }).doesNotThrowAnyException();
     }
 
-    @JaxRsVendorTest(skipFor = JERSEY)
+    @JaxRsVendorTest
     void testValueSatisfies_doesNot(FilterExceptionAssert filterExceptionAssert) throws XPathExpressionException {
         Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
@@ -402,7 +400,7 @@ class XpathRequestMatchersTest {
                 .hasMessageContainingAll("Expecting actual:", "\"hello\"", "to contain:", "\"bye\"");
     }
 
-    @JaxRsVendorTest(skipFor = JERSEY)
+    @JaxRsVendorTest
     @SuppressWarnings("DataFlowIssue")
     void testValueSatisfies_null() throws XPathExpressionException {
         Client client = ClientBuilder.newClient();
@@ -416,7 +414,7 @@ class XpathRequestMatchersTest {
         assertThatCode(() -> client.target("/hello").request().post(Entity.xml(xmlDto)).close()).doesNotThrowAnyException();
     }
 
-    @JaxRsVendorTest(skipFor = JERSEY)
+    @JaxRsVendorTest
     void testValueSatisfies_unexpectedTargetType(FilterExceptionAssert filterExceptionAssert) throws XPathExpressionException {
         Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
