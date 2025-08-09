@@ -127,7 +127,8 @@ public abstract class RequestExpectationManager {
         if (!failedRequests.isEmpty()) {
             throw new AssertionError("Some requests did not execute successfully.\n" +
                     failedRequests.entrySet().stream()
-                            .map(entry -> "Failed request:\n" + contextToString(entry.getKey()) + "\n" + entry.getValue())
+                            .map(entry -> "Failed request:\n"
+                                    + contextToString(entry.getKey()) + "\n" + entry.getValue())
                             .collect(Collectors.joining("\n", "\n", "")));
         }
 

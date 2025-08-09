@@ -187,7 +187,9 @@ class MockResponseCreatorsTest {
 
     @Test
     void testException() {
-        assertThatThrownBy(() -> MockResponseCreators.withException(new SocketException("Connection Reset")).createResponse(new MockClientRequestContext()).close())
+        assertThatThrownBy(
+                () -> MockResponseCreators.withException(new SocketException("Connection Reset"))
+                        .createResponse(new MockClientRequestContext()).close())
                 .isInstanceOf(SocketException.class)
                 .hasMessage("Connection Reset");
     }

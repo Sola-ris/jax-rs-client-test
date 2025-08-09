@@ -489,9 +489,11 @@ class XpathRequestMatchersTest {
                 argumentSet("testNumber_null",
                         (ThrowingCallable) () -> RequestMatchers.xpath("/xmlDto/str").number(null), "'expectedNumber' must not be null."),
                 argumentSet("testValueSatisfies_valueAssertionNull",
-                        (ThrowingCallable) () -> RequestMatchers.xpath("/xmlDto/str").valueSatisfies(null, null), "'valueAssertion' must not be null."),
+                        (ThrowingCallable) () -> RequestMatchers.xpath("/xmlDto/str").valueSatisfies(null, null),
+                        "'valueAssertion' must not be null."),
                 argumentSet("testValueSatisfies_targetTypeNull",
-                        (ThrowingCallable) () -> RequestMatchers.xpath("/xmlDto/str").valueSatisfies(__ -> {}, null), "'targetType' must not be null.")
+                        (ThrowingCallable) () -> RequestMatchers.xpath("/xmlDto/str").valueSatisfies(__ -> {}, null),
+                        "'targetType' must not be null.")
         );
     }
 

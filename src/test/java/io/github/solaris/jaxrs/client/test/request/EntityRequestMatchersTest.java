@@ -152,8 +152,8 @@ class EntityRequestMatchersTest {
 
         try (client) {
             assertThatCode(() -> client.target("/hello")
-                            .request()
-                            .post(Entity.entity(dto.toString(), TEXT_PLAIN_TYPE)).close())
+                    .request()
+                    .post(Entity.entity(dto.toString(), TEXT_PLAIN_TYPE)).close())
                     .doesNotThrowAnyException();
         }
     }
@@ -305,7 +305,8 @@ class EntityRequestMatchersTest {
                             .post(Entity.form(actualForm))
                             .close())
                     .isInstanceOf(AssertionError.class)
-                    .hasMessage("Expected %s to be smaller or the same size as %s", subset.asMap().get("greeting"), actualForm.asMap().get("greeting"));
+                    .hasMessage("Expected %s to be smaller or the same size as %s",
+                            subset.asMap().get("greeting"), actualForm.asMap().get("greeting"));
         }
     }
 
@@ -371,7 +372,8 @@ class EntityRequestMatchersTest {
             assertThatCode(
                     () -> client.target("/hello")
                             .request()
-                            .post(Entity.entity(new GenericEntity<>(List.of(plainPart(), imagePart(), jsonPart())) {}, MULTIPART_FORM_DATA_TYPE)).close())
+                            .post(Entity.entity(new GenericEntity<>(List.of(plainPart(), imagePart(), jsonPart())) {}, MULTIPART_FORM_DATA_TYPE))
+                            .close())
                     .doesNotThrowAnyException();
         }
     }
@@ -388,7 +390,8 @@ class EntityRequestMatchersTest {
         try (client) {
             filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello")
                             .request()
-                            .post(Entity.entity(new GenericEntity<>(List.of(plainPart(), imagePart(), jsonPart())) {}, MULTIPART_FORM_DATA_TYPE)).close())
+                            .post(Entity.entity(new GenericEntity<>(List.of(plainPart(), imagePart(), jsonPart())) {}, MULTIPART_FORM_DATA_TYPE))
+                            .close())
                     .isInstanceOf(AssertionError.class)
                     .hasMessage("Multipart Form expected: <%s> but was: <%s>", partsBuffer.get().expected(), partsBuffer.get().actual());
         }
@@ -406,7 +409,8 @@ class EntityRequestMatchersTest {
         try (client) {
             filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello")
                             .request()
-                            .post(Entity.entity(new GenericEntity<>(List.of(plainPart(), imagePart(), jsonPart())) {}, MULTIPART_FORM_DATA_TYPE)).close())
+                            .post(Entity.entity(new GenericEntity<>(List.of(plainPart(), imagePart(), jsonPart())) {}, MULTIPART_FORM_DATA_TYPE))
+                            .close())
                     .isInstanceOf(AssertionError.class)
                     .hasMessage("Multipart Form expected: <%s> but was: <%s>", partsBuffer.get().expected(), partsBuffer.get().actual());
         }
@@ -423,7 +427,8 @@ class EntityRequestMatchersTest {
             assertThatCode(
                     () -> client.target("/hello")
                             .request()
-                            .post(Entity.entity(new GenericEntity<>(List.of(plainPart(), imagePart(), jsonPart())) {}, MULTIPART_FORM_DATA_TYPE)).close())
+                            .post(Entity.entity(new GenericEntity<>(List.of(plainPart(), imagePart(), jsonPart())) {}, MULTIPART_FORM_DATA_TYPE))
+                            .close())
                     .doesNotThrowAnyException();
         }
     }

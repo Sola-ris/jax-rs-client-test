@@ -827,13 +827,17 @@ class JsonPathRequestMatchersTest {
                 argumentSet("testExpression_blank",
                         (ThrowableAssert.ThrowingCallable) () -> RequestMatchers.jsonPath(" \t\n"), "JsonPath expression must not be null or blank."),
                 argumentSet("testValueSatisfies_consumerNull",
-                        (ThrowableAssert.ThrowingCallable) () -> RequestMatchers.jsonPath(DEFINITE_PATH).valueSatisfies(null, String.class), "'valueAssertion' must not be null."),
+                        (ThrowableAssert.ThrowingCallable) () -> RequestMatchers.jsonPath(DEFINITE_PATH)
+                                .valueSatisfies(null, String.class), "'valueAssertion' must not be null."),
                 argumentSet("testValueSatisfies_targetTypeNull",
-                        (ThrowableAssert.ThrowingCallable) () -> RequestMatchers.jsonPath(DEFINITE_PATH).valueSatisfies(__ -> {}, (Class<?>) null), "'targetType' must not be null."),
+                        (ThrowableAssert.ThrowingCallable) () -> RequestMatchers.jsonPath(DEFINITE_PATH)
+                                .valueSatisfies(__ -> {}, (Class<?>) null), "'targetType' must not be null."),
                 argumentSet("testValueSatisfies_genericType_consumerNull",
-                        (ThrowableAssert.ThrowingCallable) () -> RequestMatchers.jsonPath(DEFINITE_PATH).valueSatisfies(null, new GenericType<>() {}), "'valueAssertion' must not be null."),
+                        (ThrowableAssert.ThrowingCallable) () -> RequestMatchers.jsonPath(DEFINITE_PATH)
+                                .valueSatisfies(null, new GenericType<>() {}), "'valueAssertion' must not be null."),
                 argumentSet("testValueSatisfies_genericType_targetTypeNull",
-                        (ThrowableAssert.ThrowingCallable) () -> RequestMatchers.jsonPath(DEFINITE_PATH).valueSatisfies(__ -> {}, (GenericType<?>) null), "'targetType' must not be null.")
+                        (ThrowableAssert.ThrowingCallable) () -> RequestMatchers.jsonPath(DEFINITE_PATH)
+                                .valueSatisfies(__ -> {}, (GenericType<?>) null), "'targetType' must not be null.")
         );
     }
 
