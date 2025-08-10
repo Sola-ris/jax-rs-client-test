@@ -493,7 +493,6 @@ class EntityRequestMatchersTest {
                         (ThrowingCallable) () -> RequestMatchers.entity().multipartForm(null), "'expectedEntityParts' must not be null."),
                 argumentSet("testMultipartFormContains_null",
                         (ThrowingCallable) () -> RequestMatchers.entity().multipartFormContains(null), "'expectedEntityParts' must not be null.")
-
         );
     }
 }

@@ -18,8 +18,6 @@ import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
 import org.junit.platform.commons.support.ReflectionSupport;
 
-import io.github.solaris.jaxrs.client.test.util.ConfiguredClientSupplier;
-import io.github.solaris.jaxrs.client.test.util.ConfiguredClientSupplier.DefaultClientSupplier;
 import io.github.solaris.jaxrs.client.test.util.FilterExceptionAssert;
 import io.github.solaris.jaxrs.client.test.util.FilterExceptionAssert.DefaultFilterExceptionAssert;
 
@@ -56,8 +54,6 @@ public abstract class QuarkusTestFactory {
         for (Class<?> parameterType : method.getParameterTypes()) {
             if (parameterType.equals(FilterExceptionAssert.class)) {
                 args.add(new DefaultFilterExceptionAssert());
-            } else if (parameterType.equals(ConfiguredClientSupplier.class)) {
-                args.add(new DefaultClientSupplier());
             } else {
                 throw new IllegalArgumentException("Unexpected parameter type " + parameterType);
             }

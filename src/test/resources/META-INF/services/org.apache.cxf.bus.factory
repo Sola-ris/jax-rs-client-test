@@ -1,1 +1,1 @@
-io.github.solaris.jaxrs.client.test.util.ConfiguredClientSupplier$CxfClientSupplier$ConfiguredBusFactory
+io.github.solaris.jaxrs.client.test.util.ConfiguredCxfBusFactory

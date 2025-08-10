@@ -29,13 +29,13 @@ import java.net.SocketException;
 import java.net.URI;
 
 import jakarta.ws.rs.client.Client;
+import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.core.Response;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import io.github.solaris.jaxrs.client.test.server.MockRestServer;
-import io.github.solaris.jaxrs.client.test.util.ConfiguredClientSupplier;
 import io.github.solaris.jaxrs.client.test.util.Dto;
 import io.github.solaris.jaxrs.client.test.util.MockClientRequestContext;
 import io.github.solaris.jaxrs.client.test.util.extension.JaxRsVendorTest;
@@ -208,8 +208,8 @@ class MockResponseCreatorsTest {
         private static final String JSON_STRING = "{\"something\":\"hello\"}";
 
         @JaxRsVendorTest
-        void testSuccess_withEntityAndMediaType(ConfiguredClientSupplier clientSupplier) {
-            Client client = clientSupplier.get();
+        void testSuccess_withEntityAndMediaType() {
+            Client client = ClientBuilder.newClient();
             MockRestServer server = MockRestServer.bindTo(client).build();
 
             Dto dto = new Dto("hello");
@@ -224,8 +224,8 @@ class MockResponseCreatorsTest {
         }
 
         @JaxRsVendorTest
-        void testSuccess_withEntityAndMediaType_convertOnRead(ConfiguredClientSupplier clientSupplier) {
-            Client client = clientSupplier.get();
+        void testSuccess_withEntityAndMediaType_convertOnRead() {
+            Client client = ClientBuilder.newClient();
             MockRestServer server = MockRestServer.bindTo(client).build();
 
             Dto dto = new Dto("hello");

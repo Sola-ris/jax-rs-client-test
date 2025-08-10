@@ -15,9 +15,6 @@ import org.junit.jupiter.api.extension.ParameterResolutionException;
 import org.junit.jupiter.api.extension.ParameterResolver;
 import org.junit.jupiter.api.extension.ReflectiveInvocationContext;
 
-import io.github.solaris.jaxrs.client.test.util.ConfiguredClientSupplier;
-import io.github.solaris.jaxrs.client.test.util.ConfiguredClientSupplier.CxfClientSupplier;
-import io.github.solaris.jaxrs.client.test.util.ConfiguredClientSupplier.DefaultClientSupplier;
 import io.github.solaris.jaxrs.client.test.util.EntityConverterAssert;
 import io.github.solaris.jaxrs.client.test.util.EntityConverterAssert.ClientEntityConverterAssert;
 import io.github.solaris.jaxrs.client.test.util.EntityConverterAssert.ProvidersEntityConverterAssert;
@@ -52,8 +49,7 @@ class JaxRsVendorTestExtension implements InvocationInterceptor, ParameterResolv
     @Override
     public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
         return FilterExceptionAssert.class.isAssignableFrom(parameterContext.getParameter().getType())
-                || EntityConverterAssert.class.isAssignableFrom(parameterContext.getParameter().getType())
-                || ConfiguredClientSupplier.class.isAssignableFrom(parameterContext.getParameter().getType());
+                || EntityConverterAssert.class.isAssignableFrom(parameterContext.getParameter().getType());
     }
 
     @Override
@@ -71,11 +67,6 @@ class JaxRsVendorTestExtension implements InvocationInterceptor, ParameterResolv
                 return new ClientEntityConverterAssert();
             }
             return new ProvidersEntityConverterAssert();
-        } else if (ConfiguredClientSupplier.class.isAssignableFrom(parameterContext.getParameter().getType())) {
-            if (vendor == CXF) {
-                return new CxfClientSupplier();
-            }
-            return new DefaultClientSupplier();
         } else {
             throw new ParameterResolutionException("Unexpected Parameter of type " + parameterContext.getParameter().getType());
         }

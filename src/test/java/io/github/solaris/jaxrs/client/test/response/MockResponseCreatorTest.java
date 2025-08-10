@@ -53,7 +53,6 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import io.github.solaris.jaxrs.client.test.server.MockRestServer;
-import io.github.solaris.jaxrs.client.test.util.ConfiguredClientSupplier;
 import io.github.solaris.jaxrs.client.test.util.MockClientRequestContext;
 import io.github.solaris.jaxrs.client.test.util.extension.JaxRsVendorTest;
 
@@ -87,8 +86,8 @@ class MockResponseCreatorTest {
     }
 
     @JaxRsVendorTest
-    void testRespondWithEntity(ConfiguredClientSupplier clientSupplier) {
-        Client client = clientSupplier.get();
+    void testRespondWithEntity() {
+        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         String json = "{\"foo\": true}";
