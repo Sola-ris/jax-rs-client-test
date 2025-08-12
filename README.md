@@ -63,7 +63,7 @@ can be used to verify that all the expected requests were indeed executed.
 
 ### Repeated requests
 
-Unless specified otherwise, ech expected request is expected to be executed exactly once. The `expect` method of the `MockRestServer` provides an
+Unless specified otherwise, each expected request is expected to be executed exactly once. The `expect` method of the `MockRestServer` provides an
 overload that accepts an `ExpectedCount` argument that specifies a range count (e.g. once, between, min, max, etc.) for the given request expectation.
 
 The following example shows how to do so with a `WebTarget`:
