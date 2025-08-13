@@ -19,9 +19,7 @@ import org.jspecify.annotations.Nullable;
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.TypeRef;
-import com.jayway.jsonpath.spi.mapper.GsonMappingProvider;
 import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
-import com.jayway.jsonpath.spi.mapper.JakartaMappingProvider;
 import com.jayway.jsonpath.spi.mapper.MappingProvider;
 
 /**
@@ -32,13 +30,7 @@ import com.jayway.jsonpath.spi.mapper.MappingProvider;
  * </p>
  */
 public final class JsonPathRequestMatchers {
-    // Putting JakartaMappingProvider::new into this list causes NoClassDefFoundErrors
-    // if the JSON Binding API is not present
-    private static final List<Supplier<MappingProvider>> RECORD_AND_GENERIC_TYPE_PROVIDERS = List.of(
-            JsonPathRequestMatchers::jacksonProvider,
-            JsonPathRequestMatchers::gsonProvider,
-            JsonPathRequestMatchers::jakartaProvider
-    );
+    private static final Supplier<MappingProvider> JACKSON_SUPPLIER = JacksonMappingProvider::new;
 
     private final String expression;
     private final JsonPath jsonPath;
@@ -60,15 +52,7 @@ public final class JsonPathRequestMatchers {
      * and evaluates to an array containing <b>multiple</b> values, an {@link AssertionError} will be thrown.
      * </p>
      * <h4>Note:</h4>
-     * If {@code expectedValue} is a {@code record}, a JSON implementation capable of mapping from and to them
-     * must be available at runtime.
-     * <p>
-     * Supported implementations:
-     * <ul>
-     *     <li>Jackson</li>
-     *     <li>GSON</li>
-     *     <li>Jakarta JSON Binding</li>
-     * </ul>
+     * If {@code expectedValue} is a {@code record}, Jackson must be available at runtime.
      *
      * @param expectedValue The expected value, possibly {@code null}
      */
@@ -235,15 +219,7 @@ public final class JsonPathRequestMatchers {
      * @param targetType     The expected type of the resulting value
      * @param <T>            The expected type of the resulting value. Possibly null.
      *                       <h4>Note:</h4>
-     *                       If {@code <T>} is a {@code record}, a JSON implementation capable of mapping from and to them
-     *                       must be available at runtime.
-     *                       <p>
-     *                       Supported implementations:
-     *                       <ul>
-     *                           <li>Jackson</li>
-     *                           <li>GSON</li>
-     *                           <li>Jakarta JSON Binding</li>
-     *                       </ul>
+     *                       If {@code <T>} is a {@code record}, Jackson must be available at runtime.
      */
     public <T extends @Nullable Object> RequestMatcher valueSatisfies(ThrowingConsumer<T> valueAssertion, Class<T> targetType) {
         validateNotNull(valueAssertion, "'valueAssertion' must not be null.");
@@ -264,14 +240,7 @@ public final class JsonPathRequestMatchers {
      * @param targetType     The expected generic type of the resulting value
      * @param <T>            The expected generic type of the resulting value. Possibly null.
      *                       <h4>Note:</h4>
-     *                       A JSON implementation capable of mapping from and to generic types must be available at runtime.
-     *                       <p>
-     *                       Supported implementations:
-     *                       <ul>
-     *                           <li>Jackson</li>
-     *                           <li>GSON</li>
-     *                           <li>Jakarta JSON Binding</li>
-     *                       </ul>
+     *                       This {@link RequestMatcher} requires Jackson to be available at runtime.
      */
     public <T extends @Nullable Object> RequestMatcher valueSatisfies(ThrowingConsumer<T> valueAssertion, GenericType<T> targetType) {
         validateNotNull(valueAssertion, "'valueAssertion' must not be null.");
@@ -312,7 +281,7 @@ public final class JsonPathRequestMatchers {
     private <T> @Nullable T evaluate(String jsonString, Class<T> type) {
         try {
             if (type.isRecord()) {
-                return JsonPath.parse(jsonString, getConfiguration("records")).read(expression, type);
+                return JsonPath.parse(jsonString, getJacksonConfiguration()).read(expression, type);
             } else {
                 return JsonPath.parse(jsonString).read(expression, type);
             }
@@ -323,33 +292,18 @@ public final class JsonPathRequestMatchers {
 
     private <T> @Nullable T evaluate(String jsonString, GenericType<T> type) {
         try {
-            return JsonPath.parse(jsonString, getConfiguration("GenericTypes")).read(expression, new TypeRefAdapter<>(type));
+            return JsonPath.parse(jsonString, getJacksonConfiguration()).read(expression, new TypeRefAdapter<>(type));
         } catch (Throwable t) {
             throw new AssertionError("Failed to evaluate JSON path \"" + expression + "\" with type " + type, t);
         }
     }
 
-    private static Configuration getConfiguration(String message) {
-        for (Supplier<MappingProvider> providerSupplier : RECORD_AND_GENERIC_TYPE_PROVIDERS) {
-            try {
-                return Configuration.defaultConfiguration().mappingProvider(providerSupplier.get());
-            } catch (NoClassDefFoundError e) {
-                // Try the next one
-            }
+    private static Configuration getJacksonConfiguration() {
+        try {
+            return Configuration.defaultConfiguration().mappingProvider(JACKSON_SUPPLIER.get());
+        } catch (Throwable e) {
+            throw new IllegalStateException("Unable to load Jackson.", e);
         }
-        throw new IllegalStateException("Unable to load a MappingProvider capable of handling %s.".formatted(message));
-    }
-
-    private static MappingProvider jacksonProvider() {
-        return new JacksonMappingProvider();
-    }
-
-    private static MappingProvider gsonProvider() {
-        return new GsonMappingProvider();
-    }
-
-    private static MappingProvider jakartaProvider() {
-        return new JakartaMappingProvider();
     }
 
     private String createFailureMessage(String description, @Nullable Object value) {

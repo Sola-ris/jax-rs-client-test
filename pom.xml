@@ -178,6 +178,12 @@
         </dependency>
         <dependency>
             <groupId>org.glassfish.jersey.media</groupId>
+            <artifactId>jersey-media-json-gson</artifactId>
+            <version>${version.jersey}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.media</groupId>
             <artifactId>jersey-media-jaxb</artifactId>
             <version>${version.jersey}</version>
             <scope>test</scope>

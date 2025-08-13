@@ -20,6 +20,7 @@ import org.junit.platform.commons.support.ReflectionSupport;
 
 import io.github.solaris.jaxrs.client.test.util.FilterExceptionAssert;
 import io.github.solaris.jaxrs.client.test.util.FilterExceptionAssert.DefaultFilterExceptionAssert;
+import io.github.solaris.jaxrs.client.test.util.extension.classpath.JacksonFreeTest;
 
 public abstract class QuarkusTestFactory {
 
@@ -28,6 +29,7 @@ public abstract class QuarkusTestFactory {
     @TestFactory
     Stream<DynamicNode> generate() {
         return ReflectionSupport.streamMethods(getTestInstance().getClass(), method -> method.isAnnotationPresent(JaxRsVendorTest.class), TOP_DOWN)
+                .filter(method -> !method.isAnnotationPresent(JacksonFreeTest.class))
                 .map(method -> DynamicTest.dynamicTest(generateMethodName(method), () -> {
                     ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
                     try {

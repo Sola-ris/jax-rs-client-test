@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import jakarta.ws.rs.ProcessingException;
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.client.Entity;
@@ -29,6 +30,7 @@ import io.github.solaris.jaxrs.client.test.util.Dto;
 import io.github.solaris.jaxrs.client.test.util.FilterExceptionAssert;
 import io.github.solaris.jaxrs.client.test.util.extension.JaxRsVendorTest;
 import io.github.solaris.jaxrs.client.test.util.extension.RunInQuarkus;
+import io.github.solaris.jaxrs.client.test.util.extension.classpath.JacksonFreeTest;
 
 import net.minidev.json.JSONArray;
 
@@ -176,6 +178,26 @@ class JsonPathRequestMatchersTest {
                     .isInstanceOf(AssertionError.class)
                     .hasMessage("%s cannot be converted to type %s at JSON path \"%s\"", something, Boolean.class.getTypeName(), DEFINITE_PATH);
         }
+    }
+
+    @JacksonFreeTest
+    void testValue_record_jacksonUnavailable() {
+        Client client = ClientBuilder.newClient();
+        MockRestServer server = MockRestServer.bindTo(client).build();
+
+        server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).value(new Dto("hello"))).andRespond(withSuccess());
+
+        Dto dto = new Dto(new Dto("hello"));
+
+        assertThatThrownBy(() -> client.target("/hello").request().post(Entity.json(dto)).close())
+                .isInstanceOf(ProcessingException.class)
+                .cause()
+                .isInstanceOf(AssertionError.class)
+                .cause()
+                .isInstanceOf(AssertionError.class)
+                .cause()
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("Unable to load Jackson.");
     }
 
     @JaxRsVendorTest
@@ -702,6 +724,24 @@ class JsonPathRequestMatchersTest {
         }
     }
 
+    @JacksonFreeTest
+    void testsValueSatisfies_record_jacksonUnavailable() {
+        Client client = ClientBuilder.newClient();
+        MockRestServer server = MockRestServer.bindTo(client).build();
+
+        server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).valueSatisfies(value -> {}, Dto.class)).andRespond(withSuccess());
+
+        Dto dto = new Dto(new Dto("hello"));
+
+        assertThatThrownBy(() -> client.target("/hello").request().post(Entity.json(dto)).close())
+                .isInstanceOf(ProcessingException.class)
+                .cause()
+                .isInstanceOf(AssertionError.class)
+                .cause()
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("Unable to load Jackson.");
+    }
+
     @JaxRsVendorTest
     void testsValueSatisfies_genericType() {
         Client client = ClientBuilder.newClient();
@@ -792,6 +832,25 @@ class JsonPathRequestMatchersTest {
                     .isInstanceOf(IOException.class)
                     .hasMessage("I/O Error");
         }
+    }
+
+    @JacksonFreeTest
+    void testsValueSatisfies_genericType_record_jacksonUnavailable() {
+        Client client = ClientBuilder.newClient();
+        MockRestServer server = MockRestServer.bindTo(client).build();
+
+        server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).valueSatisfies(value -> {}, new GenericType<List<Dto>>() {}))
+                .andRespond(withSuccess());
+
+        Dto dto = new Dto(new Dto("hello"));
+
+        assertThatThrownBy(() -> client.target("/hello").request().post(Entity.json(dto)).close())
+                .isInstanceOf(ProcessingException.class)
+                .cause()
+                .isInstanceOf(AssertionError.class)
+                .cause()
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("Unable to load Jackson.");
     }
 
     @JaxRsVendorTest

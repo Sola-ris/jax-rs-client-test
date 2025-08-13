@@ -28,6 +28,7 @@ class VendorClassLoader extends ClassLoader {
                     getService(vendor.getRestClientBuilderResolverClass());
             case "META-INF/services/org.glassfish.jersey.internal.inject.InjectionManagerFactory" ->
                     getService(vendor.getInjectionManagerFactoryClass());
+            case "META-INF/services/org.glassfish.jersey.internal.spi.ForcedAutoDiscoverable" -> filterGson(name);
             default -> super.getResources(name);
         };
     }
@@ -45,5 +46,13 @@ class VendorClassLoader extends ClassLoader {
         List<URL> urls = List.of(servicePath.toUri().toURL());
         serviceCache.put(clazz, urls);
         return Collections.enumeration(urls);
+    }
+
+    private Enumeration<URL> filterGson(String name) throws IOException {
+        List<URL> filtered = Collections.list(super.getResources(name))
+                .stream()
+                .filter(url -> !url.toString().contains("gson"))
+                .toList();
+        return Collections.enumeration(filtered);
     }
 }
