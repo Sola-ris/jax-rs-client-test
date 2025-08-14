@@ -33,6 +33,8 @@ import jakarta.ws.rs.core.GenericEntity;
 import jakarta.ws.rs.core.MediaType;
 
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
+import org.junit.jupiter.api.AutoClose;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -98,376 +100,6 @@ class EntityRequestMatchersTest {
                 .hasMessage("MediaType expected: <%s> but was: <%s>", APPLICATION_JSON, APPLICATION_OCTET_STREAM);
     }
 
-    @JaxRsVendorTest
-    void testIsEqualTo() {
-        Client client = ClientBuilder.newClient();
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
-        Dto dto = new Dto(true);
-
-        server.expect(RequestMatchers.entity().isEqualTo(dto)).andRespond(withSuccess());
-
-        try (client) {
-            assertThatCode(() -> client.target("/hello").request().post(Entity.entity(dto, TEXT_PLAIN_TYPE)).close())
-                    .doesNotThrowAnyException();
-        }
-    }
-
-    @JaxRsVendorTest
-    void testIsEqualTo_null() {
-        Client client = ClientBuilder.newClient();
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
-        server.expect(RequestMatchers.entity().isEqualTo(null)).andRespond(withSuccess());
-
-        try (client) {
-            assertThatCode(() -> client.target("").request().get().close())
-                    .doesNotThrowAnyException();
-        }
-    }
-
-    @JaxRsVendorTest
-    void testIsEqualTo_noMatch() {
-        Client client = ClientBuilder.newClient();
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
-        Dto dto = new Dto(true);
-
-        server.expect(RequestMatchers.entity().isEqualTo(dto)).andRespond(withSuccess());
-
-        try (client) {
-            assertThatCode(() -> client.target("/hello").request().post(Entity.entity(dto, TEXT_PLAIN_TYPE)).close())
-                    .doesNotThrowAnyException();
-        }
-    }
-
-    @JaxRsVendorTest
-    void testString() {
-        Client client = ClientBuilder.newClient();
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
-        Dto dto = new Dto(true);
-
-        server.expect(RequestMatchers.entity().string(dto.toString())).andRespond(withSuccess());
-
-        try (client) {
-            assertThatCode(() -> client.target("/hello")
-                    .request()
-                    .post(Entity.entity(dto.toString(), TEXT_PLAIN_TYPE)).close())
-                    .doesNotThrowAnyException();
-        }
-    }
-
-    @JaxRsVendorTest
-    void testString_noMatch(FilterExceptionAssert filterExceptionAssert) {
-        Client client = ClientBuilder.newClient();
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
-        Dto dto = new Dto(true);
-        Dto otherDto = new Dto(false);
-
-        server.expect(RequestMatchers.entity().string(dto.toString())).andRespond(withSuccess());
-
-        try (client) {
-            filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello")
-                            .request()
-                            .post(Entity.entity(otherDto.toString().getBytes(), TEXT_PLAIN_TYPE)).close())
-                    .isInstanceOf(AssertionError.class)
-                    .hasMessage("Entity String expected: <%s> but was: <%s>", dto.toString(), otherDto.toString());
-        }
-    }
-
-    @JaxRsVendorTest
-    void testForm() {
-        Client client = ClientBuilder.newClient();
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
-        Form form = new Form("greeting", "hello");
-
-        server.expect(RequestMatchers.entity().form(form)).andRespond(withSuccess());
-
-        try (client) {
-            assertThatCode(() -> client.target("/hello").request(APPLICATION_JSON_TYPE).post(Entity.form(form)).close())
-                    .doesNotThrowAnyException();
-        }
-    }
-
-    @JaxRsVendorTest
-    void testForm_noMatch(FilterExceptionAssert filterExceptionAssert) {
-        Client client = ClientBuilder.newClient();
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
-        Form form = new Form("greeting", "hello");
-        Form otherForm = new Form("sendoff", "goodbye");
-
-        server.expect(RequestMatchers.entity().form(form)).andRespond(withSuccess());
-
-        try (client) {
-            filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello")
-                            .request()
-                            .post(Entity.form(otherForm))
-                            .close())
-                    .isInstanceOf(AssertionError.class)
-                    .hasMessage("Form expected: <%s> but was: <%s>", form.asMap(), otherForm.asMap());
-        }
-    }
-
-    @JaxRsVendorTest
-    void testFormContains() {
-        Client client = ClientBuilder.newClient();
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
-        Form actualForm = new Form()
-                .param("greeting", "hello")
-                .param("greeting", "salutations")
-                .param("sendoff", "goodbye")
-                .param("sendoff", "farewell");
-
-        Form subset = new Form()
-                .param("greeting", "hello")
-                .param("sendoff", "goodbye");
-
-        server.expect(RequestMatchers.entity().formContains(subset)).andRespond(withSuccess());
-
-        try (client) {
-            assertThatCode(() -> client.target("/hello").request().post(Entity.form(actualForm)).close())
-                    .doesNotThrowAnyException();
-        }
-    }
-
-    @JaxRsVendorTest
-    void testFormContains_subsetIsLarger(FilterExceptionAssert filterExceptionAssert) {
-        Client client = ClientBuilder.newClient();
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
-        Form actualForm = new Form()
-                .param("sendoff", "goodbye")
-                .param("greeting", "hello");
-
-        Form subset = new Form()
-                .param("greeting", "hello")
-                .param("sendoff", "goodbye")
-                .param("question", "how are you?");
-
-        server.expect(RequestMatchers.entity().formContains(subset)).andRespond(withSuccess());
-
-        try (client) {
-            filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello")
-                            .request()
-                            .post(Entity.form(actualForm))
-                            .close())
-                    .isInstanceOf(AssertionError.class)
-                    .hasMessage("Expected " + subset.asMap() + " to be smaller or the same size as " + actualForm.asMap());
-        }
-    }
-
-    @JaxRsVendorTest
-    void testFormContains_parameterNotInSubset(FilterExceptionAssert filterExceptionAssert) {
-        Client client = ClientBuilder.newClient();
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
-        Form actualForm = new Form()
-                .param("sendoff", "goodbye")
-                .param("greeting", "hello");
-
-        Form subset = new Form()
-                .param("question", "how are you?");
-
-        server.expect(RequestMatchers.entity().formContains(subset)).andRespond(withSuccess());
-
-        try (client) {
-            filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello")
-                            .request()
-                            .post(Entity.form(actualForm))
-                            .close())
-                    .isInstanceOf(AssertionError.class)
-                    .hasMessage("Expected " + actualForm.asMap() + " to contain parameter 'question'");
-        }
-    }
-
-    @JaxRsVendorTest
-    void testFormContains_subsetHasMoreValues(FilterExceptionAssert filterExceptionAssert) {
-        Client client = ClientBuilder.newClient();
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
-        Form actualForm = new Form()
-                .param("greeting", "hello");
-
-        Form subset = new Form()
-                .param("greeting", "hello")
-                .param("greeting", "salutations");
-
-        server.expect(RequestMatchers.entity().formContains(subset)).andRespond(withSuccess());
-
-        try (client) {
-            filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello")
-                            .request()
-                            .post(Entity.form(actualForm))
-                            .close())
-                    .isInstanceOf(AssertionError.class)
-                    .hasMessage("Expected %s to be smaller or the same size as %s",
-                            subset.asMap().get("greeting"), actualForm.asMap().get("greeting"));
-        }
-    }
-
-    @JaxRsVendorTest
-    void testFormContains_subsetHasDifferentValue(FilterExceptionAssert filterExceptionAssert) {
-        Client client = ClientBuilder.newClient();
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
-        Form actualForm = new Form()
-                .param("greeting", "hello")
-                .param("greeting", "salutations");
-
-        Form subset = new Form()
-                .param("greeting", "good morning");
-
-        server.expect(RequestMatchers.entity().formContains(subset)).andRespond(withSuccess());
-
-        try (client) {
-            filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello")
-                            .request()
-                            .post(Entity.form(actualForm))
-                            .close())
-                    .isInstanceOf(AssertionError.class)
-                    .hasMessage("FormParam [name=greeting, position=0] expected: <good morning> but was: <hello>");
-        }
-    }
-
-    @JaxRsVendorTest
-    void testFormContains_subsetHasDifferentOrder(FilterExceptionAssert filterExceptionAssert) {
-        Client client = ClientBuilder.newClient();
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
-        Form actualForm = new Form()
-                .param("greeting", "hello")
-                .param("greeting", "salutations")
-                .param("greeting", "good morning");
-
-        Form subset = new Form()
-                .param("greeting", "salutations")
-                .param("greeting", "hello");
-
-        server.expect(RequestMatchers.entity().formContains(subset)).andRespond(withSuccess());
-
-        try (client) {
-            filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello")
-                            .request()
-                            .post(Entity.form(actualForm))
-                            .close())
-                    .isInstanceOf(AssertionError.class)
-                    .hasMessage("FormParam [name=greeting, position=0] expected: <salutations> but was: <hello>");
-        }
-    }
-
-    @JaxRsVendorTest(skipFor = {JERSEY, CXF, RESTEASY_REACTIVE})
-    void testMultipartForm() throws IOException {
-        Client client = ClientBuilder.newClient();
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
-        server.expect(RequestMatchers.entity().multipartForm(List.of(plainPart(), imagePart(), jsonPart()))).andRespond(withSuccess());
-
-        try (client) {
-            assertThatCode(
-                    () -> client.target("/hello")
-                            .request()
-                            .post(Entity.entity(new GenericEntity<>(List.of(plainPart(), imagePart(), jsonPart())) {}, MULTIPART_FORM_DATA_TYPE))
-                            .close())
-                    .doesNotThrowAnyException();
-        }
-    }
-
-    @JaxRsVendorTest(skipFor = {JERSEY, CXF, RESTEASY_REACTIVE})
-    void testMultipartForm_noMatch(FilterExceptionAssert filterExceptionAssert) throws IOException {
-        Client client = ClientBuilder.newClient();
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
-        AtomicReference<PartsBuffer> partsBuffer = new AtomicReference<>();
-        server.expect(partsBufferMatcher(List.of(plainPart()), partsBuffer))
-                .andExpect(RequestMatchers.entity().multipartForm(List.of(plainPart()))).andRespond(withSuccess());
-
-        try (client) {
-            filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello")
-                            .request()
-                            .post(Entity.entity(new GenericEntity<>(List.of(plainPart(), imagePart(), jsonPart())) {}, MULTIPART_FORM_DATA_TYPE))
-                            .close())
-                    .isInstanceOf(AssertionError.class)
-                    .hasMessage("Multipart Form expected: <%s> but was: <%s>", partsBuffer.get().expected(), partsBuffer.get().actual());
-        }
-    }
-
-    @JaxRsVendorTest(skipFor = {JERSEY, CXF, RESTEASY_REACTIVE})
-    void testMultipartForm_noMatch_wrongOrder(FilterExceptionAssert filterExceptionAssert) throws IOException {
-        Client client = ClientBuilder.newClient();
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
-        AtomicReference<PartsBuffer> partsBuffer = new AtomicReference<>();
-        server.expect(partsBufferMatcher(List.of(jsonPart(), imagePart(), plainPart()), partsBuffer))
-                .andExpect(RequestMatchers.entity().multipartForm(List.of(jsonPart(), imagePart(), plainPart()))).andRespond(withSuccess());
-
-        try (client) {
-            filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello")
-                            .request()
-                            .post(Entity.entity(new GenericEntity<>(List.of(plainPart(), imagePart(), jsonPart())) {}, MULTIPART_FORM_DATA_TYPE))
-                            .close())
-                    .isInstanceOf(AssertionError.class)
-                    .hasMessage("Multipart Form expected: <%s> but was: <%s>", partsBuffer.get().expected(), partsBuffer.get().actual());
-        }
-    }
-
-    @JaxRsVendorTest(skipFor = {JERSEY, CXF, RESTEASY_REACTIVE})
-    void testMultipartFormContains() throws IOException {
-        Client client = ClientBuilder.newClient();
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
-        server.expect(RequestMatchers.entity().multipartFormContains(List.of(plainPart(), jsonPart()))).andRespond(withSuccess());
-
-        try (client) {
-            assertThatCode(
-                    () -> client.target("/hello")
-                            .request()
-                            .post(Entity.entity(new GenericEntity<>(List.of(plainPart(), imagePart(), jsonPart())) {}, MULTIPART_FORM_DATA_TYPE))
-                            .close())
-                    .doesNotThrowAnyException();
-        }
-    }
-
-    @JaxRsVendorTest(skipFor = {JERSEY, CXF, RESTEASY_REACTIVE})
-    void testMultipartFormContains_subsetIsLarger(FilterExceptionAssert filterExceptionAssert) throws IOException {
-        Client client = ClientBuilder.newClient();
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
-        AtomicReference<PartsBuffer> partsBuffer = new AtomicReference<>();
-        server.expect(partsBufferMatcher(List.of(jsonPart(), imagePart(), plainPart()), partsBuffer))
-                .andExpect(RequestMatchers.entity().multipartFormContains(List.of(jsonPart(), imagePart(), plainPart()))).andRespond(withSuccess());
-
-        try (client) {
-            filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello")
-                            .request()
-                            .post(Entity.entity(new GenericEntity<>(List.of(plainPart(), imagePart())) {}, MULTIPART_FORM_DATA_TYPE)).close())
-                    .isInstanceOf(AssertionError.class)
-                    .hasMessage("Expected %s to be smaller or the same size as %s", partsBuffer.get().expected(), partsBuffer.get().actual());
-        }
-    }
-
-    @JaxRsVendorTest(skipFor = {JERSEY, CXF, RESTEASY_REACTIVE})
-    void testMultipartFormContains_noMatch(FilterExceptionAssert filterExceptionAssert) throws IOException {
-        Client client = ClientBuilder.newClient();
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
-        AtomicReference<PartsBuffer> partsBuffer = new AtomicReference<>();
-        server.expect(partsBufferMatcher(List.of(jsonPart()), partsBuffer))
-                .andExpect(RequestMatchers.entity().multipartFormContains(List.of(jsonPart()))).andRespond(withSuccess());
-
-        try (client) {
-            filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello")
-                            .request()
-                            .post(Entity.entity(new GenericEntity<>(List.of(plainPart(), imagePart())) {}, MULTIPART_FORM_DATA_TYPE)).close())
-                    .isInstanceOf(AssertionError.class)
-                    .hasMessage("Expected %s to contain all of %s", partsBuffer.get().actual(), partsBuffer.get().expected());
-        }
-    }
-
     @ParameterizedTest
     @MethodSource("invalidArguments")
     void testArgumentValidation(ThrowingCallable callable, String exceptionMessage) {
@@ -494,5 +126,326 @@ class EntityRequestMatchersTest {
                 argumentSet("testMultipartFormContains_null",
                         (ThrowingCallable) () -> RequestMatchers.entity().multipartFormContains(null), "'expectedEntityParts' must not be null.")
         );
+    }
+
+    @Nested
+    class WithClient {
+
+        @AutoClose
+        private final Client client = ClientBuilder.newClient();
+
+        @JaxRsVendorTest
+        void testIsEqualTo() {
+            MockRestServer server = MockRestServer.bindTo(client).build();
+
+            Dto dto = new Dto(true);
+
+            server.expect(RequestMatchers.entity().isEqualTo(dto)).andRespond(withSuccess());
+
+            assertThatCode(() -> client.target("/hello").request().post(Entity.entity(dto, TEXT_PLAIN_TYPE)).close())
+                    .doesNotThrowAnyException();
+        }
+
+        @JaxRsVendorTest
+        void testIsEqualTo_null() {
+            MockRestServer server = MockRestServer.bindTo(client).build();
+
+            server.expect(RequestMatchers.entity().isEqualTo(null)).andRespond(withSuccess());
+
+            assertThatCode(() -> client.target("").request().get().close())
+                    .doesNotThrowAnyException();
+        }
+
+        @JaxRsVendorTest
+        void testIsEqualTo_noMatch() {
+            MockRestServer server = MockRestServer.bindTo(client).build();
+
+            Dto dto = new Dto(true);
+
+            server.expect(RequestMatchers.entity().isEqualTo(dto)).andRespond(withSuccess());
+
+            assertThatCode(() -> client.target("/hello").request().post(Entity.entity(dto, TEXT_PLAIN_TYPE)).close())
+                    .doesNotThrowAnyException();
+        }
+
+        @JaxRsVendorTest
+        void testString() {
+            MockRestServer server = MockRestServer.bindTo(client).build();
+
+            Dto dto = new Dto(true);
+
+            server.expect(RequestMatchers.entity().string(dto.toString())).andRespond(withSuccess());
+
+            assertThatCode(() -> client.target("/hello")
+                    .request()
+                    .post(Entity.entity(dto.toString(), TEXT_PLAIN_TYPE)).close())
+                    .doesNotThrowAnyException();
+        }
+
+        @JaxRsVendorTest
+        void testString_noMatch(FilterExceptionAssert filterExceptionAssert) {
+            MockRestServer server = MockRestServer.bindTo(client).build();
+
+            Dto dto = new Dto(true);
+            Dto otherDto = new Dto(false);
+
+            server.expect(RequestMatchers.entity().string(dto.toString())).andRespond(withSuccess());
+
+            filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello")
+                            .request()
+                            .post(Entity.entity(otherDto.toString().getBytes(), TEXT_PLAIN_TYPE)).close())
+                    .isInstanceOf(AssertionError.class)
+                    .hasMessage("Entity String expected: <%s> but was: <%s>", dto.toString(), otherDto.toString());
+        }
+
+        @JaxRsVendorTest
+        void testForm() {
+            MockRestServer server = MockRestServer.bindTo(client).build();
+
+            Form form = new Form("greeting", "hello");
+
+            server.expect(RequestMatchers.entity().form(form)).andRespond(withSuccess());
+
+            assertThatCode(() -> client.target("/hello").request(APPLICATION_JSON_TYPE).post(Entity.form(form)).close())
+                    .doesNotThrowAnyException();
+        }
+
+        @JaxRsVendorTest
+        void testForm_noMatch(FilterExceptionAssert filterExceptionAssert) {
+            MockRestServer server = MockRestServer.bindTo(client).build();
+
+            Form form = new Form("greeting", "hello");
+            Form otherForm = new Form("sendoff", "goodbye");
+
+            server.expect(RequestMatchers.entity().form(form)).andRespond(withSuccess());
+
+            filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello")
+                            .request()
+                            .post(Entity.form(otherForm))
+                            .close())
+                    .isInstanceOf(AssertionError.class)
+                    .hasMessage("Form expected: <%s> but was: <%s>", form.asMap(), otherForm.asMap());
+        }
+
+        @JaxRsVendorTest
+        void testFormContains() {
+            MockRestServer server = MockRestServer.bindTo(client).build();
+
+            Form actualForm = new Form()
+                    .param("greeting", "hello")
+                    .param("greeting", "salutations")
+                    .param("sendoff", "goodbye")
+                    .param("sendoff", "farewell");
+
+            Form subset = new Form()
+                    .param("greeting", "hello")
+                    .param("sendoff", "goodbye");
+
+            server.expect(RequestMatchers.entity().formContains(subset)).andRespond(withSuccess());
+
+            assertThatCode(() -> client.target("/hello").request().post(Entity.form(actualForm)).close())
+                    .doesNotThrowAnyException();
+        }
+
+        @JaxRsVendorTest
+        void testFormContains_subsetIsLarger(FilterExceptionAssert filterExceptionAssert) {
+            MockRestServer server = MockRestServer.bindTo(client).build();
+
+            Form actualForm = new Form()
+                    .param("sendoff", "goodbye")
+                    .param("greeting", "hello");
+
+            Form subset = new Form()
+                    .param("greeting", "hello")
+                    .param("sendoff", "goodbye")
+                    .param("question", "how are you?");
+
+            server.expect(RequestMatchers.entity().formContains(subset)).andRespond(withSuccess());
+
+            filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello")
+                            .request()
+                            .post(Entity.form(actualForm))
+                            .close())
+                    .isInstanceOf(AssertionError.class)
+                    .hasMessage("Expected " + subset.asMap() + " to be smaller or the same size as " + actualForm.asMap());
+        }
+
+        @JaxRsVendorTest
+        void testFormContains_parameterNotInSubset(FilterExceptionAssert filterExceptionAssert) {
+            MockRestServer server = MockRestServer.bindTo(client).build();
+
+            Form actualForm = new Form()
+                    .param("sendoff", "goodbye")
+                    .param("greeting", "hello");
+
+            Form subset = new Form()
+                    .param("question", "how are you?");
+
+            server.expect(RequestMatchers.entity().formContains(subset)).andRespond(withSuccess());
+
+            filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello")
+                            .request()
+                            .post(Entity.form(actualForm))
+                            .close())
+                    .isInstanceOf(AssertionError.class)
+                    .hasMessage("Expected " + actualForm.asMap() + " to contain parameter 'question'");
+        }
+
+        @JaxRsVendorTest
+        void testFormContains_subsetHasMoreValues(FilterExceptionAssert filterExceptionAssert) {
+            MockRestServer server = MockRestServer.bindTo(client).build();
+
+            Form actualForm = new Form()
+                    .param("greeting", "hello");
+
+            Form subset = new Form()
+                    .param("greeting", "hello")
+                    .param("greeting", "salutations");
+
+            server.expect(RequestMatchers.entity().formContains(subset)).andRespond(withSuccess());
+
+            filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello")
+                            .request()
+                            .post(Entity.form(actualForm))
+                            .close())
+                    .isInstanceOf(AssertionError.class)
+                    .hasMessage("Expected %s to be smaller or the same size as %s",
+                            subset.asMap().get("greeting"), actualForm.asMap().get("greeting"));
+        }
+
+        @JaxRsVendorTest
+        void testFormContains_subsetHasDifferentValue(FilterExceptionAssert filterExceptionAssert) {
+            MockRestServer server = MockRestServer.bindTo(client).build();
+
+            Form actualForm = new Form()
+                    .param("greeting", "hello")
+                    .param("greeting", "salutations");
+
+            Form subset = new Form()
+                    .param("greeting", "good morning");
+
+            server.expect(RequestMatchers.entity().formContains(subset)).andRespond(withSuccess());
+
+            filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello")
+                            .request()
+                            .post(Entity.form(actualForm))
+                            .close())
+                    .isInstanceOf(AssertionError.class)
+                    .hasMessage("FormParam [name=greeting, position=0] expected: <good morning> but was: <hello>");
+        }
+
+        @JaxRsVendorTest
+        void testFormContains_subsetHasDifferentOrder(FilterExceptionAssert filterExceptionAssert) {
+            MockRestServer server = MockRestServer.bindTo(client).build();
+
+            Form actualForm = new Form()
+                    .param("greeting", "hello")
+                    .param("greeting", "salutations")
+                    .param("greeting", "good morning");
+
+            Form subset = new Form()
+                    .param("greeting", "salutations")
+                    .param("greeting", "hello");
+
+            server.expect(RequestMatchers.entity().formContains(subset)).andRespond(withSuccess());
+
+            filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello")
+                            .request()
+                            .post(Entity.form(actualForm))
+                            .close())
+                    .isInstanceOf(AssertionError.class)
+                    .hasMessage("FormParam [name=greeting, position=0] expected: <salutations> but was: <hello>");
+        }
+
+        @JaxRsVendorTest(skipFor = {JERSEY, CXF, RESTEASY_REACTIVE})
+        void testMultipartForm() throws IOException {
+            MockRestServer server = MockRestServer.bindTo(client).build();
+
+            server.expect(RequestMatchers.entity().multipartForm(List.of(plainPart(), imagePart(), jsonPart()))).andRespond(withSuccess());
+
+            assertThatCode(
+                    () -> client.target("/hello")
+                            .request()
+                            .post(Entity.entity(new GenericEntity<>(List.of(plainPart(), imagePart(), jsonPart())) {}, MULTIPART_FORM_DATA_TYPE))
+                            .close())
+                    .doesNotThrowAnyException();
+        }
+
+        @JaxRsVendorTest(skipFor = {JERSEY, CXF, RESTEASY_REACTIVE})
+        void testMultipartForm_noMatch(FilterExceptionAssert filterExceptionAssert) throws IOException {
+            MockRestServer server = MockRestServer.bindTo(client).build();
+
+            AtomicReference<PartsBuffer> partsBuffer = new AtomicReference<>();
+            server.expect(partsBufferMatcher(List.of(plainPart()), partsBuffer))
+                    .andExpect(RequestMatchers.entity().multipartForm(List.of(plainPart()))).andRespond(withSuccess());
+
+            filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello")
+                            .request()
+                            .post(Entity.entity(new GenericEntity<>(List.of(plainPart(), imagePart(), jsonPart())) {}, MULTIPART_FORM_DATA_TYPE))
+                            .close())
+                    .isInstanceOf(AssertionError.class)
+                    .hasMessage("Multipart Form expected: <%s> but was: <%s>", partsBuffer.get().expected(), partsBuffer.get().actual());
+        }
+
+        @JaxRsVendorTest(skipFor = {JERSEY, CXF, RESTEASY_REACTIVE})
+        void testMultipartForm_noMatch_wrongOrder(FilterExceptionAssert filterExceptionAssert) throws IOException {
+            MockRestServer server = MockRestServer.bindTo(client).build();
+
+            AtomicReference<PartsBuffer> partsBuffer = new AtomicReference<>();
+            server.expect(partsBufferMatcher(List.of(jsonPart(), imagePart(), plainPart()), partsBuffer))
+                    .andExpect(RequestMatchers.entity().multipartForm(List.of(jsonPart(), imagePart(), plainPart()))).andRespond(withSuccess());
+
+            filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello")
+                            .request()
+                            .post(Entity.entity(new GenericEntity<>(List.of(plainPart(), imagePart(), jsonPart())) {}, MULTIPART_FORM_DATA_TYPE))
+                            .close())
+                    .isInstanceOf(AssertionError.class)
+                    .hasMessage("Multipart Form expected: <%s> but was: <%s>", partsBuffer.get().expected(), partsBuffer.get().actual());
+        }
+
+        @JaxRsVendorTest(skipFor = {JERSEY, CXF, RESTEASY_REACTIVE})
+        void testMultipartFormContains() throws IOException {
+            MockRestServer server = MockRestServer.bindTo(client).build();
+
+            server.expect(RequestMatchers.entity().multipartFormContains(List.of(plainPart(), jsonPart()))).andRespond(withSuccess());
+
+            assertThatCode(
+                    () -> client.target("/hello")
+                            .request()
+                            .post(Entity.entity(new GenericEntity<>(List.of(plainPart(), imagePart(), jsonPart())) {}, MULTIPART_FORM_DATA_TYPE))
+                            .close())
+                    .doesNotThrowAnyException();
+        }
+
+        @JaxRsVendorTest(skipFor = {JERSEY, CXF, RESTEASY_REACTIVE})
+        void testMultipartFormContains_subsetIsLarger(FilterExceptionAssert filterExceptionAssert) throws IOException {
+            MockRestServer server = MockRestServer.bindTo(client).build();
+
+            AtomicReference<PartsBuffer> partsBuffer = new AtomicReference<>();
+            server.expect(partsBufferMatcher(List.of(jsonPart(), imagePart(), plainPart()), partsBuffer))
+                    .andExpect(RequestMatchers.entity().multipartFormContains(List.of(jsonPart(), imagePart(), plainPart())))
+                    .andRespond(withSuccess());
+
+            filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello")
+                            .request()
+                            .post(Entity.entity(new GenericEntity<>(List.of(plainPart(), imagePart())) {}, MULTIPART_FORM_DATA_TYPE)).close())
+                    .isInstanceOf(AssertionError.class)
+                    .hasMessage("Expected %s to be smaller or the same size as %s", partsBuffer.get().expected(), partsBuffer.get().actual());
+        }
+
+        @JaxRsVendorTest(skipFor = {JERSEY, CXF, RESTEASY_REACTIVE})
+        void testMultipartFormContains_noMatch(FilterExceptionAssert filterExceptionAssert) throws IOException {
+            MockRestServer server = MockRestServer.bindTo(client).build();
+
+            AtomicReference<PartsBuffer> partsBuffer = new AtomicReference<>();
+            server.expect(partsBufferMatcher(List.of(jsonPart()), partsBuffer))
+                    .andExpect(RequestMatchers.entity().multipartFormContains(List.of(jsonPart()))).andRespond(withSuccess());
+
+            filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello")
+                            .request()
+                            .post(Entity.entity(new GenericEntity<>(List.of(plainPart(), imagePart())) {}, MULTIPART_FORM_DATA_TYPE)).close())
+                    .isInstanceOf(AssertionError.class)
+                    .hasMessage("Expected %s to contain all of %s", partsBuffer.get().actual(), partsBuffer.get().expected());
+        }
     }
 }

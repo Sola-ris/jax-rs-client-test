@@ -19,6 +19,7 @@ import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.core.GenericType;
 
 import org.assertj.core.api.ThrowableAssert;
+import org.junit.jupiter.api.AutoClose;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -40,57 +41,44 @@ class JsonPathRequestMatchersTest {
     private static final String INDEFINITE_PATH = "$.something[*]";
     private static final String NON_EXISTENT_PATH = "$.somethingElse";
 
+    @AutoClose
+    private final Client client = ClientBuilder.newClient();
+
     @JaxRsVendorTest
     void testValue() {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).value(true)).andRespond(withSuccess());
 
         Dto dto = new Dto(true);
 
-        assertThatCode(() -> {
-            try (client) {
-                client.target("/hello").request().post(Entity.json(dto)).close();
-            }
-        }).doesNotThrowAnyException();
+        assertThatCode(() -> client.target("/hello").request().post(Entity.json(dto)).close()).doesNotThrowAnyException();
     }
 
     @JaxRsVendorTest
     void testValue_indefinitePath() {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         server.expect(RequestMatchers.jsonPath(INDEFINITE_PATH).value(true)).andRespond(withSuccess());
 
         Dto dto = new Dto(List.of(true));
 
-        assertThatCode(() -> {
-            try (client) {
-                client.target("/hello").request().post(Entity.json(dto)).close();
-            }
-        }).doesNotThrowAnyException();
+        assertThatCode(() -> client.target("/hello").request().post(Entity.json(dto)).close()).doesNotThrowAnyException();
     }
 
     @JaxRsVendorTest
     void testValue_typeConversion() {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).value(42)).andRespond(withSuccess());
 
         Dto dto = new Dto(42.0);
 
-        assertThatCode(() -> {
-            try (client) {
-                client.target("/hello").request().post(Entity.json(dto)).close();
-            }
-        }).doesNotThrowAnyException();
+        assertThatCode(() -> client.target("/hello").request().post(Entity.json(dto)).close()).doesNotThrowAnyException();
     }
 
     @JaxRsVendorTest
     void testValue_null() {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).value(null)).andRespond(withSuccess());
@@ -103,7 +91,6 @@ class JsonPathRequestMatchersTest {
 
     @JaxRsVendorTest
     void testValue_record() {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).value(new Dto("hello"))).andRespond(withSuccess());
@@ -116,39 +103,31 @@ class JsonPathRequestMatchersTest {
 
     @JaxRsVendorTest
     void testValue_noMatch(FilterExceptionAssert filterExceptionAssert) {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).value(true)).andRespond(withSuccess());
 
         Dto dto = new Dto(false);
 
-        try (client) {
-            filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.json(dto)).close())
-                    .isInstanceOf(AssertionError.class)
-                    .hasMessage("JSON Path \"%s\" expected: <%s> but was: <%s>", DEFINITE_PATH, true, false);
-        }
+        filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.json(dto)).close())
+                .isInstanceOf(AssertionError.class)
+                .hasMessage("JSON Path \"%s\" expected: <%s> but was: <%s>", DEFINITE_PATH, true, false);
     }
 
     @JaxRsVendorTest
     void testValue_noMatch_emptyList(FilterExceptionAssert filterExceptionAssert) {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).value(true)).andRespond(withSuccess());
 
         Dto dto = new Dto(List.of());
 
-        try (client) {
-            filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.json(dto)).close())
-                    .isInstanceOf(AssertionError.class)
-                    .hasMessage("Found no value matching %s at JSON path \"%s\"", true, DEFINITE_PATH);
-        }
+        filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.json(dto)).close())
+                .isInstanceOf(AssertionError.class);
     }
 
     @JaxRsVendorTest
     void testValue_noMatch_multipleValues(FilterExceptionAssert filterExceptionAssert) {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).value(true)).andRespond(withSuccess());
@@ -156,16 +135,13 @@ class JsonPathRequestMatchersTest {
         List<Boolean> something = List.of(true, false);
         Dto dto = new Dto(something);
 
-        try (client) {
-            filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.json(dto)).close())
-                    .isInstanceOf(AssertionError.class)
-                    .hasMessage("Found list of values %s instead of the expected single value %s", toJsonArray(something), true);
-        }
+        filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.json(dto)).close())
+                .isInstanceOf(AssertionError.class)
+                .hasMessage("Found list of values %s instead of the expected single value %s", toJsonArray(something), true);
     }
 
     @JaxRsVendorTest
     void testValue_noMatch_incompatibleTypes(FilterExceptionAssert filterExceptionAssert) {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).value(true)).andRespond(withSuccess());
@@ -173,16 +149,13 @@ class JsonPathRequestMatchersTest {
         Map<String, String> something = Map.of("greeting", "hello");
         Dto dto = new Dto(something);
 
-        try (client) {
-            filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.json(dto)).close())
-                    .isInstanceOf(AssertionError.class)
-                    .hasMessage("%s cannot be converted to type %s at JSON path \"%s\"", something, Boolean.class.getTypeName(), DEFINITE_PATH);
-        }
+        filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.json(dto)).close())
+                .isInstanceOf(AssertionError.class)
+                .hasMessage("%s cannot be converted to type %s at JSON path \"%s\"", something, Boolean.class.getTypeName(), DEFINITE_PATH);
     }
 
     @JacksonFreeTest
     void testValue_record_jacksonUnavailable() {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).value(new Dto("hello"))).andRespond(withSuccess());
@@ -202,135 +175,102 @@ class JsonPathRequestMatchersTest {
 
     @JaxRsVendorTest
     void testExists() {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).exists()).andRespond(withSuccess());
 
         Dto dto = new Dto(true);
 
-        assertThatCode(() -> {
-            try (client) {
-                client.target("/hello").request().post(Entity.json(dto)).close();
-            }
-        }).doesNotThrowAnyException();
+        assertThatCode(() -> client.target("/hello").request().post(Entity.json(dto)).close()).doesNotThrowAnyException();
     }
 
     @JaxRsVendorTest
     void testExists_doesNot(FilterExceptionAssert filterExceptionAssert) {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         server.expect(RequestMatchers.jsonPath(NON_EXISTENT_PATH).exists()).andRespond(withSuccess());
 
         Dto dto = new Dto(true);
 
-        try (client) {
-            filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.json(dto)).close())
-                    .isInstanceOf(AssertionError.class)
-                    .hasMessage("Found no value for JSON path \"%s\"", NON_EXISTENT_PATH);
-        }
+        filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.json(dto)).close())
+                .isInstanceOf(AssertionError.class)
+                .hasMessage("Found no value for JSON path \"%s\"", NON_EXISTENT_PATH);
     }
 
     @JaxRsVendorTest
     void testExists_doesNot_nullValue(FilterExceptionAssert filterExceptionAssert) {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).exists()).andRespond(withSuccess());
 
         Dto dto = new Dto(null);
 
-        try (client) {
-            filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.json(dto)).close())
-                    .isInstanceOf(AssertionError.class)
-                    .hasMessage("Found no value for JSON path \"%s\"", DEFINITE_PATH);
-        }
+        filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.json(dto)).close())
+                .isInstanceOf(AssertionError.class)
+                .hasMessage("Found no value for JSON path \"%s\"", DEFINITE_PATH);
     }
 
     @JaxRsVendorTest
     void testExists_doesNot_indefinitePath(FilterExceptionAssert filterExceptionAssert) {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         server.expect(RequestMatchers.jsonPath(INDEFINITE_PATH).exists()).andRespond(withSuccess());
 
         Dto dto = new Dto(List.of());
 
-        try (client) {
-            filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.json(dto)).close())
-                    .isInstanceOf(AssertionError.class)
-                    .hasMessage("Found no value for JSON path \"%s\"", INDEFINITE_PATH);
-        }
+        filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.json(dto)).close())
+                .isInstanceOf(AssertionError.class)
+                .hasMessage("Found no value for JSON path \"%s\"", INDEFINITE_PATH);
     }
 
     @JaxRsVendorTest
     void testDoesNotExist() {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         server.expect(RequestMatchers.jsonPath(NON_EXISTENT_PATH).doesNotExist()).andRespond(withSuccess());
 
         Dto dto = new Dto(true);
 
-        assertThatCode(() -> {
-            try (client) {
-                client.target("/hello").request().post(Entity.json(dto)).close();
-            }
-        }).doesNotThrowAnyException();
+        assertThatCode(() -> client.target("/hello").request().post(Entity.json(dto)).close()).doesNotThrowAnyException();
     }
 
     @JaxRsVendorTest
     void testDoesNotExist_indefinitePath() {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         server.expect(RequestMatchers.jsonPath(INDEFINITE_PATH).doesNotExist()).andRespond(withSuccess());
 
         Dto dto = new Dto(List.of());
 
-        assertThatCode(() -> {
-            try (client) {
-                client.target("/hello").request().post(Entity.json(dto)).close();
-            }
-        }).doesNotThrowAnyException();
+        assertThatCode(() -> client.target("/hello").request().post(Entity.json(dto)).close()).doesNotThrowAnyException();
     }
 
     @JaxRsVendorTest
     void testDoesNotExist_nullValue() {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).doesNotExist()).andRespond(withSuccess());
 
         Dto dto = new Dto(null);
 
-        assertThatCode(() -> {
-            try (client) {
-                client.target("/hello").request().post(Entity.json(dto)).close();
-            }
-        }).doesNotThrowAnyException();
+        assertThatCode(() -> client.target("/hello").request().post(Entity.json(dto)).close()).doesNotThrowAnyException();
     }
 
     @JaxRsVendorTest
     void testDoesNotExist_does_definitePath(FilterExceptionAssert filterExceptionAssert) {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).doesNotExist()).andRespond(withSuccess());
 
         Dto dto = new Dto(true);
 
-        try (client) {
-            filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.json(dto)).close())
-                    .isInstanceOf(AssertionError.class)
-                    .hasMessage("Expected no value at JSON Path \"%s\" but found true", DEFINITE_PATH);
-        }
+        filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.json(dto)).close())
+                .isInstanceOf(AssertionError.class)
+                .hasMessage("Expected no value at JSON Path \"%s\" but found true", DEFINITE_PATH);
     }
 
     @JaxRsVendorTest
     void testDoesNotExist_does_indefinitePath(FilterExceptionAssert filterExceptionAssert) {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         server.expect(RequestMatchers.jsonPath(INDEFINITE_PATH).doesNotExist()).andRespond(withSuccess());
@@ -338,144 +278,107 @@ class JsonPathRequestMatchersTest {
         List<?> something = List.of(true, false);
         Dto dto = new Dto(something);
 
-        try (client) {
-            filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.json(dto)).close())
-                    .isInstanceOf(AssertionError.class)
-                    .hasMessage("Expected no value at JSON Path \"%s\" but found %s", INDEFINITE_PATH, toJsonArray(something));
-        }
+        filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.json(dto)).close())
+                .isInstanceOf(AssertionError.class)
+                .hasMessage("Expected no value at JSON Path \"%s\" but found %s", INDEFINITE_PATH, toJsonArray(something));
     }
 
     @JaxRsVendorTest
     void testHasJsonPath() {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).hasJsonPath()).andRespond(withSuccess());
 
         Dto dto = new Dto(true);
 
-        assertThatCode(() -> {
-            try (client) {
-                client.target("/hello").request().post(Entity.json(dto)).close();
-            }
-        }).doesNotThrowAnyException();
+        assertThatCode(() -> client.target("/hello").request().post(Entity.json(dto)).close()).doesNotThrowAnyException();
     }
 
     @JaxRsVendorTest
     void testHasJsonPath_nullValue() {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).hasJsonPath()).andRespond(withSuccess());
 
         Dto dto = new Dto(null);
 
-        assertThatCode(() -> {
-            try (client) {
-                client.target("/hello").request().post(Entity.json(dto)).close();
-            }
-        }).doesNotThrowAnyException();
+        assertThatCode(() -> client.target("/hello").request().post(Entity.json(dto)).close()).doesNotThrowAnyException();
     }
 
     @JaxRsVendorTest
     void testHasJsonPath_indefinitePath() {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         server.expect(RequestMatchers.jsonPath(INDEFINITE_PATH).hasJsonPath()).andRespond(withSuccess());
 
         Dto dto = new Dto(List.of(true, false));
 
-        assertThatCode(() -> {
-            try (client) {
-                client.target("/hello").request().post(Entity.json(dto)).close();
-            }
-        }).doesNotThrowAnyException();
+        assertThatCode(() -> client.target("/hello").request().post(Entity.json(dto)).close()).doesNotThrowAnyException();
     }
 
     @JaxRsVendorTest
     void testHasJsonPath_doesNot(FilterExceptionAssert filterExceptionAssert) {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         server.expect(RequestMatchers.jsonPath(NON_EXISTENT_PATH).hasJsonPath()).andRespond(withSuccess());
 
         Dto dto = new Dto(true);
 
-        try (client) {
-            filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.json(dto)).close())
-                    .isInstanceOf(AssertionError.class)
-                    .hasMessage("Found no value for JSON path \"%s\"", NON_EXISTENT_PATH);
-        }
+        filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.json(dto)).close())
+                .isInstanceOf(AssertionError.class)
+                .hasMessage("Found no value for JSON path \"%s\"", NON_EXISTENT_PATH);
     }
 
     @JaxRsVendorTest
     void testHasJsonPath_doesNot_indefinitePath(FilterExceptionAssert filterExceptionAssert) {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         server.expect(RequestMatchers.jsonPath(INDEFINITE_PATH).hasJsonPath()).andRespond(withSuccess());
 
         Dto dto = new Dto(List.of());
 
-        try (client) {
-            filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.json(dto)).close())
-                    .isInstanceOf(AssertionError.class)
-                    .hasMessage("No values for JSON Path \"%s\"", INDEFINITE_PATH);
-        }
+        filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.json(dto)).close())
+                .isInstanceOf(AssertionError.class)
+                .hasMessage("No values for JSON Path \"%s\"", INDEFINITE_PATH);
     }
 
     @JaxRsVendorTest
     void testDoesNotHaveJsonPath() {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         server.expect(RequestMatchers.jsonPath(NON_EXISTENT_PATH).doesNotHaveJsonPath()).andRespond(withSuccess());
 
         Dto dto = new Dto(true);
 
-        assertThatCode(() -> {
-            try (client) {
-                client.target("/hello").request().post(Entity.json(dto)).close();
-            }
-        }).doesNotThrowAnyException();
+        assertThatCode(() -> client.target("/hello").request().post(Entity.json(dto)).close()).doesNotThrowAnyException();
     }
 
     @JaxRsVendorTest
     void testDoesNotHaveJsonPath_indefinitePath() {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         server.expect(RequestMatchers.jsonPath(INDEFINITE_PATH).doesNotHaveJsonPath()).andRespond(withSuccess());
 
         Dto dto = new Dto(List.of());
 
-        assertThatCode(() -> {
-            try (client) {
-                client.target("/hello").request().post(Entity.json(dto)).close();
-            }
-        }).doesNotThrowAnyException();
+        assertThatCode(() -> client.target("/hello").request().post(Entity.json(dto)).close()).doesNotThrowAnyException();
     }
 
     @JaxRsVendorTest
     void testDoesNotHaveJsonPath_does(FilterExceptionAssert filterExceptionAssert) {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).doesNotHaveJsonPath()).andRespond(withSuccess());
 
         Dto dto = new Dto(true);
 
-        try (client) {
-            filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.json(dto)).close())
-                    .isInstanceOf(AssertionError.class)
-                    .hasMessage("Expected no value at JSON Path \"%s\" but found true", DEFINITE_PATH);
-        }
+        filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.json(dto)).close())
+                .isInstanceOf(AssertionError.class)
+                .hasMessage("Expected no value at JSON Path \"%s\" but found true", DEFINITE_PATH);
     }
 
     @JaxRsVendorTest
     void testDoesNotHaveJsonPath_does_indefinitePath(FilterExceptionAssert filterExceptionAssert) {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         server.expect(RequestMatchers.jsonPath(INDEFINITE_PATH).doesNotHaveJsonPath()).andRespond(withSuccess());
@@ -483,177 +386,134 @@ class JsonPathRequestMatchersTest {
         List<Boolean> something = List.of(true, false);
         Dto dto = new Dto(something);
 
-        try (client) {
-            filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.json(dto)).close())
-                    .isInstanceOf(AssertionError.class)
-                    .hasMessage("Expected no values at JSON Path \"%s\" but found %s", INDEFINITE_PATH, toJsonArray(something));
-        }
+        filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.json(dto)).close())
+                .isInstanceOf(AssertionError.class)
+                .hasMessage("Expected no values at JSON Path \"%s\" but found %s", INDEFINITE_PATH, toJsonArray(something));
     }
 
     @JaxRsVendorTest
     void testIsString() {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).isString()).andRespond(withSuccess());
 
         Dto dto = new Dto("hello");
 
-        assertThatCode(() -> {
-            try (client) {
-                client.target("/hello").request().post(Entity.json(dto)).close();
-            }
-        }).doesNotThrowAnyException();
+        assertThatCode(() -> client.target("/hello").request().post(Entity.json(dto)).close()).doesNotThrowAnyException();
     }
 
     @JaxRsVendorTest
     void testIsString_isNot(FilterExceptionAssert filterExceptionAssert) {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).isString()).andRespond(withSuccess());
 
         Dto dto = new Dto(0);
 
-        try (client) {
-            filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.json(dto)).close())
-                    .isInstanceOf(AssertionError.class)
-                    .hasMessage("Expected a string at JSON Path \"%s\" but found 0", DEFINITE_PATH);
-        }
+        filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.json(dto)).close())
+                .isInstanceOf(AssertionError.class)
+                .hasMessage("Expected a string at JSON Path \"%s\" but found 0", DEFINITE_PATH);
     }
 
     @JaxRsVendorTest
     void testIsBoolean() {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).isBoolean()).andRespond(withSuccess());
 
         Dto dto = new Dto(true);
 
-        assertThatCode(() -> {
-            try (client) {
-                client.target("/hello").request().post(Entity.json(dto)).close();
-            }
-        }).doesNotThrowAnyException();
+        assertThatCode(() -> client.target("/hello").request().post(Entity.json(dto)).close()).doesNotThrowAnyException();
     }
 
     @JaxRsVendorTest
     void testIsBoolean_isNot(FilterExceptionAssert filterExceptionAssert) {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).isBoolean()).andRespond(withSuccess());
 
         Dto dto = new Dto(Map.of());
 
-        try (client) {
-            filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.json(dto)).close())
-                    .isInstanceOf(AssertionError.class)
-                    .hasMessage("Expected a boolean at JSON Path \"%s\" but found {}", DEFINITE_PATH);
-        }
+        filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.json(dto)).close())
+                .isInstanceOf(AssertionError.class)
+                .hasMessage("Expected a boolean at JSON Path \"%s\" but found {}", DEFINITE_PATH);
     }
 
     @JaxRsVendorTest
     void testIsNumber() {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).isNumber()).andRespond(withSuccess());
 
         Dto dto = new Dto(13.37);
 
-        assertThatCode(() -> {
-            try (client) {
-                client.target("/hello").request().post(Entity.json(dto)).close();
-            }
-        }).doesNotThrowAnyException();
+        assertThatCode(() -> client.target("/hello").request().post(Entity.json(dto)).close()).doesNotThrowAnyException();
     }
 
     @JaxRsVendorTest
     void testIsNumber_isNot(FilterExceptionAssert filterExceptionAssert) {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).isNumber()).andRespond(withSuccess());
 
         Dto dto = new Dto(List.of());
 
-        try (client) {
-            filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.json(dto)).close())
-                    .isInstanceOf(AssertionError.class)
-                    .hasMessage("Expected a number at JSON Path \"%s\" but found []", DEFINITE_PATH);
-        }
+        filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.json(dto)).close())
+                .isInstanceOf(AssertionError.class)
+                .hasMessage("Expected a number at JSON Path \"%s\" but found []", DEFINITE_PATH);
     }
 
     @JaxRsVendorTest
     void testIsArray() {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).isArray()).andRespond(withSuccess());
 
         Dto dto = new Dto(List.of());
 
-        assertThatCode(() -> {
-            try (client) {
-                client.target("/hello").request().post(Entity.json(dto)).close();
-            }
-        }).doesNotThrowAnyException();
+        assertThatCode(() -> client.target("/hello").request().post(Entity.json(dto)).close()).doesNotThrowAnyException();
     }
 
     @JaxRsVendorTest
     void testIsArray_isNot(FilterExceptionAssert filterExceptionAssert) {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).isArray()).andRespond(withSuccess());
 
         Dto dto = new Dto(true);
 
-        try (client) {
-            filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.json(dto)).close())
-                    .isInstanceOf(AssertionError.class)
-                    .hasMessage("Expected an array at JSON Path \"%s\" but found true", DEFINITE_PATH);
-        }
+        filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.json(dto)).close())
+                .isInstanceOf(AssertionError.class)
+                .hasMessage("Expected an array at JSON Path \"%s\" but found true", DEFINITE_PATH);
     }
 
     @JaxRsVendorTest
     void testIsMap() {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).isMap()).andRespond(withSuccess());
 
         Dto dto = new Dto(Map.of());
 
-        assertThatCode(() -> {
-            try (client) {
-                client.target("/hello").request().post(Entity.json(dto)).close();
-            }
-        }).doesNotThrowAnyException();
+        assertThatCode(() -> client.target("/hello").request().post(Entity.json(dto)).close()).doesNotThrowAnyException();
     }
 
     @JaxRsVendorTest
     void testIsMap_isNot(FilterExceptionAssert filterExceptionAssert) {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).isMap()).andRespond(withSuccess());
 
         Dto dto = new Dto("hello");
 
-        try (client) {
-            filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.json(dto)).close())
-                    .isInstanceOf(AssertionError.class)
-                    .hasMessage("Expected a map at JSON Path \"%s\" but found 'hello'", DEFINITE_PATH);
-        }
+        filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.json(dto)).close())
+                .isInstanceOf(AssertionError.class)
+                .hasMessage("Expected a map at JSON Path \"%s\" but found 'hello'", DEFINITE_PATH);
     }
 
     @JaxRsVendorTest
     @SuppressWarnings("DataFlowIssue")
     void testsValueSatisfies() {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).valueSatisfies(value -> assertThat(value)
@@ -671,7 +531,6 @@ class JsonPathRequestMatchersTest {
 
     @JaxRsVendorTest
     void testsValueSatisfies_doesNot(FilterExceptionAssert filterExceptionAssert) {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).valueSatisfies(value -> assertThat(value)
@@ -682,32 +541,26 @@ class JsonPathRequestMatchersTest {
 
         Dto dto = new Dto("hello");
 
-        try (client) {
-            filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.json(dto)).close())
-                    .isInstanceOf(AssertionError.class)
-                    .hasMessageContainingAll("Expecting actual:", "\"hello\"", "to contain:", "\"bye\"");
-        }
+        filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.json(dto)).close())
+                .isInstanceOf(AssertionError.class)
+                .hasMessageContainingAll("Expecting actual:", "\"hello\"", "to contain:", "\"bye\"");
     }
 
     @JaxRsVendorTest
     void testsValueSatisfies_incompatibleType(FilterExceptionAssert filterExceptionAssert) {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).valueSatisfies(value -> {}, Dto.class)).andRespond(withSuccess());
 
         Dto dto = new Dto("hello");
 
-        try (client) {
-            filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.json(dto)).close())
-                    .isInstanceOf(AssertionError.class)
-                    .hasMessage("Failed to evaluate JSON path \"%s\" with type %s", DEFINITE_PATH, Dto.class.toString());
-        }
+        filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.json(dto)).close())
+                .isInstanceOf(AssertionError.class)
+                .hasMessage("Failed to evaluate JSON path \"%s\" with type %s", DEFINITE_PATH, Dto.class.toString());
     }
 
     @JaxRsVendorTest
     void testsValueSatisfies_exceptionInMatcher(FilterExceptionAssert filterExceptionAssert) {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).valueSatisfies(value -> throwIoException(), Dto.class))
@@ -715,18 +568,15 @@ class JsonPathRequestMatchersTest {
 
         Dto dto = new Dto(new Dto("hello"));
 
-        try (client) {
-            filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.json(dto)).close())
-                    .isInstanceOf(AssertionError.class)
-                    .cause()
-                    .isInstanceOf(IOException.class)
-                    .hasMessage("I/O Error");
-        }
+        filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.json(dto)).close())
+                .isInstanceOf(AssertionError.class)
+                .cause()
+                .isInstanceOf(IOException.class)
+                .hasMessage("I/O Error");
     }
 
     @JacksonFreeTest
     void testsValueSatisfies_record_jacksonUnavailable() {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).valueSatisfies(value -> {}, Dto.class)).andRespond(withSuccess());
@@ -744,7 +594,6 @@ class JsonPathRequestMatchersTest {
 
     @JaxRsVendorTest
     void testsValueSatisfies_genericType() {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).valueSatisfies(value -> assertThat(value)
@@ -765,7 +614,6 @@ class JsonPathRequestMatchersTest {
 
     @JaxRsVendorTest
     void testsValueSatisfies_genericType_doesNot(FilterExceptionAssert filterExceptionAssert) {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).valueSatisfies(value -> assertThat(value)
@@ -781,24 +629,21 @@ class JsonPathRequestMatchersTest {
         List<Dto> something = List.of(new Dto("hello"), new Dto("goodbye"));
         Dto dto = new Dto(something);
 
-        try (client) {
-            filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.json(dto)).close())
-                    .isInstanceOf(AssertionError.class)
-                    .hasMessageContainingAll(
-                            "Expecting actual:",
-                            something.toString(),
-                            "to contain exactly (and in same order):",
-                            "but some elements were not found:",
-                            something.toString(),
-                            "and others were not expected:",
-                            "[Dto[something=hello], Dto[something=goodbye]]"
-                    );
-        }
+        filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.json(dto)).close())
+                .isInstanceOf(AssertionError.class)
+                .hasMessageContainingAll(
+                        "Expecting actual:",
+                        something.toString(),
+                        "to contain exactly (and in same order):",
+                        "but some elements were not found:",
+                        something.toString(),
+                        "and others were not expected:",
+                        "[Dto[something=hello], Dto[something=goodbye]]"
+                );
     }
 
     @JaxRsVendorTest
     void testsValueSatisfies_genericType_incompatibleType(FilterExceptionAssert filterExceptionAssert) {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         GenericType<Map<String, Dto>> type = new GenericType<>() {};
@@ -808,16 +653,13 @@ class JsonPathRequestMatchersTest {
 
         Dto dto = new Dto("hello");
 
-        try (client) {
-            filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.json(dto)).close())
-                    .isInstanceOf(AssertionError.class)
-                    .hasMessage("Failed to evaluate JSON path \"%s\" with type %s", DEFINITE_PATH, type);
-        }
+        filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.json(dto)).close())
+                .isInstanceOf(AssertionError.class)
+                .hasMessage("Failed to evaluate JSON path \"%s\" with type %s", DEFINITE_PATH, type);
     }
 
     @JaxRsVendorTest
     void testsValueSatisfies_genericType_exceptionInMatcher(FilterExceptionAssert filterExceptionAssert) {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).valueSatisfies(value -> throwIoException(), new GenericType<List<Dto>>() {}))
@@ -825,18 +667,15 @@ class JsonPathRequestMatchersTest {
 
         Dto dto = new Dto(List.of(new Dto("hello"), new Dto("goodbye")));
 
-        try (client) {
-            filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.json(dto)).close())
-                    .isInstanceOf(AssertionError.class)
-                    .cause()
-                    .isInstanceOf(IOException.class)
-                    .hasMessage("I/O Error");
-        }
+        filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.json(dto)).close())
+                .isInstanceOf(AssertionError.class)
+                .cause()
+                .isInstanceOf(IOException.class)
+                .hasMessage("I/O Error");
     }
 
     @JacksonFreeTest
     void testsValueSatisfies_genericType_record_jacksonUnavailable() {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).valueSatisfies(value -> {}, new GenericType<List<Dto>>() {}))
@@ -855,16 +694,13 @@ class JsonPathRequestMatchersTest {
 
     @JaxRsVendorTest
     void testInvalidJson(FilterExceptionAssert filterExceptionAssert) {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).exists()).andRespond(withSuccess());
 
-        try (client) {
-            filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.json("<dto></dto>")).close())
-                    .isInstanceOf(JsonPathException.class)
-                    .hasMessageContaining("This is not a json object according to the JsonProvider:");
-        }
+        filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.json("<dto></dto>")).close())
+                .isInstanceOf(JsonPathException.class)
+                .hasMessageContaining("This is not a json object according to the JsonProvider:");
     }
 
     @ParameterizedTest

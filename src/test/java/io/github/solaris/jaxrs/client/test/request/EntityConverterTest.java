@@ -30,6 +30,7 @@ import jakarta.ws.rs.core.GenericType;
 import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.Response;
 
+import org.junit.jupiter.api.AutoClose;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -42,45 +43,41 @@ import io.github.solaris.jaxrs.client.test.util.extension.JaxRsVendorTest;
 
 class EntityConverterTest {
 
+    @AutoClose
+    private final Client client = ClientBuilder.newClient();
+
     @JaxRsVendorTest
     void testConvertEntity_type(EntityConverterAssert converterAssert) {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         String entity = "hello";
 
         server.expect(converterAssert.typeAsserter(entity, 1)).andRespond(withSuccess());
 
-        try (client) {
-            assertThatCode(() -> {
-                try (Response response = client.target("/hello").request().post(Entity.text(entity.getBytes()))) {
-                    assertThat(response.getStatusInfo().toEnum()).isEqualTo(OK);
-                }
-            }).doesNotThrowAnyException();
-        }
+        assertThatCode(() -> {
+            try (Response response = client.target("/hello").request().post(Entity.text(entity.getBytes()))) {
+                assertThat(response.getStatusInfo().toEnum()).isEqualTo(OK);
+            }
+        }).doesNotThrowAnyException();
     }
 
     @JaxRsVendorTest
     void testConvertEntity_type_shortCircuit(EntityConverterAssert converterAssert) {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         String entity = "hello";
 
         server.expect(converterAssert.typeAsserter(entity, 0)).andRespond(withSuccess());
 
-        try (client) {
-            assertThatCode(() -> {
-                try (Response response = client.target("/hello").request().post(Entity.text(entity))) {
-                    assertThat(response.getStatusInfo().toEnum()).isEqualTo(OK);
-                }
-            }).doesNotThrowAnyException();
-        }
+        assertThatCode(() -> {
+            try (Response response = client.target("/hello").request().post(Entity.text(entity))) {
+                assertThat(response.getStatusInfo().toEnum()).isEqualTo(OK);
+            }
+        }).doesNotThrowAnyException();
     }
 
     @JaxRsVendorTest
     void testConvertEntity_type_noEntityPresent(FilterExceptionAssert filterExceptionAssert) {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         server.expect(request -> {
@@ -88,34 +85,28 @@ class EntityConverterTest {
             converter.convertEntity(request, String.class);
         }).andRespond(withSuccess());
 
-        try (client) {
-            filterExceptionAssert.assertThatThrownBy(() -> client.target("").request().get().close())
-                    .isInstanceOf(AssertionError.class)
-                    .hasMessage("Request contains no entity to convert.");
-        }
+        filterExceptionAssert.assertThatThrownBy(() -> client.target("").request().get().close())
+                .isInstanceOf(AssertionError.class)
+                .hasMessage("Request contains no entity to convert.");
     }
 
     @JaxRsVendorTest
     void testConvertEntity_genericType(EntityConverterAssert converterAssert) {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         Form form = new Form("greeting", "hello");
 
         server.expect(converterAssert.genericTypeAsserter(form.asMap(), 1)).andRespond(withSuccess());
 
-        try (client) {
-            assertThatCode(() -> {
-                try (Response response = client.target("/hello").request().post(Entity.form(form))) {
-                    assertThat(response.getStatusInfo().toEnum()).isEqualTo(OK);
-                }
-            }).doesNotThrowAnyException();
-        }
+        assertThatCode(() -> {
+            try (Response response = client.target("/hello").request().post(Entity.form(form))) {
+                assertThat(response.getStatusInfo().toEnum()).isEqualTo(OK);
+            }
+        }).doesNotThrowAnyException();
     }
 
     @JaxRsVendorTest
     void testConvertEntity_genericType_shortCircuit(EntityConverterAssert converterAssert) {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         Form form = new Form("greeting", "hello");
@@ -123,18 +114,15 @@ class EntityConverterTest {
 
         server.expect(converterAssert.genericTypeAsserter(form.asMap(), 0)).andRespond(withSuccess());
 
-        try (client) {
-            assertThatCode(() -> {
-                try (Response response = client.target("/hello").request().post(Entity.entity(genericMap, APPLICATION_FORM_URLENCODED_TYPE))) {
-                    assertThat(response.getStatusInfo().toEnum()).isEqualTo(OK);
-                }
-            }).doesNotThrowAnyException();
-        }
+        assertThatCode(() -> {
+            try (Response response = client.target("/hello").request().post(Entity.entity(genericMap, APPLICATION_FORM_URLENCODED_TYPE))) {
+                assertThat(response.getStatusInfo().toEnum()).isEqualTo(OK);
+            }
+        }).doesNotThrowAnyException();
     }
 
     @JaxRsVendorTest
     void testConvertEntity_genericType_noEntityPresent(FilterExceptionAssert filterExceptionAssert) {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         server.expect(request -> {
@@ -142,16 +130,13 @@ class EntityConverterTest {
             converter.convertEntity(request, new GenericType<MultivaluedMap<String, String>>() {});
         }).andRespond(withSuccess());
 
-        try (client) {
-            filterExceptionAssert.assertThatThrownBy(() -> client.target("").request().get().close())
-                    .isInstanceOf(AssertionError.class)
-                    .hasMessage("Request contains no entity to convert.");
-        }
+        filterExceptionAssert.assertThatThrownBy(() -> client.target("").request().get().close())
+                .isInstanceOf(AssertionError.class)
+                .hasMessage("Request contains no entity to convert.");
     }
 
     @JaxRsVendorTest
     void testUnableToConvertEntity_writingFails(EntityConverterAssert converterAssert) {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         Form form = new Form("greeting", "hello");
@@ -161,14 +146,11 @@ class EntityConverterTest {
             converter.convertEntity(request, Dto.class);
         }).andRespond(withSuccess());
 
-        try (client) {
-            converterAssert.assertConversionFailure(() -> client.target("/hello").request().post(Entity.form(form)).close());
-        }
+        converterAssert.assertConversionFailure(() -> client.target("/hello").request().post(Entity.form(form)).close());
     }
 
     @JaxRsVendorTest
     void testUnableToConvertEntity_readingFails(EntityConverterAssert converterAssert) {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         server.expect(request -> {
@@ -176,17 +158,14 @@ class EntityConverterTest {
             converter.convertEntity(request, Dto.class);
         }).andRespond(withSuccess());
 
-        try (client) {
-            converterAssert.assertConversionFailure(() -> client.target("/hello")
-                    .request()
-                    .post(Entity.entity(Class.class, TEXT_HTML_TYPE))
-                    .close());
-        }
+        converterAssert.assertConversionFailure(() -> client.target("/hello")
+                .request()
+                .post(Entity.entity(Class.class, TEXT_HTML_TYPE))
+                .close());
     }
 
     @JaxRsVendorTest(skipFor = {JERSEY, CXF, RESTEASY_REACTIVE})
     void testBufferExpectedMultipart_repeatedReads() {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         server.expect(request -> {
@@ -198,15 +177,12 @@ class EntityConverterTest {
             assertThat(plainPart.getContent().readAllBytes()).isEqualTo(PLAIN_CONTENT.getBytes());
         }).andRespond(withSuccess());
 
-        try (client) {
-            assertThatCode(() -> client.target("/hello").request().get().close())
-                    .doesNotThrowAnyException();
-        }
+        assertThatCode(() -> client.target("/hello").request().get().close())
+                .doesNotThrowAnyException();
     }
 
     @JaxRsVendorTest(skipFor = {JERSEY, CXF, RESTEASY_REACTIVE})
     void testBufferExpectedMultipart_repeatedTypedReads() {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         server.expect(request -> {
@@ -218,15 +194,12 @@ class EntityConverterTest {
             assertThat(jsonPart.getContent(Dto.class)).isEqualTo(new Dto(false));
         }).andRespond(withSuccess());
 
-        try (client) {
-            assertThatCode(() -> client.target("/hello").request().get().close())
-                    .doesNotThrowAnyException();
-        }
+        assertThatCode(() -> client.target("/hello").request().get().close())
+                .doesNotThrowAnyException();
     }
 
     @JaxRsVendorTest(skipFor = {JERSEY, CXF, RESTEASY_REACTIVE})
     void testBufferExpectedMultipart_repeatedGenericReads() {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         server.expect(request -> {
@@ -238,15 +211,12 @@ class EntityConverterTest {
             assertThat(listPart.getContent(new GenericType<List<String>>() {})).isEqualTo(LIST_CONTENT);
         }).andRespond(withSuccess());
 
-        try (client) {
-            assertThatCode(() -> client.target("/hello").request().get().close())
-                    .doesNotThrowAnyException();
-        }
+        assertThatCode(() -> client.target("/hello").request().get().close())
+                .doesNotThrowAnyException();
     }
 
     @JaxRsVendorTest(skipFor = {JERSEY, CXF, RESTEASY_REACTIVE})
     void testBufferMultipartRequest_repeatedReads() {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         server.expect(request -> {
@@ -258,19 +228,16 @@ class EntityConverterTest {
             assertThat(plainPart.getContent().readAllBytes()).isEqualTo(PLAIN_CONTENT.getBytes());
         }).andRespond(withSuccess());
 
-        try (client) {
-            assertThatCode(
-                    () -> client.target("/hello")
-                            .request()
-                            .post(Entity.entity(new GenericEntity<>(List.of(plainPart())) {}, MULTIPART_FORM_DATA_TYPE))
-                            .close())
-                    .doesNotThrowAnyException();
-        }
+        assertThatCode(
+                () -> client.target("/hello")
+                        .request()
+                        .post(Entity.entity(new GenericEntity<>(List.of(plainPart())) {}, MULTIPART_FORM_DATA_TYPE))
+                        .close())
+                .doesNotThrowAnyException();
     }
 
     @JaxRsVendorTest(skipFor = {JERSEY, CXF, RESTEASY_REACTIVE})
     void testBufferMultipartRequest_repeatedTypedReads() {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         server.expect(request -> {
@@ -282,19 +249,16 @@ class EntityConverterTest {
             assertThat(jsonPart.getContent(Dto.class)).isEqualTo(new Dto(false));
         }).andRespond(withSuccess());
 
-        try (client) {
-            assertThatCode(
-                    () -> client.target("/hello")
-                            .request()
-                            .post(Entity.entity(new GenericEntity<>(List.of(jsonPart())) {}, MULTIPART_FORM_DATA_TYPE))
-                            .close())
-                    .doesNotThrowAnyException();
-        }
+        assertThatCode(
+                () -> client.target("/hello")
+                        .request()
+                        .post(Entity.entity(new GenericEntity<>(List.of(jsonPart())) {}, MULTIPART_FORM_DATA_TYPE))
+                        .close())
+                .doesNotThrowAnyException();
     }
 
     @JaxRsVendorTest(skipFor = {JERSEY, CXF, RESTEASY_REACTIVE})
     void testBufferMultipartRequest_repeatedGenericReads() {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         server.expect(request -> {
@@ -306,19 +270,16 @@ class EntityConverterTest {
             assertThat(listPart.getContent(new GenericType<List<String>>() {})).isEqualTo(LIST_CONTENT);
         }).andRespond(withSuccess());
 
-        try (client) {
-            assertThatCode(
-                    () -> client.target("/hello")
-                            .request()
-                            .post(Entity.entity(new GenericEntity<>(List.of(listPart())) {}, MULTIPART_FORM_DATA_TYPE))
-                            .close())
-                    .doesNotThrowAnyException();
-        }
+        assertThatCode(
+                () -> client.target("/hello")
+                        .request()
+                        .post(Entity.entity(new GenericEntity<>(List.of(listPart())) {}, MULTIPART_FORM_DATA_TYPE))
+                        .close())
+                .doesNotThrowAnyException();
     }
 
     @JaxRsVendorTest(skipFor = {JERSEY, CXF, RESTEASY_REACTIVE})
     void testBufferMultipartRequest_boundaryRemoved() {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         server.expect(request -> {
@@ -331,19 +292,16 @@ class EntityConverterTest {
                     .doesNotContain("boundary");
         }).andRespond(withSuccess());
 
-        try (client) {
-            assertThatCode(
-                    () -> client.target("/hello")
-                            .request()
-                            .post(Entity.entity(new GenericEntity<>(List.of(plainPart())) {}, MULTIPART_FORM_DATA_TYPE))
-                            .close())
-                    .doesNotThrowAnyException();
-        }
+        assertThatCode(
+                () -> client.target("/hello")
+                        .request()
+                        .post(Entity.entity(new GenericEntity<>(List.of(plainPart())) {}, MULTIPART_FORM_DATA_TYPE))
+                        .close())
+                .doesNotThrowAnyException();
     }
 
     @JaxRsVendorTest(skipFor = {JERSEY, CXF, RESTEASY_REACTIVE})
     void testBufferMultipartRequest_entityPartsRecreated() {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         server.expect(request -> {
@@ -359,19 +317,16 @@ class EntityConverterTest {
             assertThat(entityBefore).isNotSameAs(entityAfter);
         }).andRespond(withSuccess());
 
-        try (client) {
-            assertThatCode(
-                    () -> client.target("/hello")
-                            .request()
-                            .post(Entity.entity(new GenericEntity<>(List.of(plainPart())) {}, MULTIPART_FORM_DATA_TYPE))
-                            .close())
-                    .doesNotThrowAnyException();
-        }
+        assertThatCode(
+                () -> client.target("/hello")
+                        .request()
+                        .post(Entity.entity(new GenericEntity<>(List.of(plainPart())) {}, MULTIPART_FORM_DATA_TYPE))
+                        .close())
+                .doesNotThrowAnyException();
     }
 
     @JaxRsVendorTest(skipFor = {JERSEY, CXF, RESTEASY_REACTIVE})
     void testBufferMultipartRequest_notMultiPartFormData(FilterExceptionAssert filterExceptionAssert) {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         server.expect(request -> {
@@ -379,31 +334,30 @@ class EntityConverterTest {
             converter.bufferMultipartRequest(request);
         }).andRespond(withSuccess());
 
-        try (client) {
-            filterExceptionAssert.assertThatThrownBy(() -> client.target("").request().post(Entity.json(new Dto("hello"))).close())
-                    .isInstanceOf(AssertionError.class)
-                    .hasMessage("MediaType must be %s", MULTIPART_FORM_DATA);
-        }
+        filterExceptionAssert.assertThatThrownBy(() -> client.target("").request().post(Entity.json(new Dto("hello"))).close())
+                .isInstanceOf(AssertionError.class)
+                .hasMessage("MediaType must be %s", MULTIPART_FORM_DATA);
     }
 
     @Nested
     @SuppressWarnings("DataFlowIssue")
     class ArgumentValidation {
+
+        @AutoClose
+        private final Client validationClient = ClientBuilder.newClient();
+
         @Test
         void testFromRequestContext_converterUnobtainable() {
-            Client client = ClientBuilder.newClient();
-            MockRestServer server = MockRestServer.bindTo(client).build();
+            MockRestServer server = MockRestServer.bindTo(validationClient).build();
 
             server.expect(request -> {
                 request.setProperty(EntityConverter.class.getName(), "hello");
                 EntityConverter.fromRequestContext(request);
             });
 
-            try (client) {
-                new DefaultFilterExceptionAssert().assertThatThrownBy(() -> client.target("").request().get().close())
-                        .isInstanceOf(IllegalStateException.class)
-                        .hasMessage("Unable to obtain EntityConverter from RequestContext.");
-            }
+            new DefaultFilterExceptionAssert().assertThatThrownBy(() -> validationClient.target("").request().get().close())
+                    .isInstanceOf(IllegalStateException.class)
+                    .hasMessage("Unable to obtain EntityConverter from RequestContext.");
         }
 
         @Test
@@ -466,17 +420,14 @@ class EntityConverterTest {
             validateArguments(new DefaultFilterExceptionAssert(), matcher, "'requestContext' must not be null.");
         }
 
-        private static void validateArguments(FilterExceptionAssert filterExceptionAssert, RequestMatcher matcher, String exceptionMessage) {
-            Client client = ClientBuilder.newClient();
-            MockRestServer server = MockRestServer.bindTo(client).build();
+        private void validateArguments(FilterExceptionAssert filterExceptionAssert, RequestMatcher matcher, String exceptionMessage) {
+            MockRestServer server = MockRestServer.bindTo(validationClient).build();
 
             server.expect(matcher);
 
-            try (client) {
-                filterExceptionAssert.assertThatThrownBy(() -> client.target("").request().get().close())
-                        .isInstanceOf(IllegalArgumentException.class)
-                        .hasMessage(exceptionMessage);
-            }
+            filterExceptionAssert.assertThatThrownBy(() -> validationClient.target("").request().get().close())
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessage(exceptionMessage);
         }
     }
 }

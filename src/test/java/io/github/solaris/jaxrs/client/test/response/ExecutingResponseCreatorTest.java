@@ -28,6 +28,7 @@ import jakarta.ws.rs.core.UriBuilder;
 
 import org.jspecify.annotations.NullUnmarked;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AutoClose;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -46,6 +47,9 @@ class ExecutingResponseCreatorTest {
 
     private static URI requestUri;
     private static HttpServer httpServer;
+
+    @AutoClose
+    private final Client client = ClientBuilder.newClient();
 
     @BeforeAll
     static void startServer() throws IOException {
@@ -107,27 +111,24 @@ class ExecutingResponseCreatorTest {
                 .hasMessage("'client' must not be null.");
     }
 
-    private static void testResponseCreator(ExecutingResponseCreator responseCreator) {
+    private void testResponseCreator(ExecutingResponseCreator responseCreator) {
         HeaderCaptor headerCaptor = new HeaderCaptor();
-        ClientBuilder builder = ClientBuilder.newBuilder();
-        MockRestServer mockServer = MockRestServer.bindTo(builder).build();
+        MockRestServer mockServer = MockRestServer.bindTo(client).build();
 
         mockServer.expect(requestTo(requestUri)).andRespond(responseCreator);
         mockServer.expect(requestTo("/goodbye")).andRespond(withSuccess());
 
         assertThatCode(() -> {
-            try (Client client = builder.build()) {
-                Response serverResponse = client.target(requestUri)
-                        .register(headerCaptor)
-                        .request()
-                        .header("X-Custom", "Custom-X")
-                        .post(Entity.entity(REQUEST_BODY, TEXT_PLAIN));
-                assertThat(serverResponse.getStatusInfo().toEnum()).isEqualTo(OK);
-                serverResponse.close();
+            Response serverResponse = client.target(requestUri)
+                    .register(headerCaptor)
+                    .request()
+                    .header("X-Custom", "Custom-X")
+                    .post(Entity.entity(REQUEST_BODY, TEXT_PLAIN));
+            assertThat(serverResponse.getStatusInfo().toEnum()).isEqualTo(OK);
+            serverResponse.close();
 
-                Response mockResponse = client.target("/goodbye").request().get();
-                assertThat(mockResponse.getStatusInfo().toEnum()).isEqualTo(OK);
-            }
+            Response mockResponse = client.target("/goodbye").request().get();
+            assertThat(mockResponse.getStatusInfo().toEnum()).isEqualTo(OK);
         }).doesNotThrowAnyException();
 
         mockServer.verify();
@@ -138,27 +139,24 @@ class ExecutingResponseCreatorTest {
         assertThat(HANDLER.body).isEqualTo(REQUEST_BODY);
     }
 
-    private static void testResponseCreatorWithoutBody(ExecutingResponseCreator responseCreator) {
+    private void testResponseCreatorWithoutBody(ExecutingResponseCreator responseCreator) {
         HeaderCaptor headerCaptor = new HeaderCaptor();
-        ClientBuilder builder = ClientBuilder.newBuilder();
-        MockRestServer mockServer = MockRestServer.bindTo(builder).build();
+        MockRestServer mockServer = MockRestServer.bindTo(client).build();
 
         mockServer.expect(requestTo(requestUri)).andRespond(responseCreator);
         mockServer.expect(requestTo("/goodbye")).andRespond(withSuccess());
 
         assertThatCode(() -> {
-            try (Client client = builder.build()) {
-                Response serverResponse = client.target(requestUri)
-                        .register(headerCaptor)
-                        .request()
-                        .header("X-Custom", "Custom-X")
-                        .get();
-                assertThat(serverResponse.getStatusInfo().toEnum()).isEqualTo(OK);
-                serverResponse.close();
+            Response serverResponse = client.target(requestUri)
+                    .register(headerCaptor)
+                    .request()
+                    .header("X-Custom", "Custom-X")
+                    .get();
+            assertThat(serverResponse.getStatusInfo().toEnum()).isEqualTo(OK);
+            serverResponse.close();
 
-                Response mockResponse = client.target("/goodbye").request().get();
-                assertThat(mockResponse.getStatusInfo().toEnum()).isEqualTo(OK);
-            }
+            Response mockResponse = client.target("/goodbye").request().get();
+            assertThat(mockResponse.getStatusInfo().toEnum()).isEqualTo(OK);
         }).doesNotThrowAnyException();
 
         mockServer.verify();

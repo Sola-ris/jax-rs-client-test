@@ -32,6 +32,7 @@ import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.core.Response;
 
+import org.junit.jupiter.api.AutoClose;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -207,16 +208,18 @@ class MockResponseCreatorsTest {
     class WithEntity {
         private static final String JSON_STRING = "{\"something\":\"hello\"}";
 
+        @AutoClose
+        private final Client client = ClientBuilder.newClient();
+
         @JaxRsVendorTest
         void testSuccess_withEntityAndMediaType() {
-            Client client = ClientBuilder.newClient();
             MockRestServer server = MockRestServer.bindTo(client).build();
 
             Dto dto = new Dto("hello");
 
             server.expect(anything()).andRespond(MockResponseCreators.withSuccess(dto, APPLICATION_JSON_TYPE));
 
-            try (client; Response response = client.target("").request().get()) {
+            try (Response response = client.target("").request().get()) {
                 assertThat(response).satisfies(
                         r -> assertThat(r.readEntity(Dto.class)).isEqualTo(dto)
                 );
@@ -225,14 +228,13 @@ class MockResponseCreatorsTest {
 
         @JaxRsVendorTest
         void testSuccess_withEntityAndMediaType_convertOnRead() {
-            Client client = ClientBuilder.newClient();
             MockRestServer server = MockRestServer.bindTo(client).build();
 
             Dto dto = new Dto("hello");
 
             server.expect(anything()).andRespond(MockResponseCreators.withSuccess(dto, APPLICATION_JSON_TYPE));
 
-            try (client; Response response = client.target("").request().get()) {
+            try (Response response = client.target("").request().get()) {
                 assertThat(response).satisfies(
                         r -> assertThat(r.readEntity(String.class)).isEqualTo(JSON_STRING)
                 );

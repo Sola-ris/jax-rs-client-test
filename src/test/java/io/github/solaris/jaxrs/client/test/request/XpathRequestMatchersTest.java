@@ -24,6 +24,7 @@ import jakarta.xml.bind.annotation.XmlRootElement;
 
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.jspecify.annotations.NullUnmarked;
+import org.junit.jupiter.api.AutoClose;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -52,37 +53,29 @@ class XpathRequestMatchersTest {
                 <greeting xml:lang='de'>hallo</greeting>
             </xmlDto>""";
 
+    @AutoClose
+    private final Client client = ClientBuilder.newClient();
+
     @JaxRsVendorTest
     void testExists() throws XPathExpressionException {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         server.expect(RequestMatchers.xpath("/xmlDto").exists()).andRespond(withSuccess());
 
-        assertThatCode(() -> {
-            try (client) {
-                client.target("/hello").request().post(Entity.xml(new XmlDto())).close();
-            }
-        }).doesNotThrowAnyException();
+        assertThatCode(() -> client.target("/hello").request().post(Entity.xml(new XmlDto())).close()).doesNotThrowAnyException();
     }
 
     @JaxRsVendorTest
     void testExists_explicitDefaultNamespace() throws XPathExpressionException {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         server.expect(RequestMatchers.xpath("/:xmlDto", Map.of("", "urn:jax-rs.client.test")).exists()).andRespond(withSuccess());
 
-        assertThatCode(() -> {
-            try (client) {
-                client.target("/hello").request().post(Entity.xml(EXPLICIT_DEFAULT_NS)).close();
-            }
-        }).doesNotThrowAnyException();
+        assertThatCode(() -> client.target("/hello").request().post(Entity.xml(EXPLICIT_DEFAULT_NS)).close()).doesNotThrowAnyException();
     }
 
     @JaxRsVendorTest
     void testExists_childInDifferentNamespace() throws XPathExpressionException {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         Map<String, String> namespaces = Map.of(
@@ -91,111 +84,76 @@ class XpathRequestMatchersTest {
         );
         server.expect(RequestMatchers.xpath("/:xmlDto/other:greeting", namespaces).exists()).andRespond(withSuccess());
 
-        assertThatCode(() -> {
-            try (client) {
-                client.target("/hello").request().post(Entity.xml(CHILD_IN_DIFFERENT_NS)).close();
-            }
-        }).doesNotThrowAnyException();
+        assertThatCode(() -> client.target("/hello").request().post(Entity.xml(CHILD_IN_DIFFERENT_NS)).close()).doesNotThrowAnyException();
     }
 
     @JaxRsVendorTest
     void testExists_usingXmlNamespaceAttribute() throws XPathExpressionException {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         Map<String, String> namespaces = Map.of("", "urn:jax-rs.client.test");
         server.expect(RequestMatchers.xpath("/xmlDto/greeting[@xml:lang='en']", namespaces).exists()).andRespond(withSuccess());
 
-        assertThatCode(() -> {
-            try (client) {
-                client.target("/hello").request().post(Entity.xml(ATTRIBUTE_IN_XML_NAMESPACE)).close();
-            }
-        }).doesNotThrowAnyException();
+        assertThatCode(() -> client.target("/hello").request().post(Entity.xml(ATTRIBUTE_IN_XML_NAMESPACE)).close()).doesNotThrowAnyException();
     }
 
     @JaxRsVendorTest
     void testExists_doesNot(FilterExceptionAssert filterExceptionAssert) throws XPathExpressionException {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         server.expect(RequestMatchers.xpath("/xmlEntity", Map.of()).exists()).andRespond(withSuccess());
 
-        filterExceptionAssert.assertThatThrownBy(() -> {
-                    try (client) {
-                        client.target("/hello").request().post(Entity.xml(new XmlDto())).close();
-                    }
-                })
+        filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.xml(new XmlDto())).close())
                 .isInstanceOf(AssertionError.class)
                 .hasMessage("XPath /xmlEntity does not exist");
     }
 
     @JaxRsVendorTest
     void testDoesNotExist() throws XPathExpressionException {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         server.expect(RequestMatchers.xpath("/xmlEntity").doesNotExist()).andRespond(withSuccess());
 
-        assertThatCode(() -> {
-            try (client) {
-                client.target("/hello").request().post(Entity.xml(new XmlDto())).close();
-            }
-        }).doesNotThrowAnyException();
+        assertThatCode(() -> client.target("/hello").request().post(Entity.xml(new XmlDto())).close()).doesNotThrowAnyException();
     }
 
     @JaxRsVendorTest
     void testDoesNotExist_does(FilterExceptionAssert filterExceptionAssert) throws XPathExpressionException {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         server.expect(RequestMatchers.xpath("/xmlDto").doesNotExist()).andRespond(withSuccess());
 
-        filterExceptionAssert.assertThatThrownBy(() -> {
-                    try (client) {
-                        client.target("/hello").request().post(Entity.xml(new XmlDto())).close();
-                    }
-                })
+        filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.xml(new XmlDto())).close())
                 .isInstanceOf(AssertionError.class)
                 .hasMessage("XPath /xmlDto does exist");
     }
 
     @JaxRsVendorTest
     void testNodeCount() throws XPathExpressionException {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         server.expect(RequestMatchers.xpath("/xmlDto/%s", "nodes").nodeCount(1)).andRespond(withSuccess());
         XmlDto xmlDto = new XmlDto();
         xmlDto.nodes = List.of("hello");
 
-        assertThatCode(() -> {
-            try (client) {
-                client.target("/hello").request().post(Entity.xml(xmlDto)).close();
-            }
-        }).doesNotThrowAnyException();
+        assertThatCode(() -> client.target("/hello").request().post(Entity.xml(xmlDto)).close()).doesNotThrowAnyException();
     }
 
     @JaxRsVendorTest
     void testNodeCount_noMatch(FilterExceptionAssert filterExceptionAssert) throws XPathExpressionException {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         server.expect(RequestMatchers.xpath("/xmlDto/nodes").nodeCount(2)).andRespond(withSuccess());
         XmlDto xmlDto = new XmlDto();
         xmlDto.nodes = List.of("hello");
 
-        filterExceptionAssert.assertThatThrownBy(() -> {
-                    try (client) {
-                        client.target("/hello").request().post(Entity.xml(xmlDto)).close();
-                    }
-                })
+        filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.xml(xmlDto)).close())
                 .isInstanceOf(AssertionError.class)
                 .hasMessage("NodeCount for XPath /xmlDto/nodes expected: <2> but was: <1>");
     }
 
     @JaxRsVendorTest
     void testString() throws XPathExpressionException {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         server.expect(RequestMatchers.xpath("/xmlDto/str").string("hello")).andRespond(withSuccess());
@@ -203,16 +161,11 @@ class XpathRequestMatchersTest {
         XmlDto xmlDto = new XmlDto();
         xmlDto.str = "hello";
 
-        assertThatCode(() -> {
-            try (client) {
-                client.target("/hello").request().post(Entity.xml(xmlDto)).close();
-            }
-        }).doesNotThrowAnyException();
+        assertThatCode(() -> client.target("/hello").request().post(Entity.xml(xmlDto)).close()).doesNotThrowAnyException();
     }
 
     @JaxRsVendorTest
     void testString_coerceNumber() throws XPathExpressionException {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         server.expect(RequestMatchers.xpath("/xmlDto/num").string("42.0")).andRespond(withSuccess());
@@ -220,34 +173,24 @@ class XpathRequestMatchersTest {
         XmlDto xmlDto = new XmlDto();
         xmlDto.num = 42;
 
-        assertThatCode(() -> {
-            try (client) {
-                client.target("/hello").request().post(Entity.xml(xmlDto)).close();
-            }
-        }).doesNotThrowAnyException();
+        assertThatCode(() -> client.target("/hello").request().post(Entity.xml(xmlDto)).close()).doesNotThrowAnyException();
     }
 
     @JaxRsVendorTest
     void testString_noMatch(FilterExceptionAssert filterExceptionAssert) throws XPathExpressionException {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         server.expect(RequestMatchers.xpath("/xmlDto/str").string("hello")).andRespond(withSuccess());
         XmlDto xmlDto = new XmlDto();
         xmlDto.str = "goodbye";
 
-        filterExceptionAssert.assertThatThrownBy(() -> {
-                    try (client) {
-                        client.target("/hello").request().post(Entity.xml(xmlDto)).close();
-                    }
-                })
+        filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.xml(xmlDto)).close())
                 .isInstanceOf(AssertionError.class)
                 .hasMessage("XPath /xmlDto/str expected: <hello> but was: <goodbye>");
     }
 
     @JaxRsVendorTest
     void testNumber() throws XPathExpressionException {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         server.expect(RequestMatchers.xpath("/xmlDto/num").number(1.0)).andRespond(withSuccess());
@@ -255,16 +198,11 @@ class XpathRequestMatchersTest {
         XmlDto xmlDto = new XmlDto();
         xmlDto.num = 1;
 
-        assertThatCode(() -> {
-            try (client) {
-                client.target("/hello").request().post(Entity.xml(xmlDto)).close();
-            }
-        }).doesNotThrowAnyException();
+        assertThatCode(() -> client.target("/hello").request().post(Entity.xml(xmlDto)).close()).doesNotThrowAnyException();
     }
 
     @JaxRsVendorTest
     void testNumber_coerceString() throws XPathExpressionException {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         server.expect(RequestMatchers.xpath("/xmlDto/str").number(42.0)).andRespond(withSuccess());
@@ -272,16 +210,11 @@ class XpathRequestMatchersTest {
         XmlDto xmlDto = new XmlDto();
         xmlDto.str = "42";
 
-        assertThatCode(() -> {
-            try (client) {
-                client.target("/hello").request().post(Entity.xml(xmlDto)).close();
-            }
-        }).doesNotThrowAnyException();
+        assertThatCode(() -> client.target("/hello").request().post(Entity.xml(xmlDto)).close()).doesNotThrowAnyException();
     }
 
     @JaxRsVendorTest
     void testNumber_noMatch(FilterExceptionAssert filterExceptionAssert) throws XPathExpressionException {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         server.expect(RequestMatchers.xpath("/xmlDto/num").number(1.0)).andRespond(withSuccess());
@@ -289,18 +222,13 @@ class XpathRequestMatchersTest {
         XmlDto xmlDto = new XmlDto();
         xmlDto.num = 2;
 
-        filterExceptionAssert.assertThatThrownBy(() -> {
-                    try (client) {
-                        client.target("/hello").request().post(Entity.xml(xmlDto)).close();
-                    }
-                })
+        filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.xml(xmlDto)).close())
                 .isInstanceOf(AssertionError.class)
                 .hasMessage("XPath /xmlDto/num expected: <1.0> but was: <2.0>");
     }
 
     @JaxRsVendorTest
     void testNumber_notANumber(FilterExceptionAssert filterExceptionAssert) throws XPathExpressionException {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         server.expect(RequestMatchers.xpath("/xmlDto/str").number(1.0)).andRespond(withSuccess());
@@ -308,18 +236,13 @@ class XpathRequestMatchersTest {
         XmlDto xmlDto = new XmlDto();
         xmlDto.str = "hello";
 
-        filterExceptionAssert.assertThatThrownBy(() -> {
-                    try (client) {
-                        client.target("/hello").request().post(Entity.xml(xmlDto)).close();
-                    }
-                })
+        filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.xml(xmlDto)).close())
                 .isInstanceOf(AssertionError.class)
                 .hasMessage("XPath /xmlDto/str expected: <1.0> but was: <NaN>");
     }
 
     @JaxRsVendorTest
     void testBooleanValue() throws XPathExpressionException {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         server.expect(RequestMatchers.xpath("/xmlDto/bool").booleanValue(true)).andRespond(withSuccess());
@@ -327,16 +250,11 @@ class XpathRequestMatchersTest {
         XmlDto xmlDto = new XmlDto();
         xmlDto.bool = true;
 
-        assertThatCode(() -> {
-            try (client) {
-                client.target("/hello").request().post(Entity.xml(xmlDto)).close();
-            }
-        }).doesNotThrowAnyException();
+        assertThatCode(() -> client.target("/hello").request().post(Entity.xml(xmlDto)).close()).doesNotThrowAnyException();
     }
 
     @JaxRsVendorTest
     void testBooleanValue_noMatch(FilterExceptionAssert filterExceptionAssert) throws XPathExpressionException {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         server.expect(RequestMatchers.xpath("/xmlDto/bool").booleanValue(false)).andRespond(withSuccess());
@@ -344,11 +262,7 @@ class XpathRequestMatchersTest {
         XmlDto xmlDto = new XmlDto();
         xmlDto.bool = true;
 
-        filterExceptionAssert.assertThatThrownBy(() -> {
-                    try (client) {
-                        client.target("/hello").request().post(Entity.xml(xmlDto)).close();
-                    }
-                })
+        filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.xml(xmlDto)).close())
                 .isInstanceOf(AssertionError.class)
                 .hasMessage("XPath /xmlDto/bool expected: <false> but was: <true>");
     }
@@ -356,7 +270,6 @@ class XpathRequestMatchersTest {
     @JaxRsVendorTest
     @SuppressWarnings("DataFlowIssue")
     void testValueSatisfies() throws XPathExpressionException {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         server.expect(RequestMatchers.xpath("/xmlDto/str").valueSatisfies(node -> assertThat(node)
@@ -376,16 +289,11 @@ class XpathRequestMatchersTest {
         XmlDto xmlDto = new XmlDto();
         xmlDto.str = "hello";
 
-        assertThatCode(() -> {
-            try (client) {
-                client.target("/hello").request().post(Entity.xml(xmlDto)).close();
-            }
-        }).doesNotThrowAnyException();
+        assertThatCode(() -> client.target("/hello").request().post(Entity.xml(xmlDto)).close()).doesNotThrowAnyException();
     }
 
     @JaxRsVendorTest
     void testValueSatisfies_doesNot(FilterExceptionAssert filterExceptionAssert) throws XPathExpressionException {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         server.expect(RequestMatchers.xpath("/xmlDto/str")
@@ -403,7 +311,6 @@ class XpathRequestMatchersTest {
     @JaxRsVendorTest
     @SuppressWarnings("DataFlowIssue")
     void testValueSatisfies_null() throws XPathExpressionException {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         server.expect(RequestMatchers.xpath("/xmlDto/str").valueSatisfies(node -> assertThat(node).isNull(), Node.class))
@@ -416,7 +323,6 @@ class XpathRequestMatchersTest {
 
     @JaxRsVendorTest
     void testValueSatisfies_unexpectedTargetType(FilterExceptionAssert filterExceptionAssert) throws XPathExpressionException {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         server.expect(RequestMatchers.xpath("/xmlDto/str")
@@ -434,16 +340,11 @@ class XpathRequestMatchersTest {
 
     @JaxRsVendorTest
     void testInvalidXml(FilterExceptionAssert filterExceptionAssert) throws XPathExpressionException {
-        Client client = ClientBuilder.newClient();
         MockRestServer server = MockRestServer.bindTo(client).build();
 
         server.expect(RequestMatchers.xpath("/xmlDto").exists()).andRespond(withSuccess());
 
-        filterExceptionAssert.assertThatThrownBy(() -> {
-                    try (client) {
-                        client.target("/hello").request().post(Entity.xml("{\"something\": false}")).close();
-                    }
-                })
+        filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.xml("{\"something\": false}")).close())
                 .isInstanceOf(AssertionError.class)
                 .cause()
                 .isInstanceOf(SAXParseException.class)
