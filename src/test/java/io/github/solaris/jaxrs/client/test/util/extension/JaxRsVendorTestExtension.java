@@ -24,7 +24,7 @@ import io.github.solaris.jaxrs.client.test.util.FilterExceptionAssert.CxfMicroPr
 import io.github.solaris.jaxrs.client.test.util.FilterExceptionAssert.DefaultFilterExceptionAssert;
 
 class JaxRsVendorTestExtension implements ParameterResolver, TestInstancePreConstructCallback, TestInstancePreDestroyCallback {
-    public static final Namespace NAMESPACE = Namespace.create(JaxRsVendorTestExtension.class);
+    private static final Namespace NAMESPACE = Namespace.create(JaxRsVendorTestExtension.class);
 
     private final JaxRsVendor vendor;
 
