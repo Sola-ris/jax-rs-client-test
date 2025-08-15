@@ -44,10 +44,10 @@ class JsonPathRequestMatchersTest {
     @AutoClose
     private final Client client = ClientBuilder.newClient();
 
+    private final MockRestServer server = MockRestServer.bindTo(client).build();
+
     @JaxRsVendorTest
     void testValue() {
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).value(true)).andRespond(withSuccess());
 
         Dto dto = new Dto(true);
@@ -57,8 +57,6 @@ class JsonPathRequestMatchersTest {
 
     @JaxRsVendorTest
     void testValue_indefinitePath() {
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
         server.expect(RequestMatchers.jsonPath(INDEFINITE_PATH).value(true)).andRespond(withSuccess());
 
         Dto dto = new Dto(List.of(true));
@@ -68,8 +66,6 @@ class JsonPathRequestMatchersTest {
 
     @JaxRsVendorTest
     void testValue_typeConversion() {
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).value(42)).andRespond(withSuccess());
 
         Dto dto = new Dto(42.0);
@@ -79,8 +75,6 @@ class JsonPathRequestMatchersTest {
 
     @JaxRsVendorTest
     void testValue_null() {
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).value(null)).andRespond(withSuccess());
 
         Dto dto = new Dto(null);
@@ -91,8 +85,6 @@ class JsonPathRequestMatchersTest {
 
     @JaxRsVendorTest
     void testValue_record() {
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).value(new Dto("hello"))).andRespond(withSuccess());
 
         Dto dto = new Dto(new Dto("hello"));
@@ -103,8 +95,6 @@ class JsonPathRequestMatchersTest {
 
     @JaxRsVendorTest
     void testValue_noMatch(FilterExceptionAssert filterExceptionAssert) {
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).value(true)).andRespond(withSuccess());
 
         Dto dto = new Dto(false);
@@ -116,8 +106,6 @@ class JsonPathRequestMatchersTest {
 
     @JaxRsVendorTest
     void testValue_noMatch_emptyList(FilterExceptionAssert filterExceptionAssert) {
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).value(true)).andRespond(withSuccess());
 
         Dto dto = new Dto(List.of());
@@ -128,8 +116,6 @@ class JsonPathRequestMatchersTest {
 
     @JaxRsVendorTest
     void testValue_noMatch_multipleValues(FilterExceptionAssert filterExceptionAssert) {
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).value(true)).andRespond(withSuccess());
 
         List<Boolean> something = List.of(true, false);
@@ -142,8 +128,6 @@ class JsonPathRequestMatchersTest {
 
     @JaxRsVendorTest
     void testValue_noMatch_incompatibleTypes(FilterExceptionAssert filterExceptionAssert) {
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).value(true)).andRespond(withSuccess());
 
         Map<String, String> something = Map.of("greeting", "hello");
@@ -156,8 +140,6 @@ class JsonPathRequestMatchersTest {
 
     @JacksonFreeTest
     void testValue_record_jacksonUnavailable() {
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).value(new Dto("hello"))).andRespond(withSuccess());
 
         Dto dto = new Dto(new Dto("hello"));
@@ -175,8 +157,6 @@ class JsonPathRequestMatchersTest {
 
     @JaxRsVendorTest
     void testExists() {
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).exists()).andRespond(withSuccess());
 
         Dto dto = new Dto(true);
@@ -186,8 +166,6 @@ class JsonPathRequestMatchersTest {
 
     @JaxRsVendorTest
     void testExists_doesNot(FilterExceptionAssert filterExceptionAssert) {
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
         server.expect(RequestMatchers.jsonPath(NON_EXISTENT_PATH).exists()).andRespond(withSuccess());
 
         Dto dto = new Dto(true);
@@ -199,8 +177,6 @@ class JsonPathRequestMatchersTest {
 
     @JaxRsVendorTest
     void testExists_doesNot_nullValue(FilterExceptionAssert filterExceptionAssert) {
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).exists()).andRespond(withSuccess());
 
         Dto dto = new Dto(null);
@@ -212,8 +188,6 @@ class JsonPathRequestMatchersTest {
 
     @JaxRsVendorTest
     void testExists_doesNot_indefinitePath(FilterExceptionAssert filterExceptionAssert) {
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
         server.expect(RequestMatchers.jsonPath(INDEFINITE_PATH).exists()).andRespond(withSuccess());
 
         Dto dto = new Dto(List.of());
@@ -225,8 +199,6 @@ class JsonPathRequestMatchersTest {
 
     @JaxRsVendorTest
     void testDoesNotExist() {
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
         server.expect(RequestMatchers.jsonPath(NON_EXISTENT_PATH).doesNotExist()).andRespond(withSuccess());
 
         Dto dto = new Dto(true);
@@ -236,8 +208,6 @@ class JsonPathRequestMatchersTest {
 
     @JaxRsVendorTest
     void testDoesNotExist_indefinitePath() {
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
         server.expect(RequestMatchers.jsonPath(INDEFINITE_PATH).doesNotExist()).andRespond(withSuccess());
 
         Dto dto = new Dto(List.of());
@@ -247,8 +217,6 @@ class JsonPathRequestMatchersTest {
 
     @JaxRsVendorTest
     void testDoesNotExist_nullValue() {
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).doesNotExist()).andRespond(withSuccess());
 
         Dto dto = new Dto(null);
@@ -258,8 +226,6 @@ class JsonPathRequestMatchersTest {
 
     @JaxRsVendorTest
     void testDoesNotExist_does_definitePath(FilterExceptionAssert filterExceptionAssert) {
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).doesNotExist()).andRespond(withSuccess());
 
         Dto dto = new Dto(true);
@@ -271,8 +237,6 @@ class JsonPathRequestMatchersTest {
 
     @JaxRsVendorTest
     void testDoesNotExist_does_indefinitePath(FilterExceptionAssert filterExceptionAssert) {
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
         server.expect(RequestMatchers.jsonPath(INDEFINITE_PATH).doesNotExist()).andRespond(withSuccess());
 
         List<?> something = List.of(true, false);
@@ -285,8 +249,6 @@ class JsonPathRequestMatchersTest {
 
     @JaxRsVendorTest
     void testHasJsonPath() {
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).hasJsonPath()).andRespond(withSuccess());
 
         Dto dto = new Dto(true);
@@ -296,8 +258,6 @@ class JsonPathRequestMatchersTest {
 
     @JaxRsVendorTest
     void testHasJsonPath_nullValue() {
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).hasJsonPath()).andRespond(withSuccess());
 
         Dto dto = new Dto(null);
@@ -307,8 +267,6 @@ class JsonPathRequestMatchersTest {
 
     @JaxRsVendorTest
     void testHasJsonPath_indefinitePath() {
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
         server.expect(RequestMatchers.jsonPath(INDEFINITE_PATH).hasJsonPath()).andRespond(withSuccess());
 
         Dto dto = new Dto(List.of(true, false));
@@ -318,8 +276,6 @@ class JsonPathRequestMatchersTest {
 
     @JaxRsVendorTest
     void testHasJsonPath_doesNot(FilterExceptionAssert filterExceptionAssert) {
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
         server.expect(RequestMatchers.jsonPath(NON_EXISTENT_PATH).hasJsonPath()).andRespond(withSuccess());
 
         Dto dto = new Dto(true);
@@ -331,8 +287,6 @@ class JsonPathRequestMatchersTest {
 
     @JaxRsVendorTest
     void testHasJsonPath_doesNot_indefinitePath(FilterExceptionAssert filterExceptionAssert) {
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
         server.expect(RequestMatchers.jsonPath(INDEFINITE_PATH).hasJsonPath()).andRespond(withSuccess());
 
         Dto dto = new Dto(List.of());
@@ -344,8 +298,6 @@ class JsonPathRequestMatchersTest {
 
     @JaxRsVendorTest
     void testDoesNotHaveJsonPath() {
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
         server.expect(RequestMatchers.jsonPath(NON_EXISTENT_PATH).doesNotHaveJsonPath()).andRespond(withSuccess());
 
         Dto dto = new Dto(true);
@@ -355,8 +307,6 @@ class JsonPathRequestMatchersTest {
 
     @JaxRsVendorTest
     void testDoesNotHaveJsonPath_indefinitePath() {
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
         server.expect(RequestMatchers.jsonPath(INDEFINITE_PATH).doesNotHaveJsonPath()).andRespond(withSuccess());
 
         Dto dto = new Dto(List.of());
@@ -366,8 +316,6 @@ class JsonPathRequestMatchersTest {
 
     @JaxRsVendorTest
     void testDoesNotHaveJsonPath_does(FilterExceptionAssert filterExceptionAssert) {
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).doesNotHaveJsonPath()).andRespond(withSuccess());
 
         Dto dto = new Dto(true);
@@ -379,8 +327,6 @@ class JsonPathRequestMatchersTest {
 
     @JaxRsVendorTest
     void testDoesNotHaveJsonPath_does_indefinitePath(FilterExceptionAssert filterExceptionAssert) {
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
         server.expect(RequestMatchers.jsonPath(INDEFINITE_PATH).doesNotHaveJsonPath()).andRespond(withSuccess());
 
         List<Boolean> something = List.of(true, false);
@@ -393,8 +339,6 @@ class JsonPathRequestMatchersTest {
 
     @JaxRsVendorTest
     void testIsString() {
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).isString()).andRespond(withSuccess());
 
         Dto dto = new Dto("hello");
@@ -404,8 +348,6 @@ class JsonPathRequestMatchersTest {
 
     @JaxRsVendorTest
     void testIsString_isNot(FilterExceptionAssert filterExceptionAssert) {
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).isString()).andRespond(withSuccess());
 
         Dto dto = new Dto(0);
@@ -417,8 +359,6 @@ class JsonPathRequestMatchersTest {
 
     @JaxRsVendorTest
     void testIsBoolean() {
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).isBoolean()).andRespond(withSuccess());
 
         Dto dto = new Dto(true);
@@ -428,8 +368,6 @@ class JsonPathRequestMatchersTest {
 
     @JaxRsVendorTest
     void testIsBoolean_isNot(FilterExceptionAssert filterExceptionAssert) {
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).isBoolean()).andRespond(withSuccess());
 
         Dto dto = new Dto(Map.of());
@@ -441,8 +379,6 @@ class JsonPathRequestMatchersTest {
 
     @JaxRsVendorTest
     void testIsNumber() {
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).isNumber()).andRespond(withSuccess());
 
         Dto dto = new Dto(13.37);
@@ -452,8 +388,6 @@ class JsonPathRequestMatchersTest {
 
     @JaxRsVendorTest
     void testIsNumber_isNot(FilterExceptionAssert filterExceptionAssert) {
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).isNumber()).andRespond(withSuccess());
 
         Dto dto = new Dto(List.of());
@@ -465,8 +399,6 @@ class JsonPathRequestMatchersTest {
 
     @JaxRsVendorTest
     void testIsArray() {
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).isArray()).andRespond(withSuccess());
 
         Dto dto = new Dto(List.of());
@@ -476,8 +408,6 @@ class JsonPathRequestMatchersTest {
 
     @JaxRsVendorTest
     void testIsArray_isNot(FilterExceptionAssert filterExceptionAssert) {
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).isArray()).andRespond(withSuccess());
 
         Dto dto = new Dto(true);
@@ -489,8 +419,6 @@ class JsonPathRequestMatchersTest {
 
     @JaxRsVendorTest
     void testIsMap() {
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).isMap()).andRespond(withSuccess());
 
         Dto dto = new Dto(Map.of());
@@ -500,8 +428,6 @@ class JsonPathRequestMatchersTest {
 
     @JaxRsVendorTest
     void testIsMap_isNot(FilterExceptionAssert filterExceptionAssert) {
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).isMap()).andRespond(withSuccess());
 
         Dto dto = new Dto("hello");
@@ -514,8 +440,6 @@ class JsonPathRequestMatchersTest {
     @JaxRsVendorTest
     @SuppressWarnings("DataFlowIssue")
     void testsValueSatisfies() {
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).valueSatisfies(value -> assertThat(value)
                                 .isNotNull()
                                 .extracting(Dto::something, STRING)
@@ -531,8 +455,6 @@ class JsonPathRequestMatchersTest {
 
     @JaxRsVendorTest
     void testsValueSatisfies_doesNot(FilterExceptionAssert filterExceptionAssert) {
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).valueSatisfies(value -> assertThat(value)
                                 .isNotNull()
                                 .contains("bye"),
@@ -548,8 +470,6 @@ class JsonPathRequestMatchersTest {
 
     @JaxRsVendorTest
     void testsValueSatisfies_incompatibleType(FilterExceptionAssert filterExceptionAssert) {
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).valueSatisfies(value -> {}, Dto.class)).andRespond(withSuccess());
 
         Dto dto = new Dto("hello");
@@ -561,8 +481,6 @@ class JsonPathRequestMatchersTest {
 
     @JaxRsVendorTest
     void testsValueSatisfies_exceptionInMatcher(FilterExceptionAssert filterExceptionAssert) {
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).valueSatisfies(value -> throwIoException(), Dto.class))
                 .andRespond(withSuccess());
 
@@ -577,8 +495,6 @@ class JsonPathRequestMatchersTest {
 
     @JacksonFreeTest
     void testsValueSatisfies_record_jacksonUnavailable() {
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).valueSatisfies(value -> {}, Dto.class)).andRespond(withSuccess());
 
         Dto dto = new Dto(new Dto("hello"));
@@ -594,8 +510,6 @@ class JsonPathRequestMatchersTest {
 
     @JaxRsVendorTest
     void testsValueSatisfies_genericType() {
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).valueSatisfies(value -> assertThat(value)
                                 .isNotNull()
                                 .hasSize(2)
@@ -614,8 +528,6 @@ class JsonPathRequestMatchersTest {
 
     @JaxRsVendorTest
     void testsValueSatisfies_genericType_doesNot(FilterExceptionAssert filterExceptionAssert) {
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).valueSatisfies(value -> assertThat(value)
                                 .isNotNull()
                                 .hasSize(2)
@@ -644,10 +556,8 @@ class JsonPathRequestMatchersTest {
 
     @JaxRsVendorTest
     void testsValueSatisfies_genericType_incompatibleType(FilterExceptionAssert filterExceptionAssert) {
-        MockRestServer server = MockRestServer.bindTo(client).build();
 
         GenericType<Map<String, Dto>> type = new GenericType<>() {};
-
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).valueSatisfies(value -> {}, type))
                 .andRespond(withSuccess());
 
@@ -660,8 +570,6 @@ class JsonPathRequestMatchersTest {
 
     @JaxRsVendorTest
     void testsValueSatisfies_genericType_exceptionInMatcher(FilterExceptionAssert filterExceptionAssert) {
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).valueSatisfies(value -> throwIoException(), new GenericType<List<Dto>>() {}))
                 .andRespond(withSuccess());
 
@@ -676,8 +584,6 @@ class JsonPathRequestMatchersTest {
 
     @JacksonFreeTest
     void testsValueSatisfies_genericType_record_jacksonUnavailable() {
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).valueSatisfies(value -> {}, new GenericType<List<Dto>>() {}))
                 .andRespond(withSuccess());
 
@@ -694,8 +600,6 @@ class JsonPathRequestMatchersTest {
 
     @JaxRsVendorTest
     void testInvalidJson(FilterExceptionAssert filterExceptionAssert) {
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).exists()).andRespond(withSuccess());
 
         filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.json("<dto></dto>")).close())

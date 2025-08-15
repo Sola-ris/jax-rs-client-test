@@ -37,10 +37,10 @@ class AsyncRequestTest {
     @AutoClose
     private final Client client = ClientBuilder.newClient();
 
+    private final MockRestServer server = MockRestServer.bindTo(client).build();
+
     @JaxRsVendorTest
     void testInvokeAsync_success() {
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
         server.expect(method(GET)).andRespond(withSuccess());
 
         Future<Response> responseFuture = client.target("").request().async().get();
@@ -53,8 +53,6 @@ class AsyncRequestTest {
 
     @JaxRsVendorTest
     void testInvokeAsync_failure() {
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
         server.expect(method(GET)).andRespond(withException(new SocketException(EXCEPTION_MESSAGE)));
 
         Future<Response> responseFuture = client.target("").request().async().get();
@@ -70,8 +68,6 @@ class AsyncRequestTest {
 
     @JaxRsVendorTest
     void testInvokeAsyncWithCallback_success() {
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
         server.expect(method(GET)).andRespond(withSuccess(BODY, APPLICATION_JSON_TYPE));
 
         Future<Response> responseFuture = client.target("").request().async().get(new AssertingResponseCallback());
@@ -81,8 +77,6 @@ class AsyncRequestTest {
 
     @JaxRsVendorTest
     void testInvokeAsyncWithCallback_failure() {
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
         server.expect(method(GET)).andRespond(withException(new SocketException(EXCEPTION_MESSAGE)));
 
         Future<Response> responseFuture = client.target("").request().async().get(new AssertingResponseCallback());
@@ -92,8 +86,6 @@ class AsyncRequestTest {
 
     @JaxRsVendorTest
     void testInvokeRx_success() {
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
         server.expect(method(GET)).andRespond(withSuccess());
 
         CompletionStage<Response> completionStage = client.target("").request().rx().get();
@@ -106,8 +98,6 @@ class AsyncRequestTest {
 
     @JaxRsVendorTest
     void testInvokeRx_failure() {
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
         server.expect(method(GET)).andRespond(withException(new SocketException(EXCEPTION_MESSAGE)));
 
         CompletionStage<Response> completionStage = client.target("").request().rx().get();

@@ -134,10 +134,10 @@ class EntityRequestMatchersTest {
         @AutoClose
         private final Client client = ClientBuilder.newClient();
 
+        private final MockRestServer server = MockRestServer.bindTo(client).build();
+
         @JaxRsVendorTest
         void testIsEqualTo() {
-            MockRestServer server = MockRestServer.bindTo(client).build();
-
             Dto dto = new Dto(true);
 
             server.expect(RequestMatchers.entity().isEqualTo(dto)).andRespond(withSuccess());
@@ -148,8 +148,6 @@ class EntityRequestMatchersTest {
 
         @JaxRsVendorTest
         void testIsEqualTo_null() {
-            MockRestServer server = MockRestServer.bindTo(client).build();
-
             server.expect(RequestMatchers.entity().isEqualTo(null)).andRespond(withSuccess());
 
             assertThatCode(() -> client.target("").request().get().close())
@@ -158,8 +156,6 @@ class EntityRequestMatchersTest {
 
         @JaxRsVendorTest
         void testIsEqualTo_noMatch() {
-            MockRestServer server = MockRestServer.bindTo(client).build();
-
             Dto dto = new Dto(true);
 
             server.expect(RequestMatchers.entity().isEqualTo(dto)).andRespond(withSuccess());
@@ -170,8 +166,6 @@ class EntityRequestMatchersTest {
 
         @JaxRsVendorTest
         void testString() {
-            MockRestServer server = MockRestServer.bindTo(client).build();
-
             Dto dto = new Dto(true);
 
             server.expect(RequestMatchers.entity().string(dto.toString())).andRespond(withSuccess());
@@ -184,8 +178,6 @@ class EntityRequestMatchersTest {
 
         @JaxRsVendorTest
         void testString_noMatch(FilterExceptionAssert filterExceptionAssert) {
-            MockRestServer server = MockRestServer.bindTo(client).build();
-
             Dto dto = new Dto(true);
             Dto otherDto = new Dto(false);
 
@@ -200,8 +192,6 @@ class EntityRequestMatchersTest {
 
         @JaxRsVendorTest
         void testForm() {
-            MockRestServer server = MockRestServer.bindTo(client).build();
-
             Form form = new Form("greeting", "hello");
 
             server.expect(RequestMatchers.entity().form(form)).andRespond(withSuccess());
@@ -212,8 +202,6 @@ class EntityRequestMatchersTest {
 
         @JaxRsVendorTest
         void testForm_noMatch(FilterExceptionAssert filterExceptionAssert) {
-            MockRestServer server = MockRestServer.bindTo(client).build();
-
             Form form = new Form("greeting", "hello");
             Form otherForm = new Form("sendoff", "goodbye");
 
@@ -229,8 +217,6 @@ class EntityRequestMatchersTest {
 
         @JaxRsVendorTest
         void testFormContains() {
-            MockRestServer server = MockRestServer.bindTo(client).build();
-
             Form actualForm = new Form()
                     .param("greeting", "hello")
                     .param("greeting", "salutations")
@@ -249,8 +235,6 @@ class EntityRequestMatchersTest {
 
         @JaxRsVendorTest
         void testFormContains_subsetIsLarger(FilterExceptionAssert filterExceptionAssert) {
-            MockRestServer server = MockRestServer.bindTo(client).build();
-
             Form actualForm = new Form()
                     .param("sendoff", "goodbye")
                     .param("greeting", "hello");
@@ -272,8 +256,6 @@ class EntityRequestMatchersTest {
 
         @JaxRsVendorTest
         void testFormContains_parameterNotInSubset(FilterExceptionAssert filterExceptionAssert) {
-            MockRestServer server = MockRestServer.bindTo(client).build();
-
             Form actualForm = new Form()
                     .param("sendoff", "goodbye")
                     .param("greeting", "hello");
@@ -293,8 +275,6 @@ class EntityRequestMatchersTest {
 
         @JaxRsVendorTest
         void testFormContains_subsetHasMoreValues(FilterExceptionAssert filterExceptionAssert) {
-            MockRestServer server = MockRestServer.bindTo(client).build();
-
             Form actualForm = new Form()
                     .param("greeting", "hello");
 
@@ -315,8 +295,6 @@ class EntityRequestMatchersTest {
 
         @JaxRsVendorTest
         void testFormContains_subsetHasDifferentValue(FilterExceptionAssert filterExceptionAssert) {
-            MockRestServer server = MockRestServer.bindTo(client).build();
-
             Form actualForm = new Form()
                     .param("greeting", "hello")
                     .param("greeting", "salutations");
@@ -336,8 +314,6 @@ class EntityRequestMatchersTest {
 
         @JaxRsVendorTest
         void testFormContains_subsetHasDifferentOrder(FilterExceptionAssert filterExceptionAssert) {
-            MockRestServer server = MockRestServer.bindTo(client).build();
-
             Form actualForm = new Form()
                     .param("greeting", "hello")
                     .param("greeting", "salutations")
@@ -359,8 +335,6 @@ class EntityRequestMatchersTest {
 
         @JaxRsVendorTest(skipFor = {JERSEY, CXF, RESTEASY_REACTIVE})
         void testMultipartForm() throws IOException {
-            MockRestServer server = MockRestServer.bindTo(client).build();
-
             server.expect(RequestMatchers.entity().multipartForm(List.of(plainPart(), imagePart(), jsonPart()))).andRespond(withSuccess());
 
             assertThatCode(
@@ -373,8 +347,6 @@ class EntityRequestMatchersTest {
 
         @JaxRsVendorTest(skipFor = {JERSEY, CXF, RESTEASY_REACTIVE})
         void testMultipartForm_noMatch(FilterExceptionAssert filterExceptionAssert) throws IOException {
-            MockRestServer server = MockRestServer.bindTo(client).build();
-
             AtomicReference<PartsBuffer> partsBuffer = new AtomicReference<>();
             server.expect(partsBufferMatcher(List.of(plainPart()), partsBuffer))
                     .andExpect(RequestMatchers.entity().multipartForm(List.of(plainPart()))).andRespond(withSuccess());
@@ -389,8 +361,6 @@ class EntityRequestMatchersTest {
 
         @JaxRsVendorTest(skipFor = {JERSEY, CXF, RESTEASY_REACTIVE})
         void testMultipartForm_noMatch_wrongOrder(FilterExceptionAssert filterExceptionAssert) throws IOException {
-            MockRestServer server = MockRestServer.bindTo(client).build();
-
             AtomicReference<PartsBuffer> partsBuffer = new AtomicReference<>();
             server.expect(partsBufferMatcher(List.of(jsonPart(), imagePart(), plainPart()), partsBuffer))
                     .andExpect(RequestMatchers.entity().multipartForm(List.of(jsonPart(), imagePart(), plainPart()))).andRespond(withSuccess());
@@ -405,8 +375,6 @@ class EntityRequestMatchersTest {
 
         @JaxRsVendorTest(skipFor = {JERSEY, CXF, RESTEASY_REACTIVE})
         void testMultipartFormContains() throws IOException {
-            MockRestServer server = MockRestServer.bindTo(client).build();
-
             server.expect(RequestMatchers.entity().multipartFormContains(List.of(plainPart(), jsonPart()))).andRespond(withSuccess());
 
             assertThatCode(
@@ -419,8 +387,6 @@ class EntityRequestMatchersTest {
 
         @JaxRsVendorTest(skipFor = {JERSEY, CXF, RESTEASY_REACTIVE})
         void testMultipartFormContains_subsetIsLarger(FilterExceptionAssert filterExceptionAssert) throws IOException {
-            MockRestServer server = MockRestServer.bindTo(client).build();
-
             AtomicReference<PartsBuffer> partsBuffer = new AtomicReference<>();
             server.expect(partsBufferMatcher(List.of(jsonPart(), imagePart(), plainPart()), partsBuffer))
                     .andExpect(RequestMatchers.entity().multipartFormContains(List.of(jsonPart(), imagePart(), plainPart())))
@@ -435,8 +401,6 @@ class EntityRequestMatchersTest {
 
         @JaxRsVendorTest(skipFor = {JERSEY, CXF, RESTEASY_REACTIVE})
         void testMultipartFormContains_noMatch(FilterExceptionAssert filterExceptionAssert) throws IOException {
-            MockRestServer server = MockRestServer.bindTo(client).build();
-
             AtomicReference<PartsBuffer> partsBuffer = new AtomicReference<>();
             server.expect(partsBufferMatcher(List.of(jsonPart()), partsBuffer))
                     .andExpect(RequestMatchers.entity().multipartFormContains(List.of(jsonPart()))).andRespond(withSuccess());

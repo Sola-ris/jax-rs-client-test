@@ -211,10 +211,10 @@ class MockResponseCreatorsTest {
         @AutoClose
         private final Client client = ClientBuilder.newClient();
 
+        private final MockRestServer server = MockRestServer.bindTo(client).build();
+
         @JaxRsVendorTest
         void testSuccess_withEntityAndMediaType() {
-            MockRestServer server = MockRestServer.bindTo(client).build();
-
             Dto dto = new Dto("hello");
 
             server.expect(anything()).andRespond(MockResponseCreators.withSuccess(dto, APPLICATION_JSON_TYPE));
@@ -228,8 +228,6 @@ class MockResponseCreatorsTest {
 
         @JaxRsVendorTest
         void testSuccess_withEntityAndMediaType_convertOnRead() {
-            MockRestServer server = MockRestServer.bindTo(client).build();
-
             Dto dto = new Dto("hello");
 
             server.expect(anything()).andRespond(MockResponseCreators.withSuccess(dto, APPLICATION_JSON_TYPE));

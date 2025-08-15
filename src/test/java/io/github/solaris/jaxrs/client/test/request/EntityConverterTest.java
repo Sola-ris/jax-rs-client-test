@@ -46,10 +46,10 @@ class EntityConverterTest {
     @AutoClose
     private final Client client = ClientBuilder.newClient();
 
+    private final MockRestServer server = MockRestServer.bindTo(client).build();
+
     @JaxRsVendorTest
     void testConvertEntity_type(EntityConverterAssert converterAssert) {
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
         String entity = "hello";
 
         server.expect(converterAssert.typeAsserter(entity, 1)).andRespond(withSuccess());
@@ -63,8 +63,6 @@ class EntityConverterTest {
 
     @JaxRsVendorTest
     void testConvertEntity_type_shortCircuit(EntityConverterAssert converterAssert) {
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
         String entity = "hello";
 
         server.expect(converterAssert.typeAsserter(entity, 0)).andRespond(withSuccess());
@@ -78,8 +76,6 @@ class EntityConverterTest {
 
     @JaxRsVendorTest
     void testConvertEntity_type_noEntityPresent(FilterExceptionAssert filterExceptionAssert) {
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
         server.expect(request -> {
             EntityConverter converter = EntityConverter.fromRequestContext(request);
             converter.convertEntity(request, String.class);
@@ -92,8 +88,6 @@ class EntityConverterTest {
 
     @JaxRsVendorTest
     void testConvertEntity_genericType(EntityConverterAssert converterAssert) {
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
         Form form = new Form("greeting", "hello");
 
         server.expect(converterAssert.genericTypeAsserter(form.asMap(), 1)).andRespond(withSuccess());
@@ -107,8 +101,6 @@ class EntityConverterTest {
 
     @JaxRsVendorTest
     void testConvertEntity_genericType_shortCircuit(EntityConverterAssert converterAssert) {
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
         Form form = new Form("greeting", "hello");
         GenericEntity<MultivaluedMap<String, String>> genericMap = new GenericEntity<>(form.asMap()) {};
 
@@ -123,8 +115,6 @@ class EntityConverterTest {
 
     @JaxRsVendorTest
     void testConvertEntity_genericType_noEntityPresent(FilterExceptionAssert filterExceptionAssert) {
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
         server.expect(request -> {
             EntityConverter converter = EntityConverter.fromRequestContext(request);
             converter.convertEntity(request, new GenericType<MultivaluedMap<String, String>>() {});
@@ -137,8 +127,6 @@ class EntityConverterTest {
 
     @JaxRsVendorTest
     void testUnableToConvertEntity_writingFails(EntityConverterAssert converterAssert) {
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
         Form form = new Form("greeting", "hello");
 
         server.expect(request -> {
@@ -151,8 +139,6 @@ class EntityConverterTest {
 
     @JaxRsVendorTest
     void testUnableToConvertEntity_readingFails(EntityConverterAssert converterAssert) {
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
         server.expect(request -> {
             EntityConverter converter = EntityConverter.fromRequestContext(request);
             converter.convertEntity(request, Dto.class);
@@ -166,8 +152,6 @@ class EntityConverterTest {
 
     @JaxRsVendorTest(skipFor = {JERSEY, CXF, RESTEASY_REACTIVE})
     void testBufferExpectedMultipart_repeatedReads() {
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
         server.expect(request -> {
             EntityConverter converter = EntityConverter.fromRequestContext(request);
             EntityPart plainPart = converter.bufferExpectedMultipart(List.of(plainPart())).get(0);
@@ -183,8 +167,6 @@ class EntityConverterTest {
 
     @JaxRsVendorTest(skipFor = {JERSEY, CXF, RESTEASY_REACTIVE})
     void testBufferExpectedMultipart_repeatedTypedReads() {
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
         server.expect(request -> {
             EntityConverter converter = EntityConverter.fromRequestContext(request);
             EntityPart jsonPart = converter.bufferExpectedMultipart(List.of(jsonPart())).get(0);
@@ -200,8 +182,6 @@ class EntityConverterTest {
 
     @JaxRsVendorTest(skipFor = {JERSEY, CXF, RESTEASY_REACTIVE})
     void testBufferExpectedMultipart_repeatedGenericReads() {
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
         server.expect(request -> {
             EntityConverter converter = EntityConverter.fromRequestContext(request);
             EntityPart listPart = converter.bufferExpectedMultipart(List.of(listPart())).get(0);
@@ -217,8 +197,6 @@ class EntityConverterTest {
 
     @JaxRsVendorTest(skipFor = {JERSEY, CXF, RESTEASY_REACTIVE})
     void testBufferMultipartRequest_repeatedReads() {
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
         server.expect(request -> {
             EntityConverter converter = EntityConverter.fromRequestContext(request);
             EntityPart plainPart = converter.bufferMultipartRequest(request).get(0);
@@ -238,8 +216,6 @@ class EntityConverterTest {
 
     @JaxRsVendorTest(skipFor = {JERSEY, CXF, RESTEASY_REACTIVE})
     void testBufferMultipartRequest_repeatedTypedReads() {
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
         server.expect(request -> {
             EntityConverter converter = EntityConverter.fromRequestContext(request);
             EntityPart jsonPart = converter.bufferMultipartRequest(request).get(0);
@@ -259,8 +235,6 @@ class EntityConverterTest {
 
     @JaxRsVendorTest(skipFor = {JERSEY, CXF, RESTEASY_REACTIVE})
     void testBufferMultipartRequest_repeatedGenericReads() {
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
         server.expect(request -> {
             EntityConverter converter = EntityConverter.fromRequestContext(request);
             EntityPart listPart = converter.bufferMultipartRequest(request).get(0);
@@ -280,8 +254,6 @@ class EntityConverterTest {
 
     @JaxRsVendorTest(skipFor = {JERSEY, CXF, RESTEASY_REACTIVE})
     void testBufferMultipartRequest_boundaryRemoved() {
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
         server.expect(request -> {
             EntityConverter converter = EntityConverter.fromRequestContext(request);
             EntityPart plainPart = converter.bufferMultipartRequest(request).get(0);
@@ -302,8 +274,6 @@ class EntityConverterTest {
 
     @JaxRsVendorTest(skipFor = {JERSEY, CXF, RESTEASY_REACTIVE})
     void testBufferMultipartRequest_entityPartsRecreated() {
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
         server.expect(request -> {
             @SuppressWarnings("unchecked")
             EntityPart entityBefore = ((List<EntityPart>) request.getEntity()).get(0);
@@ -327,8 +297,6 @@ class EntityConverterTest {
 
     @JaxRsVendorTest(skipFor = {JERSEY, CXF, RESTEASY_REACTIVE})
     void testBufferMultipartRequest_notMultiPartFormData(FilterExceptionAssert filterExceptionAssert) {
-        MockRestServer server = MockRestServer.bindTo(client).build();
-
         server.expect(request -> {
             EntityConverter converter = EntityConverter.fromRequestContext(request);
             converter.bufferMultipartRequest(request);
