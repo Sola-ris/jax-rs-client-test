@@ -105,9 +105,9 @@ public class MockResponseCreator implements ResponseCreator {
                 .links(links.toArray(new Link[0]))
                 .cookie(cookies.toArray(new NewCookie[0]));
 
-        // RestEasy Reactive throws an NPE when passed an empty array of Variants
+        // RestEasy Reactive throws an NPE when passed an empty list of Variants
         if (!variants.isEmpty()) {
-            responseBuilder.variants(variants.toArray(new Variant[0]));
+            responseBuilder.variants(variants);
         }
 
         Response response = responseBuilder.build();
