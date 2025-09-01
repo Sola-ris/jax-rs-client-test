@@ -119,9 +119,11 @@ public class MockResponseCreator implements ResponseCreator {
         if (entity != null && response.getClass().getPackageName().contains("cxf")) {
             EntityConverter converter = EntityConverter.fromRequestContext(request);
             InputStream serialized = converter.convertEntity(new SerializingRequestContext(response), InputStream.class);
-            return Response.fromResponse(response)
-                    .entity(serialized)
-                    .build();
+            try (response) {
+                return Response.fromResponse(response)
+                        .entity(serialized)
+                        .build();
+            }
         }
 
         return response;
