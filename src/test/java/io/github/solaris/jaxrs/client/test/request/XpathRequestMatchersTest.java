@@ -343,7 +343,7 @@ class XpathRequestMatchersTest {
         filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.xml(xmlDto)).close())
                 .isInstanceOf(AssertionError.class)
                 .hasCauseInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining(" UnSupported Return Type : %s", XmlDto.class);
+                .hasRootCauseMessage("UnSupported Return Type : %s", XmlDto.class);
     }
 
     @JaxRsVendorTest
