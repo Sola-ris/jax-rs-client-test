@@ -29,6 +29,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXParseException;
 
 import io.github.solaris.jaxrs.client.test.server.MockRestServer;
@@ -74,7 +75,6 @@ class XpathRequestMatchersTest {
 
     @JaxRsVendorTest
     void testExists_childInDifferentNamespace() throws XPathExpressionException {
-
         Map<String, String> namespaces = Map.of(
                 "", "urn:jax-rs.client.test",
                 "other", "urn:jax-ws.client.test"
@@ -86,7 +86,6 @@ class XpathRequestMatchersTest {
 
     @JaxRsVendorTest
     void testExists_usingXmlNamespaceAttribute() throws XPathExpressionException {
-
         Map<String, String> namespaces = Map.of("", "urn:jax-rs.client.test");
         server.expect(RequestMatchers.xpath("/xmlDto/greeting[@xml:lang='en']", namespaces).exists()).andRespond(withSuccess());
 
@@ -121,6 +120,7 @@ class XpathRequestMatchersTest {
     @JaxRsVendorTest
     void testNodeCount() throws XPathExpressionException {
         server.expect(RequestMatchers.xpath("/xmlDto/%s", "nodes").nodeCount(1)).andRespond(withSuccess());
+
         XmlDto xmlDto = new XmlDto();
         xmlDto.nodes = List.of("hello");
 
@@ -130,6 +130,7 @@ class XpathRequestMatchersTest {
     @JaxRsVendorTest
     void testNodeCount_noMatch(FilterExceptionAssert filterExceptionAssert) throws XPathExpressionException {
         server.expect(RequestMatchers.xpath("/xmlDto/nodes").nodeCount(2)).andRespond(withSuccess());
+
         XmlDto xmlDto = new XmlDto();
         xmlDto.nodes = List.of("hello");
 
@@ -153,7 +154,7 @@ class XpathRequestMatchersTest {
         server.expect(RequestMatchers.xpath("/xmlDto/num").string("42.0")).andRespond(withSuccess());
 
         XmlDto xmlDto = new XmlDto();
-        xmlDto.num = 42;
+        xmlDto.num = 42.0;
 
         assertThatCode(() -> client.target("/hello").request().post(Entity.xml(xmlDto)).close()).doesNotThrowAnyException();
     }
@@ -161,6 +162,7 @@ class XpathRequestMatchersTest {
     @JaxRsVendorTest
     void testString_noMatch(FilterExceptionAssert filterExceptionAssert) throws XPathExpressionException {
         server.expect(RequestMatchers.xpath("/xmlDto/str").string("hello")).andRespond(withSuccess());
+
         XmlDto xmlDto = new XmlDto();
         xmlDto.str = "goodbye";
 
@@ -284,6 +286,52 @@ class XpathRequestMatchersTest {
     }
 
     @JaxRsVendorTest
+    @SuppressWarnings("DataFlowIssue")
+    void testValueSatisfies_nodeList() throws XPathExpressionException {
+        server.expect(RequestMatchers.xpath("/xmlDto/nodes/node").valueSatisfies(nodeList -> assertThat(nodeList).isNotNull()
+                                .satisfies(
+                                        nl -> assertThat(nl.getLength()).isEqualTo(2),
+                                        nl -> assertThat(nl.item(0).getTextContent()).isEqualTo("hello"),
+                                        nl -> assertThat(nl.item(1).getTextContent()).isEqualTo("goodbye")
+                                ),
+                        NodeList.class))
+                .andRespond(withSuccess());
+
+        XmlDto xmlDto = new XmlDto();
+        xmlDto.nodes = List.of("hello", "goodbye");
+
+        assertThatCode(() -> client.target("/hello").request().post(Entity.xml(xmlDto)).close()).doesNotThrowAnyException();
+    }
+
+    @JaxRsVendorTest
+    void testValueSatisfies_int() throws XPathExpressionException {
+        server.expect(RequestMatchers.xpath("/xmlDto/num").valueSatisfies(integer -> assertThat(integer)
+                                .isNotNull()
+                                .isEqualTo(Integer.MIN_VALUE),
+                        Integer.class))
+                .andRespond(withSuccess());
+
+        XmlDto xmlDto = new XmlDto();
+        xmlDto.num = Integer.MIN_VALUE;
+
+        assertThatCode(() -> client.target("/hello").request().post(Entity.xml(xmlDto)).close()).doesNotThrowAnyException();
+    }
+
+    @JaxRsVendorTest
+    void testValueSatisfies_long() throws XPathExpressionException {
+        server.expect(RequestMatchers.xpath("/xmlDto/num").valueSatisfies(integer -> assertThat(integer)
+                                .isNotNull()
+                                .isEqualTo(Long.MAX_VALUE),
+                        Long.class))
+                .andRespond(withSuccess());
+
+        XmlDto xmlDto = new XmlDto();
+        xmlDto.num = Long.MAX_VALUE;
+
+        assertThatCode(() -> client.target("/hello").request().post(Entity.xml(xmlDto)).close()).doesNotThrowAnyException();
+    }
+
+    @JaxRsVendorTest
     void testValueSatisfies_unexpectedTargetType(FilterExceptionAssert filterExceptionAssert) throws XPathExpressionException {
         server.expect(RequestMatchers.xpath("/xmlDto/str")
                         .valueSatisfies(xmlDto -> {}, XmlDto.class))
@@ -295,7 +343,7 @@ class XpathRequestMatchersTest {
         filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.xml(xmlDto)).close())
                 .isInstanceOf(AssertionError.class)
                 .hasCauseInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Unexpected targetType");
+                .hasMessageContaining(" UnSupported Return Type : %s", XmlDto.class);
     }
 
     @JaxRsVendorTest
@@ -367,9 +415,10 @@ class XpathRequestMatchersTest {
         private String str;
 
         @XmlElement
-        private double num;
+        private Number num;
 
         @XmlElementWrapper
+        @XmlElement(name = "node")
         private List<Object> nodes;
     }
 }

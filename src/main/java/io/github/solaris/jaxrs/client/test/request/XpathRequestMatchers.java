@@ -17,7 +17,6 @@ import java.util.Set;
 
 import javax.xml.XMLConstants;
 import javax.xml.namespace.NamespaceContext;
-import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPath;
@@ -25,6 +24,7 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
+import javax.xml.xpath.XPathNodes;
 
 import jakarta.ws.rs.client.ClientRequestContext;
 
@@ -74,23 +74,12 @@ public final class XpathRequestMatchers {
         inputSource.setEncoding(UTF_8.name());
         Document document = builder.parse(inputSource);
 
-        return (T) xPathExpression.evaluate(document, getQname(targetType));
-    }
-
-    private static <T> QName getQname(Class<T> targetType) {
-        if (Number.class.isAssignableFrom(targetType)) {
-            return XPathConstants.NUMBER;
-        } else if (CharSequence.class.isAssignableFrom(targetType)) {
-            return XPathConstants.STRING;
-        } else if (Boolean.class.isAssignableFrom(targetType)) {
-            return XPathConstants.BOOLEAN;
-        } else if (Node.class.isAssignableFrom(targetType)) {
-            return XPathConstants.NODE;
-        } else if (NodeList.class.isAssignableFrom(targetType)) {
-            return XPathConstants.NODESET;
-        } else {
-            throw new IllegalArgumentException("Unexpected targetType " + targetType + ".");
+        // XPathExpression::evaluateExpression only supports javax.xml.xpath.XPathNodes for NODESET
+        if (NodeList.class.equals(targetType)) {
+            return (T) xPathExpression.evaluate(document, XPathConstants.NODESET);
         }
+
+        return xPathExpression.evaluateExpression(document, targetType);
     }
 
     /**
@@ -120,8 +109,8 @@ public final class XpathRequestMatchers {
      */
     public RequestMatcher nodeCount(int expectedCount) {
         return (XpathRequestMatcher) request -> {
-            NodeList nodeList = evaluate(request, NodeList.class);
-            int actualCount = nodeList == null ? 0 : nodeList.getLength();
+            XPathNodes nodes = evaluate(request, XPathNodes.class);
+            int actualCount = nodes == null ? 0 : nodes.size();
             assertEqual("NodeCount for XPath " + expression, expectedCount, actualCount);
         };
     }
@@ -172,9 +161,9 @@ public final class XpathRequestMatchers {
      * @param <T>            The expected type of the resulting value. Possibly null. Supported values:
      *                       <ul>
      *                          <li>{@link Node} ({@link XPathConstants#NODE})</li>
-     *                          <li>{@link NodeList} ({@link XPathConstants#NODESET})</li>
+     *                          <li>{@link NodeList} and {@link XPathNodes} ({@link XPathConstants#NODESET})</li>
      *                          <li>{@link String} ({@link XPathConstants#STRING})</li>
-     *                          <li>{@link Double} ({@link XPathConstants#NUMBER})</li>
+     *                          <li>{@link Double}, {@link Integer} and {@link Long} ({@link XPathConstants#NUMBER})</li>
      *                          <li>{@link Boolean} ({@link XPathConstants#BOOLEAN})</li>
      *                       </ul>
      */
