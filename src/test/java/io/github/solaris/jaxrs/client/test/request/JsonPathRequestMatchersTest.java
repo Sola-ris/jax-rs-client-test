@@ -454,6 +454,18 @@ class JsonPathRequestMatchersTest {
     }
 
     @JaxRsVendorTest
+    @SuppressWarnings("DataFlowIssue")
+    void testsValueSatisfies_null() {
+        server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).valueSatisfies(value -> assertThat(value).isNull(), Dto.class))
+                .andRespond(withSuccess());
+
+        Dto dto = new Dto(null);
+
+        assertThatCode(() -> client.target("/hello").request().post(Entity.json(dto)).close())
+                .doesNotThrowAnyException();
+    }
+
+    @JaxRsVendorTest
     void testsValueSatisfies_doesNot(FilterExceptionAssert filterExceptionAssert) {
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).valueSatisfies(value -> assertThat(value)
                                 .isNotNull()
@@ -521,6 +533,17 @@ class JsonPathRequestMatchersTest {
                 .andRespond(withSuccess());
 
         Dto dto = new Dto(List.of(new Dto("hello"), new Dto("goodbye")));
+
+        assertThatCode(() -> client.target("/hello").request().post(Entity.json(dto)).close())
+                .doesNotThrowAnyException();
+    }
+
+    @JaxRsVendorTest
+    void testsValueSatisfies_genericType_null() {
+        server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).valueSatisfies(value -> assertThat(value).isNull(), new GenericType<List<Dto>>() {}))
+                .andRespond(withSuccess());
+
+        Dto dto = new Dto(null);
 
         assertThatCode(() -> client.target("/hello").request().post(Entity.json(dto)).close())
                 .doesNotThrowAnyException();
