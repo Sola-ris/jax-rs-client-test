@@ -62,7 +62,7 @@ public final class XpathRequestMatchers {
     }
 
     @SuppressWarnings("unchecked")
-    private @Nullable <T> T evaluate(ClientRequestContext requestContext, Class<T> targetType) throws Exception {
+    private <T extends @Nullable Object> T evaluate(ClientRequestContext requestContext, Class<T> targetType) throws Exception {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         factory.setNamespaceAware(namespaceAware);
         DocumentBuilder builder = factory.newDocumentBuilder();

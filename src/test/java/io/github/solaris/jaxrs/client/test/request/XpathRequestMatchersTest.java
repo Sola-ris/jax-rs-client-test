@@ -238,7 +238,6 @@ class XpathRequestMatchersTest {
     }
 
     @JaxRsVendorTest
-    @SuppressWarnings("DataFlowIssue")
     void testValueSatisfies() throws XPathExpressionException {
         server.expect(RequestMatchers.xpath("/xmlDto/str").valueSatisfies(node -> assertThat(node)
                                 .isNotNull()
@@ -286,7 +285,6 @@ class XpathRequestMatchersTest {
     }
 
     @JaxRsVendorTest
-    @SuppressWarnings("DataFlowIssue")
     void testValueSatisfies_nodeList() throws XPathExpressionException {
         server.expect(RequestMatchers.xpath("/xmlDto/nodes/node").valueSatisfies(nodeList -> assertThat(nodeList).isNotNull()
                                 .satisfies(

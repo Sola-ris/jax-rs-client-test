@@ -278,7 +278,7 @@ public final class JsonPathRequestMatchers {
         }
     }
 
-    private <T> @Nullable T evaluate(String jsonString, Class<T> type) {
+    private <T extends @Nullable Object> T evaluate(String jsonString, Class<T> type) {
         try {
             if (type.isRecord()) {
                 return JsonPath.parse(jsonString, getJacksonConfiguration()).read(expression, type);
@@ -290,7 +290,7 @@ public final class JsonPathRequestMatchers {
         }
     }
 
-    private <T> @Nullable T evaluate(String jsonString, GenericType<T> type) {
+    private <T extends @Nullable Object> T evaluate(String jsonString, GenericType<T> type) {
         try {
             return JsonPath.parse(jsonString, getJacksonConfiguration()).read(expression, new TypeRefAdapter<>(type));
         } catch (Throwable t) {

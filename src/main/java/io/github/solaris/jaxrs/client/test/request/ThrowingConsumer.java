@@ -15,8 +15,5 @@ public interface ThrowingConsumer<T extends @Nullable Object> {
      *
      * @param t The argument to consume
      */
-    void accept(@Nullable T t) throws Exception;
-    // Should be inferred from ThrowingConsumer<T extends @Nullable Object>
-    // but NullAway does not at the moment, while IntelliJ does
-    // Could be https://github.com/uber/NullAway/issues/1155 or https://github.com/uber/NullAway/issues/1075
+    void accept(T t) throws Exception;
 }
