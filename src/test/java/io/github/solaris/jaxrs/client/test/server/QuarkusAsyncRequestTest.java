@@ -7,6 +7,11 @@ import io.quarkus.test.junit.QuarkusTest;
 class QuarkusAsyncRequestTest extends QuarkusTestFactory {
 
     @Override
+    protected Class<?> getTestClass() {
+        return AsyncRequestTest.MicroProfileRestClient.class;
+    }
+
+    @Override
     protected Object getTestInstance() {
         return new AsyncRequestTest().new MicroProfileRestClient();
     }

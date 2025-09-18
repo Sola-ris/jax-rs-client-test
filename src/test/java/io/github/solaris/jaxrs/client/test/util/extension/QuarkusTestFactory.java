@@ -24,17 +24,20 @@ import io.github.solaris.jaxrs.client.test.util.extension.classpath.JacksonFreeT
 
 public abstract class QuarkusTestFactory {
 
+    protected abstract Class<?> getTestClass();
+
     protected abstract Object getTestInstance();
 
     @TestFactory
     Stream<DynamicNode> generate() {
-        return ReflectionSupport.streamMethods(getTestInstance().getClass(), method -> method.isAnnotationPresent(JaxRsVendorTest.class), TOP_DOWN)
+        RuntimeDelegate.setInstance(null);
+        RestClientBuilderResolver.setInstance(null);
+
+        return ReflectionSupport.streamMethods(getTestClass(), method -> method.isAnnotationPresent(JaxRsVendorTest.class), TOP_DOWN)
                 .filter(method -> !method.isAnnotationPresent(JacksonFreeTest.class))
                 .map(method -> DynamicTest.dynamicTest(generateMethodName(method), () -> {
                     ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
                     try {
-                        RuntimeDelegate.setInstance(null);
-                        RestClientBuilderResolver.setInstance(null);
                         Thread.currentThread().setContextClassLoader(RESTEASY_REACTIVE.getVendorClassLoader());
                         ReflectionSupport.invokeMethod(method, getTestInstance(), getArgs(method));
                     } finally {

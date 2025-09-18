@@ -7,6 +7,11 @@ import io.quarkus.test.junit.QuarkusTest;
 class QuarkusMockResponseCreatorsTest extends QuarkusTestFactory {
 
     @Override
+    protected Class<?> getTestClass() {
+        return MockResponseCreatorsTest.WithEntity.class;
+    }
+
+    @Override
     protected Object getTestInstance() {
         return new MockResponseCreatorsTest().new WithEntity();
     }

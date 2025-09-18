@@ -114,10 +114,10 @@ class AsyncRequestTest {
     @Nested
     @RunInQuarkus
     class MicroProfileRestClient {
+        private final RestClientBuilder builder = RestClientBuilder.newBuilder().baseUri("http://localhost");
 
         @JaxRsVendorTest
         void testInvokeMpRestClientAsync_success() throws Exception {
-            RestClientBuilder builder = RestClientBuilder.newBuilder().baseUri("http://localhost");
             MockRestServer server = MockRestServer.bindTo(builder).build();
 
             server.expect(method(GET)).andExpect(requestTo("http://localhost/hello-async")).andRespond(withSuccess());
@@ -130,7 +130,6 @@ class AsyncRequestTest {
 
         @JaxRsVendorTest
         void testInvokeMpRestClientAsync_failure() throws Exception {
-            RestClientBuilder builder = RestClientBuilder.newBuilder().baseUri("http://localhost");
             MockRestServer server = MockRestServer.bindTo(builder).build();
 
             server.expect(method(GET))

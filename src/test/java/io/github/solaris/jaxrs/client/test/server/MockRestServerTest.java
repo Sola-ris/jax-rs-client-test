@@ -77,10 +77,10 @@ class MockRestServerTest {
 
     @Nested
     class BindClientBuilder {
+        private final ClientBuilder builder = ClientBuilder.newBuilder();
 
         @JaxRsVendorTest
         void testOrderedExpectations() {
-            ClientBuilder builder = ClientBuilder.newBuilder();
             MockRestServer server = MockRestServer.bindTo(builder).build();
 
             server.expect(requestTo("/hello")).andRespond(withSuccess());
@@ -98,7 +98,6 @@ class MockRestServerTest {
 
         @JaxRsVendorTest
         void testUnorderedExpectations() {
-            ClientBuilder builder = ClientBuilder.newBuilder();
             MockRestServer server = MockRestServer.bindTo(builder).withRequestOrder(UNORDERED).build();
 
             server.expect(requestTo("/hello")).andRespond(withSuccess());
@@ -116,7 +115,6 @@ class MockRestServerTest {
 
         @JaxRsVendorTest
         void testStrictExpectations() {
-            ClientBuilder builder = ClientBuilder.newBuilder();
             MockRestServer server = MockRestServer.bindTo(builder).withRequestOrder(STRICT).build();
 
             server.expect(times(2), requestTo("/hello")).andRespond(withSuccess());
@@ -135,7 +133,6 @@ class MockRestServerTest {
 
         @JaxRsVendorTest
         void testOrderedExpectations_requestsOutOfOrder(FilterExceptionAssert filterExceptionAssert) {
-            ClientBuilder builder = ClientBuilder.newBuilder();
             MockRestServer server = MockRestServer.bindTo(builder).build();
 
             server.expect(requestTo("/hello")).andRespond(withSuccess());
@@ -150,7 +147,6 @@ class MockRestServerTest {
 
         @JaxRsVendorTest
         void testStrictExpectations_firstRequestUnsatisfied(FilterExceptionAssert filterExceptionAssert) {
-            ClientBuilder builder = ClientBuilder.newBuilder();
             MockRestServer server = MockRestServer.bindTo(builder).withRequestOrder(STRICT).build();
 
             server.expect(min(2), requestTo("/hello")).andRespond(withSuccess());
@@ -166,7 +162,6 @@ class MockRestServerTest {
 
         @JaxRsVendorTest
         void testReset(FilterExceptionAssert filterExceptionAssert) {
-            ClientBuilder builder = ClientBuilder.newBuilder();
             MockRestServer server = MockRestServer.bindTo(builder).build();
 
             server.expect(max(2), requestTo("/hello")).andRespond(withSuccess());
@@ -196,7 +191,6 @@ class MockRestServerTest {
 
         @JaxRsVendorTest
         void testReset_unordered(FilterExceptionAssert filterExceptionAssert) {
-            ClientBuilder builder = ClientBuilder.newBuilder();
             MockRestServer server = MockRestServer.bindTo(builder).withRequestOrder(UNORDERED).build();
 
             server.expect(max(2), requestTo("/hello")).andRespond(withSuccess());
@@ -226,7 +220,6 @@ class MockRestServerTest {
 
         @JaxRsVendorTest
         void testReset_strict(FilterExceptionAssert filterExceptionAssert) {
-            ClientBuilder builder = ClientBuilder.newBuilder();
             MockRestServer server = MockRestServer.bindTo(builder).withRequestOrder(STRICT).build();
 
             server.expect(max(2), requestTo("/hello")).andRespond(withSuccess());
@@ -256,7 +249,6 @@ class MockRestServerTest {
 
         @JaxRsVendorTest
         void testUnsatisfiedExpectation() {
-            ClientBuilder builder = ClientBuilder.newBuilder();
             MockRestServer server = MockRestServer.bindTo(builder).build();
 
             server.expect(requestTo("/hello")).andRespond(withSuccess());
@@ -318,7 +310,6 @@ class MockRestServerTest {
 
         @JaxRsVendorTest
         void testVerifyWithTimeout() {
-            ClientBuilder builder = ClientBuilder.newBuilder();
             MockRestServer server = MockRestServer.bindTo(builder).build();
 
             server.expect(requestTo("/hello")).andRespond(withSuccess());
@@ -358,7 +349,6 @@ class MockRestServerTest {
 
         @JaxRsVendorTest
         void testVerifyFailsAfterRequestFailure(FilterExceptionAssert filterExceptionAssert) {
-            ClientBuilder builder = ClientBuilder.newBuilder();
             MockRestServer server = MockRestServer.bindTo(builder).build();
 
             server.expect(requestTo("/hello")).andRespond(withSuccess());
@@ -377,7 +367,6 @@ class MockRestServerTest {
 
         @JaxRsVendorTest
         void testFailuresClearedAfterReset(FilterExceptionAssert filterExceptionAssert) {
-            ClientBuilder builder = ClientBuilder.newBuilder();
             MockRestServer server = MockRestServer.bindTo(builder).build();
 
             server.expect(requestTo("/hello")).andRespond(withSuccess());
@@ -401,7 +390,6 @@ class MockRestServerTest {
 
         @JaxRsVendorTest
         void testFollowUpRequestAfterFailure(FilterExceptionAssert filterExceptionAssert) {
-            ClientBuilder builder = ClientBuilder.newBuilder();
             MockRestServer server = MockRestServer.bindTo(builder).build();
 
             server.expect(requestTo("/error")).andRespond(withException(new SocketException("Connection Reset")));
@@ -420,7 +408,6 @@ class MockRestServerTest {
 
         @JaxRsVendorTest
         void testBuilderUnaffectedByBoundClient() {
-            ClientBuilder builder = ClientBuilder.newBuilder();
             Client client = builder.build();
             MockRestServer server = MockRestServer.bindTo(client).build();
 
@@ -440,7 +427,6 @@ class MockRestServerTest {
 
         @JaxRsVendorTest
         void testBuilderUnaffectedByBoundWebTarget() {
-            ClientBuilder builder = ClientBuilder.newBuilder();
             Client client = builder.build();
             WebTarget target = client.target("");
             MockRestServer server = MockRestServer.bindTo(target).build();
@@ -1087,10 +1073,10 @@ class MockRestServerTest {
     @Nested
     @RunInQuarkus
     class BindMicroProfileRestClientBuilder {
+        private final RestClientBuilder restClientBuilder = RestClientBuilder.newBuilder().baseUri("http://localhost");
 
         @JaxRsVendorTest
         void testOrderedExpectations() {
-            RestClientBuilder restClientBuilder = RestClientBuilder.newBuilder().baseUri("http://localhost");
             MockRestServer server = MockRestServer.bindTo(restClientBuilder).build();
 
             server.expect(requestTo("http://localhost/hello")).andRespond(withSuccess());
@@ -1108,7 +1094,6 @@ class MockRestServerTest {
 
         @JaxRsVendorTest
         void testUnorderedExpectations() {
-            RestClientBuilder restClientBuilder = RestClientBuilder.newBuilder().baseUri("http://localhost");
             MockRestServer server = MockRestServer.bindTo(restClientBuilder).withRequestOrder(UNORDERED).build();
 
             server.expect(requestTo("http://localhost/hello")).andRespond(withSuccess());
@@ -1126,7 +1111,6 @@ class MockRestServerTest {
 
         @JaxRsVendorTest
         void testStrictExpectations() {
-            RestClientBuilder restClientBuilder = RestClientBuilder.newBuilder().baseUri("http://localhost");
             MockRestServer server = MockRestServer.bindTo(restClientBuilder).withRequestOrder(STRICT).build();
 
             server.expect(times(2), requestTo("http://localhost/hello")).andRespond(withSuccess());
@@ -1145,7 +1129,6 @@ class MockRestServerTest {
 
         @JaxRsVendorTest
         void testOrderedExpectations_requestsOutOfOrder(FilterExceptionAssert filterExceptionAssert) throws Exception {
-            RestClientBuilder restClientBuilder = RestClientBuilder.newBuilder().baseUri("http://localhost");
             MockRestServer server = MockRestServer.bindTo(restClientBuilder).build();
 
             server.expect(requestTo("http://localhost/hello")).andRespond(withSuccess());
@@ -1160,7 +1143,6 @@ class MockRestServerTest {
 
         @JaxRsVendorTest
         void testStrictExpectations_firstRequestUnsatisfied(FilterExceptionAssert filterExceptionAssert) throws Exception {
-            RestClientBuilder restClientBuilder = RestClientBuilder.newBuilder().baseUri("http://localhost");
             MockRestServer server = MockRestServer.bindTo(restClientBuilder).withRequestOrder(STRICT).build();
 
             server.expect(min(2), requestTo("http://localhost/hello")).andRespond(withSuccess());
@@ -1176,7 +1158,6 @@ class MockRestServerTest {
 
         @JaxRsVendorTest
         void testReset(FilterExceptionAssert filterExceptionAssert) throws Exception {
-            RestClientBuilder restClientBuilder = RestClientBuilder.newBuilder().baseUri("http://localhost");
             MockRestServer server = MockRestServer.bindTo(restClientBuilder).build();
 
             server.expect(max(2), requestTo("http://localhost/hello")).andRespond(withSuccess());
@@ -1206,7 +1187,6 @@ class MockRestServerTest {
 
         @JaxRsVendorTest
         void testReset_unordered(FilterExceptionAssert filterExceptionAssert) throws Exception {
-            RestClientBuilder restClientBuilder = RestClientBuilder.newBuilder().baseUri("http://localhost");
             MockRestServer server = MockRestServer.bindTo(restClientBuilder).build();
 
             server.expect(max(2), requestTo("http://localhost/hello")).andRespond(withSuccess());
@@ -1236,7 +1216,6 @@ class MockRestServerTest {
 
         @JaxRsVendorTest
         void testReset_strict(FilterExceptionAssert filterExceptionAssert) throws Exception {
-            RestClientBuilder restClientBuilder = RestClientBuilder.newBuilder().baseUri("http://localhost");
             MockRestServer server = MockRestServer.bindTo(restClientBuilder).build();
 
             server.expect(max(2), requestTo("http://localhost/hello")).andRespond(withSuccess());
@@ -1266,7 +1245,6 @@ class MockRestServerTest {
 
         @JaxRsVendorTest
         void testUnsatisfiedExpectation() throws Exception {
-            RestClientBuilder restClientBuilder = RestClientBuilder.newBuilder().baseUri("http://localhost");
             MockRestServer server = MockRestServer.bindTo(restClientBuilder).build();
 
             server.expect(requestTo("http://localhost/hello")).andRespond(withSuccess());
@@ -1287,7 +1265,6 @@ class MockRestServerTest {
 
         @JaxRsVendorTest
         void testMultipleBuilds() throws Exception {
-            RestClientBuilder restClientBuilder = RestClientBuilder.newBuilder().baseUri("http://localhost");
             MockRestServerBuilder serverBuilder = MockRestServer.bindTo(restClientBuilder);
 
             MockRestServer server = serverBuilder.build();
@@ -1328,7 +1305,6 @@ class MockRestServerTest {
 
         @JaxRsVendorTest
         void testVerifyWithTimeout() throws Exception {
-            RestClientBuilder restClientBuilder = RestClientBuilder.newBuilder().baseUri("http://localhost");
             MockRestServer server = MockRestServer.bindTo(restClientBuilder).build();
 
             server.expect(requestTo("http://localhost/hello")).andRespond(withSuccess());
@@ -1368,7 +1344,6 @@ class MockRestServerTest {
 
         @JaxRsVendorTest
         void testVerifyFailsAfterRequestFailure(FilterExceptionAssert filterExceptionAssert) throws Exception {
-            RestClientBuilder restClientBuilder = RestClientBuilder.newBuilder().baseUri("http://localhost");
             MockRestServer server = MockRestServer.bindTo(restClientBuilder).build();
 
             server.expect(requestTo("http://localhost/hello")).andRespond(withSuccess());
@@ -1387,7 +1362,6 @@ class MockRestServerTest {
 
         @JaxRsVendorTest
         void testFailuresClearedAfterReset(FilterExceptionAssert filterExceptionAssert) throws Exception {
-            RestClientBuilder restClientBuilder = RestClientBuilder.newBuilder().baseUri("http://localhost");
             MockRestServer server = MockRestServer.bindTo(restClientBuilder).build();
 
             server.expect(requestTo("http://localhost/hello")).andRespond(withSuccess());
@@ -1411,7 +1385,6 @@ class MockRestServerTest {
 
         @JaxRsVendorTest
         void testFollowUpRequestAfterFailure(FilterExceptionAssert filterExceptionAssert) throws Exception {
-            RestClientBuilder restClientBuilder = RestClientBuilder.newBuilder().baseUri("http://localhost");
             MockRestServer server = MockRestServer.bindTo(restClientBuilder).build();
 
             server.expect(requestTo("http://localhost/goodbye")).andRespond(withException(new SocketException("Connection Reset")));
