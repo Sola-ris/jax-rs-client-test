@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="true" type="JUnit" factoryName="JUnit">
-    <module name="jax-rs-client-test" />
+    <module name="jax-rs-client-test.test" />
     <useClassPathOnly />
     <option name="MAIN_CLASS_NAME" value="" />
     <option name="METHOD_NAME" value="" />
