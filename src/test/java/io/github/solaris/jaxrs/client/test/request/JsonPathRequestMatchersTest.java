@@ -453,7 +453,6 @@ class JsonPathRequestMatchersTest {
     }
 
     @JaxRsVendorTest
-    @SuppressWarnings("DataFlowIssue")
     void testsValueSatisfies_null() {
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).valueSatisfies(value -> assertThat(value).isNull(), Dto.class))
                 .andRespond(withSuccess());
@@ -538,7 +537,6 @@ class JsonPathRequestMatchersTest {
     }
 
     @JaxRsVendorTest
-    @SuppressWarnings("DataFlowIssue")
     void testsValueSatisfies_genericType_null() {
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).valueSatisfies(value -> assertThat(value).isNull(), new GenericType<List<Dto>>() {}))
                 .andRespond(withSuccess());

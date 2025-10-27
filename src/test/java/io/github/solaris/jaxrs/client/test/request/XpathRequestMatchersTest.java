@@ -274,7 +274,6 @@ class XpathRequestMatchersTest {
     }
 
     @JaxRsVendorTest
-    @SuppressWarnings("DataFlowIssue")
     void testValueSatisfies_null() throws XPathExpressionException {
         server.expect(RequestMatchers.xpath("/xmlDto/str").valueSatisfies(node -> assertThat(node).isNull(), Node.class))
                 .andRespond(withSuccess());
@@ -382,7 +381,7 @@ class XpathRequestMatchersTest {
                 .hasMessage(exceptionMessage);
     }
 
-    @SuppressWarnings({"DataFlowIssue", "ResultOfMethodCallIgnored"})
+    @SuppressWarnings("DataFlowIssue")
     private static Stream<Arguments> invalidArguments() {
         return Stream.of(
                 argumentSet("testExpression_null",

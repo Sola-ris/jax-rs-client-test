@@ -108,7 +108,7 @@ class EntityRequestMatchersTest {
                 .hasMessage(exceptionMessage);
     }
 
-    @SuppressWarnings({"DataFlowIssue", "ResultOfMethodCallIgnored"})
+    @SuppressWarnings("DataFlowIssue")
     private static Stream<Arguments> invalidArguments() {
         return Stream.of(
                 argumentSet("testMediaType_null",
