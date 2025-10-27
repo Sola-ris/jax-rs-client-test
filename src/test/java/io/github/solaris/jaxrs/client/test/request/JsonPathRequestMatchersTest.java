@@ -29,9 +29,9 @@ import com.jayway.jsonpath.JsonPathException;
 import io.github.solaris.jaxrs.client.test.server.MockRestServer;
 import io.github.solaris.jaxrs.client.test.util.Dto;
 import io.github.solaris.jaxrs.client.test.util.FilterExceptionAssert;
-import io.github.solaris.jaxrs.client.test.util.extension.JaxRsVendorTest;
-import io.github.solaris.jaxrs.client.test.util.extension.RunInQuarkus;
 import io.github.solaris.jaxrs.client.test.util.extension.classpath.JacksonFreeTest;
+import io.github.solaris.jaxrs.client.test.util.extension.vendor.JaxRsVendorTest;
+import io.github.solaris.jaxrs.client.test.util.extension.vendor.RunInQuarkus;
 
 import net.minidev.json.JSONArray;
 

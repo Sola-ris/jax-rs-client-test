@@ -5,9 +5,9 @@ import static io.github.solaris.jaxrs.client.test.util.MultiParts.imagePart;
 import static io.github.solaris.jaxrs.client.test.util.MultiParts.jsonPart;
 import static io.github.solaris.jaxrs.client.test.util.MultiParts.partsBufferMatcher;
 import static io.github.solaris.jaxrs.client.test.util.MultiParts.plainPart;
-import static io.github.solaris.jaxrs.client.test.util.extension.JaxRsVendor.CXF;
-import static io.github.solaris.jaxrs.client.test.util.extension.JaxRsVendor.JERSEY;
-import static io.github.solaris.jaxrs.client.test.util.extension.JaxRsVendor.RESTEASY_REACTIVE;
+import static io.github.solaris.jaxrs.client.test.util.extension.vendor.JaxRsVendor.CXF;
+import static io.github.solaris.jaxrs.client.test.util.extension.vendor.JaxRsVendor.JERSEY;
+import static io.github.solaris.jaxrs.client.test.util.extension.vendor.JaxRsVendor.RESTEASY_REACTIVE;
 import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
 import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON_TYPE;
 import static jakarta.ws.rs.core.MediaType.APPLICATION_OCTET_STREAM;
@@ -44,7 +44,7 @@ import io.github.solaris.jaxrs.client.test.util.Dto;
 import io.github.solaris.jaxrs.client.test.util.FilterExceptionAssert;
 import io.github.solaris.jaxrs.client.test.util.MockClientRequestContext;
 import io.github.solaris.jaxrs.client.test.util.MultiParts.PartsBuffer;
-import io.github.solaris.jaxrs.client.test.util.extension.JaxRsVendorTest;
+import io.github.solaris.jaxrs.client.test.util.extension.vendor.JaxRsVendorTest;
 
 class EntityRequestMatchersTest {
 

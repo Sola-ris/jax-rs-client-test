@@ -34,8 +34,8 @@ import org.xml.sax.SAXParseException;
 
 import io.github.solaris.jaxrs.client.test.server.MockRestServer;
 import io.github.solaris.jaxrs.client.test.util.FilterExceptionAssert;
-import io.github.solaris.jaxrs.client.test.util.extension.JaxRsVendorTest;
-import io.github.solaris.jaxrs.client.test.util.extension.RunInQuarkus;
+import io.github.solaris.jaxrs.client.test.util.extension.vendor.JaxRsVendorTest;
+import io.github.solaris.jaxrs.client.test.util.extension.vendor.RunInQuarkus;
 
 @RunInQuarkus
 class XpathRequestMatchersTest {

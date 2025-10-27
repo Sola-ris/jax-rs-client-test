@@ -54,7 +54,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import io.github.solaris.jaxrs.client.test.server.MockRestServer;
 import io.github.solaris.jaxrs.client.test.util.MockClientRequestContext;
-import io.github.solaris.jaxrs.client.test.util.extension.JaxRsVendorTest;
+import io.github.solaris.jaxrs.client.test.util.extension.vendor.JaxRsVendorTest;
 
 class MockResponseCreatorTest {
 

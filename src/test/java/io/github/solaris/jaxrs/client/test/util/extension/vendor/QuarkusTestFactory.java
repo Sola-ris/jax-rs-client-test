@@ -1,6 +1,6 @@
-package io.github.solaris.jaxrs.client.test.util.extension;
+package io.github.solaris.jaxrs.client.test.util.extension.vendor;
 
-import static io.github.solaris.jaxrs.client.test.util.extension.JaxRsVendor.RESTEASY_REACTIVE;
+import static io.github.solaris.jaxrs.client.test.util.extension.vendor.JaxRsVendor.RESTEASY_REACTIVE;
 import static java.util.stream.Collectors.joining;
 import static org.junit.platform.commons.support.HierarchyTraversalMode.TOP_DOWN;
 
