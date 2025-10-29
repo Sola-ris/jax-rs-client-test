@@ -25,7 +25,7 @@ Heavily inspired by Spring's [Client testing infrastructure](https://docs.spring
 ## Compatibility
 
 * JDK 17 or higher
-* JAX-RS (Jakarta RESTful Web Services) 3.1
+* JAX-RS (Jakarta RESTful Web Services) 3.1 & 4.0
 
 ## Maven coordinates
 
@@ -252,7 +252,7 @@ To build the project simply call `./mvnw clean install`.
 
 ## Tested implementations
 
-* [Jersey 3.1.x](https://github.com/eclipse-ee4j/jersey/tree/3.1)
+* [Jersey](https://github.com/eclipse-ee4j/jersey)
 * [RESTEasy](https://github.com/resteasy/resteasy)
 * [Apache CXF](https://github.com/apache/cxf)
 * [RESTEasy Reactive / Quarkus REST](https://github.com/quarkusio/quarkus)

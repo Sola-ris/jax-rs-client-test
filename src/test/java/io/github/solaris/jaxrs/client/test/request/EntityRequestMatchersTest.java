@@ -8,12 +8,12 @@ import static io.github.solaris.jaxrs.client.test.util.MultiParts.plainPart;
 import static io.github.solaris.jaxrs.client.test.util.extension.vendor.JaxRsVendor.CXF;
 import static io.github.solaris.jaxrs.client.test.util.extension.vendor.JaxRsVendor.JERSEY;
 import static io.github.solaris.jaxrs.client.test.util.extension.vendor.JaxRsVendor.RESTEASY_REACTIVE;
+import static jakarta.ws.rs.core.MediaType.APPLICATION_ATOM_XML;
+import static jakarta.ws.rs.core.MediaType.APPLICATION_ATOM_XML_TYPE;
 import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
 import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON_TYPE;
 import static jakarta.ws.rs.core.MediaType.APPLICATION_OCTET_STREAM;
 import static jakarta.ws.rs.core.MediaType.APPLICATION_OCTET_STREAM_TYPE;
-import static jakarta.ws.rs.core.MediaType.APPLICATION_SVG_XML;
-import static jakarta.ws.rs.core.MediaType.APPLICATION_SVG_XML_TYPE;
 import static jakarta.ws.rs.core.MediaType.MULTIPART_FORM_DATA_TYPE;
 import static jakarta.ws.rs.core.MediaType.TEXT_PLAIN_TYPE;
 import static org.assertj.core.api.Assertions.assertThatCode;
@@ -58,7 +58,7 @@ class EntityRequestMatchersTest {
     void testMediaType_notSet() {
         assertThatThrownBy(
                 () -> RequestMatchers.entity()
-                        .mediaType(APPLICATION_SVG_XML_TYPE)
+                        .mediaType(APPLICATION_ATOM_XML_TYPE)
                         .match(new MockClientRequestContext((MediaType) null)))
                 .isInstanceOf(AssertionError.class)
                 .hasMessage("MediaType was not set.");
@@ -84,7 +84,7 @@ class EntityRequestMatchersTest {
     void testMediaType_string_notSet() {
         assertThatThrownBy(
                 () -> RequestMatchers.entity()
-                        .mediaType(APPLICATION_SVG_XML)
+                        .mediaType(APPLICATION_ATOM_XML)
                         .match(new MockClientRequestContext((MediaType) null)))
                 .isInstanceOf(AssertionError.class)
                 .hasMessage("MediaType was not set.");

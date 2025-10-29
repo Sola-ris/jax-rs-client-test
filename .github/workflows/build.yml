@@ -26,10 +26,13 @@ jobs:
           cache: "maven"
           check-latest: true
 
-      - name: Build with Maven
+      - name: Build with Maven (JAX-RS 3.1)
         run: ./mvnw -B clean verify --file pom.xml
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@5a1091511ad55cbe89839c7260b706298ca349f7 # v5.5.1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Build with Maven (JAX-RS 4.0)
+        run: ./mvnw -B clean verify --file pom.xml -Pjax-rs-4

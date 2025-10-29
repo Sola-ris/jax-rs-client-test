@@ -577,8 +577,8 @@ class JsonPathRequestMatchersTest {
 
     @JaxRsVendorTest
     void testsValueSatisfies_genericType_incompatibleType(FilterExceptionAssert filterExceptionAssert) {
-
         GenericType<Map<String, Dto>> type = new GenericType<>() {};
+
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).valueSatisfies(value -> {}, type))
                 .andRespond(withSuccess());
 

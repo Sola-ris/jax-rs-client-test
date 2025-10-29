@@ -12,6 +12,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.function.Predicate;
 
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.ClientRequestContext;
@@ -103,6 +104,10 @@ public record MockClientRequestContext(
     @Override
     public String getHeaderString(String name) {
         return "";
+    }
+
+    public boolean containsHeaderString(String name, String valueSeparatorRegex, Predicate<String> valuePredicate) {
+        return false;
     }
 
     @Override
