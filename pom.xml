@@ -232,6 +232,12 @@
             <artifactId>resteasy-multipart-provider</artifactId>
             <version>${version.resteasy}</version>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-io</groupId>
+                    <artifactId>commons-io</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.jboss.resteasy.microprofile</groupId>
@@ -457,12 +463,13 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.5.4</version>
                 <configuration>
+                    <argLine>@{argLine}</argLine>
                     <reportFormat>plain</reportFormat>
                     <failIfNoTests>true</failIfNoTests>
                     <useModulePath>false</useModulePath>
-                    <argLine>-Duser.language=en @{argLine}</argLine>
                     <redirectTestOutputToFile>true</redirectTestOutputToFile>
                     <systemPropertyVariables>
+                        <user.language>en</user.language>
                         <vendors.enabled>${vendors.enabled}</vendors.enabled>
                         <quarkus.native.builder-image>commandline</quarkus.native.builder-image>
                         <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
