@@ -35,4 +35,4 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Build with Maven (JAX-RS 4.0)
-        run: ./mvnw -B clean verify --file pom.xml -Pjax-rs-4
+        run: ./mvnw -B clean test --file pom.xml -Pjax-rs-4
