@@ -357,8 +357,7 @@
                                     -XepOpt:NullAway:JSpecifyMode=true \
                                     -XepOpt:NullAway:OnlyNullMarked=true \
                                     -XepOpt:NullAway:CheckContracts=true \
-                                    -XepOpt:NullAway:WarnOnGenericInferenceFailure \
-                                    -XepOpt:NullAway:CustomContractAnnotations=io.github.solaris.jaxrs.client.test.internal.Contract
+                                    -XepOpt:NullAway:WarnOnGenericInferenceFailure
                                 </arg>
                                 <arg>--should-stop=ifError=FLOW</arg>
                             </compilerArgs>
@@ -371,7 +370,7 @@
                                 <path>
                                     <groupId>com.uber.nullaway</groupId>
                                     <artifactId>nullaway</artifactId>
-                                    <version>0.12.10</version>
+                                    <version>0.12.11</version>
                                 </path>
                             </annotationProcessorPaths>
                         </configuration>
