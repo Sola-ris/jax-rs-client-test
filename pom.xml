@@ -561,7 +561,7 @@
                 <version.jersey>4.0.0-M4</version.jersey>
                 <version.resteasy>7.0.0.Final</version.resteasy>
 
-                <version.jaxkson-jax-rs>2.20.1</version.jaxkson-jax-rs>
+                <version.jackson-jax-rs>2.20.1</version.jackson-jax-rs>
 
                 <vendors.enabled>JERSEY,JERSEY_HK2,RESTEASY</vendors.enabled>
             </properties>
