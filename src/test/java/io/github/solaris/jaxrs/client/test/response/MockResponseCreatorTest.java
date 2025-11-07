@@ -107,7 +107,6 @@ class MockResponseCreatorTest {
                 .value("123456")
                 .sameSite(STRICT)
                 .secure(true)
-                .version(42)
                 .build();
         NewCookie themeCookie = new NewCookie.Builder("theme")
                 // Truncated to seconds to prevent differences in millis after parsing
