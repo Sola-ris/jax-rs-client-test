@@ -6,7 +6,6 @@ import static io.github.solaris.jaxrs.client.test.util.MultiParts.PLAIN_CONTENT;
 import static io.github.solaris.jaxrs.client.test.util.MultiParts.jsonPart;
 import static io.github.solaris.jaxrs.client.test.util.MultiParts.listPart;
 import static io.github.solaris.jaxrs.client.test.util.MultiParts.plainPart;
-import static io.github.solaris.jaxrs.client.test.util.extension.vendor.JaxRsVendor.CXF;
 import static io.github.solaris.jaxrs.client.test.util.extension.vendor.JaxRsVendor.JERSEY;
 import static io.github.solaris.jaxrs.client.test.util.extension.vendor.JaxRsVendor.RESTEASY_REACTIVE;
 import static jakarta.ws.rs.core.HttpHeaders.CONTENT_TYPE;
@@ -18,6 +17,7 @@ import static jakarta.ws.rs.core.Response.Status.OK;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.ws.rs.client.Client;
@@ -150,7 +150,7 @@ class EntityConverterTest {
                 .close());
     }
 
-    @JaxRsVendorTest(skipFor = {JERSEY, CXF, RESTEASY_REACTIVE})
+    @JaxRsVendorTest(skipFor = {JERSEY, RESTEASY_REACTIVE})
     void testBufferExpectedMultipart_repeatedReads() {
         server.expect(request -> {
             EntityConverter converter = EntityConverter.fromRequestContext(request);
@@ -165,7 +165,7 @@ class EntityConverterTest {
                 .doesNotThrowAnyException();
     }
 
-    @JaxRsVendorTest(skipFor = {JERSEY, CXF, RESTEASY_REACTIVE})
+    @JaxRsVendorTest(skipFor = {JERSEY, RESTEASY_REACTIVE})
     void testBufferExpectedMultipart_repeatedTypedReads() {
         server.expect(request -> {
             EntityConverter converter = EntityConverter.fromRequestContext(request);
@@ -180,7 +180,7 @@ class EntityConverterTest {
                 .doesNotThrowAnyException();
     }
 
-    @JaxRsVendorTest(skipFor = {JERSEY, CXF, RESTEASY_REACTIVE})
+    @JaxRsVendorTest(skipFor = {JERSEY, RESTEASY_REACTIVE})
     void testBufferExpectedMultipart_repeatedGenericReads() {
         server.expect(request -> {
             EntityConverter converter = EntityConverter.fromRequestContext(request);
@@ -195,7 +195,7 @@ class EntityConverterTest {
                 .doesNotThrowAnyException();
     }
 
-    @JaxRsVendorTest(skipFor = {JERSEY, CXF, RESTEASY_REACTIVE})
+    @JaxRsVendorTest(skipFor = {JERSEY, RESTEASY_REACTIVE})
     void testBufferMultipartRequest_repeatedReads() {
         server.expect(request -> {
             EntityConverter converter = EntityConverter.fromRequestContext(request);
@@ -214,7 +214,7 @@ class EntityConverterTest {
                 .doesNotThrowAnyException();
     }
 
-    @JaxRsVendorTest(skipFor = {JERSEY, CXF, RESTEASY_REACTIVE})
+    @JaxRsVendorTest(skipFor = {JERSEY, RESTEASY_REACTIVE})
     void testBufferMultipartRequest_repeatedTypedReads() {
         server.expect(request -> {
             EntityConverter converter = EntityConverter.fromRequestContext(request);
@@ -233,7 +233,7 @@ class EntityConverterTest {
                 .doesNotThrowAnyException();
     }
 
-    @JaxRsVendorTest(skipFor = {JERSEY, CXF, RESTEASY_REACTIVE})
+    @JaxRsVendorTest(skipFor = {JERSEY, RESTEASY_REACTIVE})
     void testBufferMultipartRequest_repeatedGenericReads() {
         server.expect(request -> {
             EntityConverter converter = EntityConverter.fromRequestContext(request);
@@ -252,7 +252,7 @@ class EntityConverterTest {
                 .doesNotThrowAnyException();
     }
 
-    @JaxRsVendorTest(skipFor = {JERSEY, CXF, RESTEASY_REACTIVE})
+    @JaxRsVendorTest(skipFor = {JERSEY, RESTEASY_REACTIVE})
     void testBufferMultipartRequest_boundaryRemoved() {
         server.expect(request -> {
             EntityConverter converter = EntityConverter.fromRequestContext(request);
@@ -272,7 +272,7 @@ class EntityConverterTest {
                 .doesNotThrowAnyException();
     }
 
-    @JaxRsVendorTest(skipFor = {JERSEY, CXF, RESTEASY_REACTIVE})
+    @JaxRsVendorTest(skipFor = {JERSEY, RESTEASY_REACTIVE})
     void testBufferMultipartRequest_entityPartsRecreated() {
         server.expect(request -> {
             @SuppressWarnings("unchecked")
@@ -295,7 +295,7 @@ class EntityConverterTest {
                 .doesNotThrowAnyException();
     }
 
-    @JaxRsVendorTest(skipFor = {JERSEY, CXF, RESTEASY_REACTIVE})
+    @JaxRsVendorTest(skipFor = {JERSEY, RESTEASY_REACTIVE})
     void testBufferMultipartRequest_notMultiPartFormData(FilterExceptionAssert filterExceptionAssert) {
         server.expect(request -> {
             EntityConverter converter = EntityConverter.fromRequestContext(request);
@@ -377,6 +377,24 @@ class EntityConverterTest {
                 converter.bufferExpectedMultipart(null);
             };
             validateArguments(new DefaultFilterExceptionAssert(), matcher, "'expectedParts' must not be null.");
+        }
+
+        @Test
+        void testBufferExpectedMultipart_empty() {
+            MockRestServer server = MockRestServer.bindTo(validationClient).build();
+            server.expect(request -> {
+                EntityConverter converter = EntityConverter.fromRequestContext(request);
+
+                List<EntityPart> parts = new ArrayList<>();
+                List<EntityPart> bufferedParts = converter.bufferExpectedMultipart(parts);
+
+                assertThat(parts)
+                        .isSameAs(bufferedParts)
+                        .isEmpty();
+            }).andRespond(withSuccess());
+
+            assertThatCode(() -> validationClient.target("").request().get().close())
+                    .doesNotThrowAnyException();
         }
 
         @Test

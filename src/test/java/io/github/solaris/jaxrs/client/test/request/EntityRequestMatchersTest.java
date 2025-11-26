@@ -5,7 +5,6 @@ import static io.github.solaris.jaxrs.client.test.util.MultiParts.imagePart;
 import static io.github.solaris.jaxrs.client.test.util.MultiParts.jsonPart;
 import static io.github.solaris.jaxrs.client.test.util.MultiParts.partsBufferMatcher;
 import static io.github.solaris.jaxrs.client.test.util.MultiParts.plainPart;
-import static io.github.solaris.jaxrs.client.test.util.extension.vendor.JaxRsVendor.CXF;
 import static io.github.solaris.jaxrs.client.test.util.extension.vendor.JaxRsVendor.JERSEY;
 import static io.github.solaris.jaxrs.client.test.util.extension.vendor.JaxRsVendor.RESTEASY_REACTIVE;
 import static jakarta.ws.rs.core.MediaType.APPLICATION_ATOM_XML;
@@ -333,7 +332,7 @@ class EntityRequestMatchersTest {
                     .hasMessage("FormParam [name=greeting, position=0] expected: <salutations> but was: <hello>");
         }
 
-        @JaxRsVendorTest(skipFor = {JERSEY, CXF, RESTEASY_REACTIVE})
+        @JaxRsVendorTest(skipFor = {JERSEY, RESTEASY_REACTIVE})
         void testMultipartForm() throws IOException {
             server.expect(RequestMatchers.entity().multipartForm(List.of(plainPart(), imagePart(), jsonPart()))).andRespond(withSuccess());
 
@@ -345,7 +344,7 @@ class EntityRequestMatchersTest {
                     .doesNotThrowAnyException();
         }
 
-        @JaxRsVendorTest(skipFor = {JERSEY, CXF, RESTEASY_REACTIVE})
+        @JaxRsVendorTest(skipFor = {JERSEY, RESTEASY_REACTIVE})
         void testMultipartForm_noMatch(FilterExceptionAssert filterExceptionAssert) throws IOException {
             AtomicReference<PartsBuffer> partsBuffer = new AtomicReference<>();
             server.expect(partsBufferMatcher(List.of(plainPart()), partsBuffer))
@@ -359,7 +358,7 @@ class EntityRequestMatchersTest {
                     .hasMessage("Multipart Form expected: <%s> but was: <%s>", partsBuffer.get().expected(), partsBuffer.get().actual());
         }
 
-        @JaxRsVendorTest(skipFor = {JERSEY, CXF, RESTEASY_REACTIVE})
+        @JaxRsVendorTest(skipFor = {JERSEY, RESTEASY_REACTIVE})
         void testMultipartForm_noMatch_wrongOrder(FilterExceptionAssert filterExceptionAssert) throws IOException {
             AtomicReference<PartsBuffer> partsBuffer = new AtomicReference<>();
             server.expect(partsBufferMatcher(List.of(jsonPart(), imagePart(), plainPart()), partsBuffer))
@@ -373,7 +372,7 @@ class EntityRequestMatchersTest {
                     .hasMessage("Multipart Form expected: <%s> but was: <%s>", partsBuffer.get().expected(), partsBuffer.get().actual());
         }
 
-        @JaxRsVendorTest(skipFor = {JERSEY, CXF, RESTEASY_REACTIVE})
+        @JaxRsVendorTest(skipFor = {JERSEY, RESTEASY_REACTIVE})
         void testMultipartFormContains() throws IOException {
             server.expect(RequestMatchers.entity().multipartFormContains(List.of(plainPart(), jsonPart()))).andRespond(withSuccess());
 
@@ -385,7 +384,7 @@ class EntityRequestMatchersTest {
                     .doesNotThrowAnyException();
         }
 
-        @JaxRsVendorTest(skipFor = {JERSEY, CXF, RESTEASY_REACTIVE})
+        @JaxRsVendorTest(skipFor = {JERSEY, RESTEASY_REACTIVE})
         void testMultipartFormContains_subsetIsLarger(FilterExceptionAssert filterExceptionAssert) throws IOException {
             AtomicReference<PartsBuffer> partsBuffer = new AtomicReference<>();
             server.expect(partsBufferMatcher(List.of(jsonPart(), imagePart(), plainPart()), partsBuffer))
@@ -399,7 +398,7 @@ class EntityRequestMatchersTest {
                     .hasMessage("Expected %s to be smaller or the same size as %s", partsBuffer.get().expected(), partsBuffer.get().actual());
         }
 
-        @JaxRsVendorTest(skipFor = {JERSEY, CXF, RESTEASY_REACTIVE})
+        @JaxRsVendorTest(skipFor = {JERSEY, RESTEASY_REACTIVE})
         void testMultipartFormContains_noMatch(FilterExceptionAssert filterExceptionAssert) throws IOException {
             AtomicReference<PartsBuffer> partsBuffer = new AtomicReference<>();
             server.expect(partsBufferMatcher(List.of(jsonPart()), partsBuffer))
