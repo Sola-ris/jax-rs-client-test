@@ -25,7 +25,6 @@ import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.client.WebTarget;
 
-import org.assertj.core.api.Assertions;
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
 import org.junit.jupiter.api.AutoClose;
@@ -34,12 +33,27 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import io.github.solaris.jaxrs.client.test.manager.RequestExpectationManager;
 import io.github.solaris.jaxrs.client.test.util.FilterExceptionAssert;
 import io.github.solaris.jaxrs.client.test.util.GreetingSendoffClient;
 import io.github.solaris.jaxrs.client.test.util.extension.vendor.JaxRsVendorTest;
 import io.github.solaris.jaxrs.client.test.util.extension.vendor.RunInQuarkus;
 
 class MockRestServerTest {
+
+    @JaxRsVendorTest
+    void testRequestExpectationManagerMissing(FilterExceptionAssert filterExceptionAssert) {
+        try (Client client = ClientBuilder.newClient()) {
+            MockRestServer server = MockRestServer.bindTo(client).build();
+            client.property(RequestExpectationManager.class.getName(), "hello");
+
+            server.expect(anything()).andRespond(withSuccess());
+
+            filterExceptionAssert.assertThatThrownBy(() -> client.target("").request().get().close())
+                    .isInstanceOf(AssertionError.class)
+                    .hasMessage("Tried to access the RequestExpectationManager but found a " + String.class.getName() + " instead.");
+        }
+    }
 
     @ParameterizedTest
     @MethodSource("invalidArguments")
@@ -257,7 +271,7 @@ class MockRestServerTest {
             try (Client client = builder.build()) {
                 assertThat(client.target("/hello").request().get().getStatusInfo().toEnum()).isEqualTo(OK);
 
-                Assertions.assertThatThrownBy(server::verify)
+                assertThatThrownBy(server::verify)
                         .isInstanceOf(AssertionError.class)
                         .hasMessageMatching("""
                                 Further request\\(s\\) expected leaving 1 unsatisfied expectation\\(s\\)\\.
@@ -320,7 +334,7 @@ class MockRestServerTest {
                 assertThat(client.target("/hello").request().get().getStatusInfo().toEnum()).isEqualTo(OK);
 
                 Instant start = Instant.now();
-                Assertions.assertThatThrownBy(() -> server.verify(verifyDuration))
+                assertThatThrownBy(() -> server.verify(verifyDuration))
                         .isInstanceOf(AssertionError.class)
                         .hasMessageMatching("""
                                 Further request\\(s\\) expected leaving 1 unsatisfied expectation\\(s\\)\\.
@@ -613,7 +627,7 @@ class MockRestServerTest {
 
             assertThat(client.target("/hello").request().get().getStatusInfo().toEnum()).isEqualTo(OK);
 
-            Assertions.assertThatThrownBy(server::verify)
+            assertThatThrownBy(server::verify)
                     .isInstanceOf(AssertionError.class)
                     .hasMessageMatching("""
                             Further request\\(s\\) expected leaving 1 unsatisfied expectation\\(s\\)\\.
@@ -666,7 +680,7 @@ class MockRestServerTest {
             assertThat(client.target("/hello").request().get().getStatusInfo().toEnum()).isEqualTo(OK);
 
             Instant start = Instant.now();
-            Assertions.assertThatThrownBy(() -> server.verify(verifyDuration))
+            assertThatThrownBy(() -> server.verify(verifyDuration))
                     .isInstanceOf(AssertionError.class)
                     .hasMessageMatching("""
                             Further request\\(s\\) expected leaving 1 unsatisfied expectation\\(s\\)\\.
@@ -935,7 +949,7 @@ class MockRestServerTest {
 
             assertThat(target.path("/hello").request().get().getStatusInfo().toEnum()).isEqualTo(OK);
 
-            Assertions.assertThatThrownBy(server::verify)
+            assertThatThrownBy(server::verify)
                     .isInstanceOf(AssertionError.class)
                     .hasMessageMatching("""
                             Further request\\(s\\) expected leaving 1 unsatisfied expectation\\(s\\)\\.
@@ -989,7 +1003,7 @@ class MockRestServerTest {
             assertThat(target.path("/hello").request().get().getStatusInfo().toEnum()).isEqualTo(OK);
 
             Instant start = Instant.now();
-            Assertions.assertThatThrownBy(() -> server.verify(verifyDuration))
+            assertThatThrownBy(() -> server.verify(verifyDuration))
                     .isInstanceOf(AssertionError.class)
                     .hasMessageMatching("""
                             Further request\\(s\\) expected leaving 1 unsatisfied expectation\\(s\\)\\.
@@ -1253,7 +1267,7 @@ class MockRestServerTest {
             try (GreetingSendoffClient client = restClientBuilder.build(GreetingSendoffClient.class)) {
                 assertThat(client.greeting().getStatusInfo().toEnum()).isEqualTo(OK);
 
-                Assertions.assertThatThrownBy(server::verify)
+                assertThatThrownBy(server::verify)
                         .isInstanceOf(AssertionError.class)
                         .hasMessageMatching("""
                                 Further request\\(s\\) expected leaving 1 unsatisfied expectation\\(s\\)\\.
@@ -1315,7 +1329,7 @@ class MockRestServerTest {
                 assertThat(client.greeting().getStatusInfo().toEnum()).isEqualTo(OK);
 
                 Instant start = Instant.now();
-                Assertions.assertThatThrownBy(() -> server.verify(verifyDuration))
+                assertThatThrownBy(() -> server.verify(verifyDuration))
                         .isInstanceOf(AssertionError.class)
                         .hasMessageMatching("""
                                 Further request\\(s\\) expected leaving 1 unsatisfied expectation\\(s\\)\\.
