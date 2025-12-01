@@ -53,7 +53,8 @@ public final class MockResponseFilter implements ClientRequestFilter {
                     expectationManager.validateRequest(requestContext)
             );
         } else {
-            throw new AssertionError("Tried to access the RequestExpectationManager but found a " + property.getClass().getName() + " instead.");
+            String foundType = property == null ? "null" : "a " + property.getClass().getName();
+            throw new AssertionError("Tried to access the RequestExpectationManager but found " + foundType + " instead.");
         }
     }
 
