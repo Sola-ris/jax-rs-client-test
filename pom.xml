@@ -359,7 +359,8 @@
                                     -XepOpt:NullAway:JSpecifyMode=true \
                                     -XepOpt:NullAway:OnlyNullMarked=true \
                                     -XepOpt:NullAway:CheckContracts=true \
-                                    -XepOpt:NullAway:WarnOnGenericInferenceFailure
+                                    -XepOpt:NullAway:WarnOnGenericInferenceFailure \
+                                    -Xep:RequireExplicitNullMarking:ERROR
                                 </arg>
                                 <arg>--should-stop=ifError=FLOW</arg>
                             </compilerArgs>
@@ -372,7 +373,7 @@
                                 <path>
                                     <groupId>com.uber.nullaway</groupId>
                                     <artifactId>nullaway</artifactId>
-                                    <version>0.12.12</version>
+                                    <version>0.12.13</version>
                                 </path>
                             </annotationProcessorPaths>
                         </configuration>
