@@ -154,7 +154,7 @@ class EntityConverterTest {
     void testBufferExpectedMultipart_repeatedReads() {
         server.expect(request -> {
             EntityConverter converter = EntityConverter.fromRequestContext(request);
-            EntityPart plainPart = converter.bufferExpectedMultipart(List.of(plainPart())).get(0);
+            EntityPart plainPart = converter.bufferExpectedMultipart(List.of(plainPart())).getFirst();
 
             assertThat(plainPart).isInstanceOf(BufferedEntityPart.class);
             assertThat(plainPart.getContent().readAllBytes()).isEqualTo(PLAIN_CONTENT.getBytes());
@@ -169,7 +169,7 @@ class EntityConverterTest {
     void testBufferExpectedMultipart_repeatedTypedReads() {
         server.expect(request -> {
             EntityConverter converter = EntityConverter.fromRequestContext(request);
-            EntityPart jsonPart = converter.bufferExpectedMultipart(List.of(jsonPart())).get(0);
+            EntityPart jsonPart = converter.bufferExpectedMultipart(List.of(jsonPart())).getFirst();
 
             assertThat(jsonPart).isInstanceOf(BufferedEntityPart.class);
             assertThat(jsonPart.getContent(Dto.class)).isEqualTo(new Dto(false));
@@ -184,7 +184,7 @@ class EntityConverterTest {
     void testBufferExpectedMultipart_repeatedGenericReads() {
         server.expect(request -> {
             EntityConverter converter = EntityConverter.fromRequestContext(request);
-            EntityPart listPart = converter.bufferExpectedMultipart(List.of(listPart())).get(0);
+            EntityPart listPart = converter.bufferExpectedMultipart(List.of(listPart())).getFirst();
 
             assertThat(listPart).isInstanceOf(BufferedEntityPart.class);
             assertThat(listPart.getContent(new GenericType<List<String>>() {})).isEqualTo(LIST_CONTENT);
@@ -199,7 +199,7 @@ class EntityConverterTest {
     void testBufferMultipartRequest_repeatedReads() {
         server.expect(request -> {
             EntityConverter converter = EntityConverter.fromRequestContext(request);
-            EntityPart plainPart = converter.bufferMultipartRequest(request).get(0);
+            EntityPart plainPart = converter.bufferMultipartRequest(request).getFirst();
 
             assertThat(plainPart).isInstanceOf(BufferedEntityPart.class);
             assertThat(plainPart.getContent().readAllBytes()).isEqualTo(PLAIN_CONTENT.getBytes());
@@ -218,7 +218,7 @@ class EntityConverterTest {
     void testBufferMultipartRequest_repeatedTypedReads() {
         server.expect(request -> {
             EntityConverter converter = EntityConverter.fromRequestContext(request);
-            EntityPart jsonPart = converter.bufferMultipartRequest(request).get(0);
+            EntityPart jsonPart = converter.bufferMultipartRequest(request).getFirst();
 
             assertThat(jsonPart).isInstanceOf(BufferedEntityPart.class);
             assertThat(jsonPart.getContent(Dto.class)).isEqualTo(new Dto(false));
@@ -237,7 +237,7 @@ class EntityConverterTest {
     void testBufferMultipartRequest_repeatedGenericReads() {
         server.expect(request -> {
             EntityConverter converter = EntityConverter.fromRequestContext(request);
-            EntityPart listPart = converter.bufferMultipartRequest(request).get(0);
+            EntityPart listPart = converter.bufferMultipartRequest(request).getFirst();
 
             assertThat(listPart).isInstanceOf(BufferedEntityPart.class);
             assertThat(listPart.getContent(new GenericType<List<String>>() {})).isEqualTo(LIST_CONTENT);
@@ -256,7 +256,7 @@ class EntityConverterTest {
     void testBufferMultipartRequest_boundaryRemoved() {
         server.expect(request -> {
             EntityConverter converter = EntityConverter.fromRequestContext(request);
-            EntityPart plainPart = converter.bufferMultipartRequest(request).get(0);
+            EntityPart plainPart = converter.bufferMultipartRequest(request).getFirst();
 
             assertThat(plainPart).isInstanceOf(BufferedEntityPart.class);
             assertThat(request.getHeaderString(CONTENT_TYPE))
@@ -276,13 +276,13 @@ class EntityConverterTest {
     void testBufferMultipartRequest_entityPartsRecreated() {
         server.expect(request -> {
             @SuppressWarnings("unchecked")
-            EntityPart entityBefore = ((List<EntityPart>) request.getEntity()).get(0);
+            EntityPart entityBefore = ((List<EntityPart>) request.getEntity()).getFirst();
 
             EntityConverter converter = EntityConverter.fromRequestContext(request);
             converter.bufferMultipartRequest(request);
 
             @SuppressWarnings("unchecked")
-            EntityPart entityAfter = ((List<EntityPart>) request.getEntity()).get(0);
+            EntityPart entityAfter = ((List<EntityPart>) request.getEntity()).getFirst();
 
             assertThat(entityBefore).isNotSameAs(entityAfter);
         }).andRespond(withSuccess());
