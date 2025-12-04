@@ -331,7 +331,7 @@ class XpathRequestMatchersTest {
     @JaxRsVendorTest
     void testValueSatisfies_unexpectedTargetType(FilterExceptionAssert filterExceptionAssert) throws XPathExpressionException {
         server.expect(RequestMatchers.xpath("/xmlDto/str")
-                        .valueSatisfies(xmlDto -> {}, XmlDto.class))
+                        .valueSatisfies(_ -> {}, XmlDto.class))
                 .andRespond(withSuccess());
 
         XmlDto xmlDto = new XmlDto();
@@ -396,7 +396,7 @@ class XpathRequestMatchersTest {
                         (ThrowingCallable) () -> RequestMatchers.xpath("/xmlDto/str").valueSatisfies(null, null),
                         "'valueAssertion' must not be null."),
                 argumentSet("testValueSatisfies_targetTypeNull",
-                        (ThrowingCallable) () -> RequestMatchers.xpath("/xmlDto/str").valueSatisfies(__ -> {}, null),
+                        (ThrowingCallable) () -> RequestMatchers.xpath("/xmlDto/str").valueSatisfies(_ -> {}, null),
                         "'targetType' must not be null.")
         );
     }

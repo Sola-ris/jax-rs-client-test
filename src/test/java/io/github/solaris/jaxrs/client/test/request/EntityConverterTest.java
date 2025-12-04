@@ -330,7 +330,7 @@ class EntityConverterTest {
 
         @Test
         void testFromRequestContext_requestNull() {
-            RequestMatcher matcher = request -> EntityConverter.fromRequestContext(null);
+            RequestMatcher matcher = _ -> EntityConverter.fromRequestContext(null);
             validateArguments(new DefaultFilterExceptionAssert(), matcher, "'requestContext' must not be null.");
         }
 
