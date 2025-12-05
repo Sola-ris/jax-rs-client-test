@@ -106,8 +106,9 @@ public record MockClientRequestContext(
         return "";
     }
 
+    @SuppressWarnings("unused")
     public boolean containsHeaderString(String name, String valueSeparatorRegex, Predicate<String> valuePredicate) {
-        return false;
+        throw new UnsupportedOperationException();
     }
 
     @Override

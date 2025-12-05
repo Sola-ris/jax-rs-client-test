@@ -76,6 +76,7 @@ public interface RequestContextStub extends ClientRequestContext {
     }
 
     // @Override in JAX-RS 4
+    @SuppressWarnings("unused")
     default boolean containsHeaderString(String name, String valueSeparatorRegex, Predicate<String> valuePredicate) {
         throw new UnsupportedOperationException();
     }
