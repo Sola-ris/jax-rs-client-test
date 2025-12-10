@@ -18,7 +18,7 @@ import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.core.GenericType;
 
-import org.assertj.core.api.ThrowableAssert;
+import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.junit.jupiter.api.AutoClose;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -630,7 +630,7 @@ class JsonPathRequestMatchersTest {
 
     @ParameterizedTest
     @MethodSource("invalidArguments")
-    void testArgumentValidation(ThrowableAssert.ThrowingCallable callable, String exceptionMessage) {
+    void testArgumentValidation(ThrowingCallable callable, String exceptionMessage) {
         assertThatThrownBy(callable)
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage(exceptionMessage);
@@ -640,20 +640,22 @@ class JsonPathRequestMatchersTest {
     private static Stream<Arguments> invalidArguments() {
         return Stream.of(
                 argumentSet("testExpression_null",
-                        (ThrowableAssert.ThrowingCallable) () -> RequestMatchers.jsonPath(null), "JsonPath expression must not be null or blank."),
+                        (ThrowingCallable) () -> RequestMatchers.jsonPath(null), "JsonPath expression must not be null or blank."),
                 argumentSet("testExpression_blank",
-                        (ThrowableAssert.ThrowingCallable) () -> RequestMatchers.jsonPath(" \t\n"), "JsonPath expression must not be null or blank."),
+                        (ThrowingCallable) () -> RequestMatchers.jsonPath(" \t\n"), "JsonPath expression must not be null or blank."),
+                argumentSet("testArgs_null",
+                        (ThrowingCallable) () -> RequestMatchers.jsonPath(DEFINITE_PATH, (Object[]) null), "'args' must not be null."),
                 argumentSet("testValueSatisfies_consumerNull",
-                        (ThrowableAssert.ThrowingCallable) () -> RequestMatchers.jsonPath(DEFINITE_PATH)
+                        (ThrowingCallable) () -> RequestMatchers.jsonPath(DEFINITE_PATH)
                                 .valueSatisfies(null, String.class), "'valueAssertion' must not be null."),
                 argumentSet("testValueSatisfies_targetTypeNull",
-                        (ThrowableAssert.ThrowingCallable) () -> RequestMatchers.jsonPath(DEFINITE_PATH)
+                        (ThrowingCallable) () -> RequestMatchers.jsonPath(DEFINITE_PATH)
                                 .valueSatisfies(_ -> {}, (Class<?>) null), "'targetType' must not be null."),
                 argumentSet("testValueSatisfies_genericType_consumerNull",
-                        (ThrowableAssert.ThrowingCallable) () -> RequestMatchers.jsonPath(DEFINITE_PATH)
+                        (ThrowingCallable) () -> RequestMatchers.jsonPath(DEFINITE_PATH)
                                 .valueSatisfies(null, new GenericType<>() {}), "'valueAssertion' must not be null."),
                 argumentSet("testValueSatisfies_genericType_targetTypeNull",
-                        (ThrowableAssert.ThrowingCallable) () -> RequestMatchers.jsonPath(DEFINITE_PATH)
+                        (ThrowingCallable) () -> RequestMatchers.jsonPath(DEFINITE_PATH)
                                 .valueSatisfies(_ -> {}, (GenericType<?>) null), "'targetType' must not be null.")
         );
     }
