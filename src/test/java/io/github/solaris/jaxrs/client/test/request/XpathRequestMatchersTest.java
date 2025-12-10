@@ -8,6 +8,7 @@ import static org.junit.jupiter.params.provider.Arguments.argumentSet;
 import static org.w3c.dom.Node.ELEMENT_NODE;
 import static org.w3c.dom.Node.TEXT_NODE;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -388,6 +389,12 @@ class XpathRequestMatchersTest {
                         (ThrowingCallable) () -> RequestMatchers.xpath(null), "XPath expression must not be null or blank."),
                 argumentSet("testExpression_blank",
                         (ThrowingCallable) () -> RequestMatchers.xpath(" \t\n"), "XPath expression must not be null or blank."),
+                argumentSet("testNamespaces_null",
+                        (ThrowingCallable) () -> RequestMatchers.xpath("/xmlDto/str", null, ""), "'namespaces' must not be null."),
+                argumentSet("testArgs_null",
+                        (ThrowingCallable) () -> RequestMatchers.xpath("/xmlDto/str", (Object[]) null), "'args' must not be null."),
+                argumentSet("testArgs_namespaced_null",
+                        (ThrowingCallable) () -> RequestMatchers.xpath("/xmlDto/str", Map.of(), (Object[]) null), "'args' must not be null."),
                 argumentSet("testString_null",
                         (ThrowingCallable) () -> RequestMatchers.xpath("/xmlDto/str").string(null), "'expectedString' must not be null."),
                 argumentSet("testNumber_null",
@@ -397,7 +404,17 @@ class XpathRequestMatchersTest {
                         "'valueAssertion' must not be null."),
                 argumentSet("testValueSatisfies_targetTypeNull",
                         (ThrowingCallable) () -> RequestMatchers.xpath("/xmlDto/str").valueSatisfies(_ -> {}, null),
-                        "'targetType' must not be null.")
+                        "'targetType' must not be null."),
+                argumentSet("testNamespacePrefix_null", (ThrowingCallable) () -> {
+                    Map<String, String> namespaces = new HashMap<>();
+                    namespaces.put(null, "urn:jax-rs.client.test");
+                    RequestMatchers.xpath("/xmlDto/str", namespaces);
+                }, "'prefix' must not be null."),
+                argumentSet("testNamespaceUri_null", (ThrowingCallable) () -> {
+                    Map<String, String> namespaces = new HashMap<>();
+                    namespaces.put("", null);
+                    RequestMatchers.xpath("/xmlDto/str", namespaces);
+                }, "'namespaceUri' must not be null.")
         );
     }
 
