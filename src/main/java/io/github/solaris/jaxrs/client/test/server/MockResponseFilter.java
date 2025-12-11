@@ -54,7 +54,7 @@ public final class MockResponseFilter implements ClientRequestFilter {
             );
         } else {
             String foundType = property == null ? "null" : "a " + property.getClass().getName();
-            throw new AssertionError("Tried to access the RequestExpectationManager but found " + foundType + " instead.");
+            throw new IllegalStateException("Tried to access the RequestExpectationManager but found " + foundType + " instead.");
         }
     }
 

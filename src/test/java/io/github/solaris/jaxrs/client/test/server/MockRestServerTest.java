@@ -51,7 +51,7 @@ class MockRestServerTest {
             server.expect(anything()).andRespond(withSuccess());
 
             filterExceptionAssert.assertThatThrownBy(() -> client.target("").request().get().close())
-                    .isInstanceOf(AssertionError.class)
+                    .isInstanceOf(IllegalStateException.class)
                     .hasMessage("Tried to access the RequestExpectationManager but found a " + String.class.getName() + " instead.");
         }
     }
@@ -65,7 +65,7 @@ class MockRestServerTest {
             client.property(RequestExpectationManager.class.getName(), null);
 
             filterExceptionAssert.assertThatThrownBy(() -> client.target("").request().get().close())
-                    .isInstanceOf(AssertionError.class)
+                    .isInstanceOf(IllegalStateException.class)
                     .hasMessage("Tried to access the RequestExpectationManager but found null instead.");
         }
     }
