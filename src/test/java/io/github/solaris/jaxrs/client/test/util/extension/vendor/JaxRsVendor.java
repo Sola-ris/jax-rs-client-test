@@ -46,7 +46,7 @@ public enum JaxRsVendor {
             io.quarkus.rest.client.reactive.runtime.BuilderResolver.class
     );
 
-    public static final List<JaxRsVendor> VENDORS = Stream.of(values())
+    static final List<JaxRsVendor> VENDORS = Stream.of(values())
             .filter(vendor -> Arrays.asList(System.getProperty("vendors.enabled").split(",")).contains(vendor.name()))
             .toList();
 

@@ -160,7 +160,7 @@ public abstract sealed class EntityConverter permits ClientEntityConverter, Prov
         }
     }
 
-    static void assertMultiPartEntityPresent(ClientRequestContext requestContext) {
+    private static void assertMultiPartEntityPresent(ClientRequestContext requestContext) {
         validateNotNull(requestContext, "'requestContext' must not be null.");
         assertEntityPresent(requestContext);
         if (!MULTIPART_FORM_DATA_TYPE.equals(requestContext.getMediaType())) {
