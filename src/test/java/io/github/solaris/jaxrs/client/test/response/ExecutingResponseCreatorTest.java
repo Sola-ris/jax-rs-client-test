@@ -86,8 +86,8 @@ class ExecutingResponseCreatorTest {
 
     @JaxRsVendorTest
     void testCustomClient() {
-        try (Client client = ClientBuilder.newClient()) {
-            testResponseCreator(new ExecutingResponseCreator(client));
+        try (Client customClient = ClientBuilder.newClient()) {
+            testResponseCreator(new ExecutingResponseCreator(customClient));
         }
     }
 
@@ -98,8 +98,8 @@ class ExecutingResponseCreatorTest {
 
     @JaxRsVendorTest
     void testCustomClientWithoutBody() {
-        try (Client client = ClientBuilder.newClient()) {
-            testResponseCreatorWithoutBody(new ExecutingResponseCreator(client));
+        try (Client customClient = ClientBuilder.newClient()) {
+            testResponseCreatorWithoutBody(new ExecutingResponseCreator(customClient));
         }
     }
 

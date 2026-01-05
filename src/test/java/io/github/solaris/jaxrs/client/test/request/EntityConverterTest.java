@@ -316,9 +316,9 @@ class EntityConverterTest {
 
         @Test
         void testFromRequestContext_converterUnobtainable() {
-            MockRestServer server = MockRestServer.bindTo(validationClient).build();
+            MockRestServer validationServer = MockRestServer.bindTo(validationClient).build();
 
-            server.expect(request -> {
+            validationServer.expect(request -> {
                 request.setProperty(EntityConverter.class.getName(), "hello");
                 EntityConverter.fromRequestContext(request);
             });
@@ -381,8 +381,8 @@ class EntityConverterTest {
 
         @Test
         void testBufferExpectedMultipart_empty() {
-            MockRestServer server = MockRestServer.bindTo(validationClient).build();
-            server.expect(request -> {
+            MockRestServer validationServer = MockRestServer.bindTo(validationClient).build();
+            validationServer.expect(request -> {
                 EntityConverter converter = EntityConverter.fromRequestContext(request);
 
                 List<EntityPart> parts = new ArrayList<>();
@@ -407,9 +407,9 @@ class EntityConverterTest {
         }
 
         private void validateArguments(FilterExceptionAssert filterExceptionAssert, RequestMatcher matcher, String exceptionMessage) {
-            MockRestServer server = MockRestServer.bindTo(validationClient).build();
+            MockRestServer validationServer = MockRestServer.bindTo(validationClient).build();
 
-            server.expect(matcher);
+            validationServer.expect(matcher);
 
             filterExceptionAssert.assertThatThrownBy(() -> validationClient.target("").request().get().close())
                     .isInstanceOf(IllegalArgumentException.class)
