@@ -154,13 +154,18 @@ class EntityRequestMatchersTest {
         }
 
         @JaxRsVendorTest
-        void testIsEqualTo_noMatch() {
+        void testIsEqualTo_noMatch(FilterExceptionAssert filterExceptionAssert) {
             Dto dto = new Dto(true);
+            Dto otherDto = new Dto(false);
 
             server.expect(RequestMatchers.entity().isEqualTo(dto)).andRespond(withSuccess());
 
-            assertThatCode(() -> client.target("/hello").request().post(Entity.entity(dto, TEXT_PLAIN_TYPE)).close())
-                    .doesNotThrowAnyException();
+            filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello")
+                            .request()
+                            .post(Entity.entity(otherDto, TEXT_PLAIN_TYPE))
+                            .close())
+                    .isInstanceOf(AssertionError.class)
+                    .hasMessage("Entity expected: <%s> but was: <%s>", dto, otherDto);
         }
 
         @JaxRsVendorTest
@@ -171,7 +176,8 @@ class EntityRequestMatchersTest {
 
             assertThatCode(() -> client.target("/hello")
                     .request()
-                    .post(Entity.entity(dto.toString(), TEXT_PLAIN_TYPE)).close())
+                    .post(Entity.entity(dto.toString(), TEXT_PLAIN_TYPE))
+                    .close())
                     .doesNotThrowAnyException();
         }
 
