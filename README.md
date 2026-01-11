@@ -34,7 +34,7 @@ Heavily inspired by Spring's [Client testing infrastructure](https://docs.spring
 <dependency>
     <groupId>io.github.sola-ris</groupId>
     <artifactId>jax-rs-client-test</artifactId>
-    <version>0.2.0</version>
+    <version>0.3.0</version>
 </dependency>
 ```
 [@formatter:on]: #
