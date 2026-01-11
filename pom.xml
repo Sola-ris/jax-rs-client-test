@@ -640,7 +640,7 @@
                                 </goals>
                                 <configuration>
                                     <checksums>all</checksums>
-                                    <autoPublish>true</autoPublish>
+                                    <autoPublish>false</autoPublish>
                                     <waitUntil>published</waitUntil>
                                     <deploymentName>${project.artifactId} - ${project.version}</deploymentName>
                                 </configuration>
