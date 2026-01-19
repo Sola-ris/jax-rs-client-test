@@ -573,7 +573,7 @@
                 <version.jersey>4.0.0</version.jersey>
                 <version.resteasy>7.0.0.Final</version.resteasy>
 
-                <version.jackson-jax-rs>2.20.1</version.jackson-jax-rs>
+                <version.jackson-jax-rs>2.21.0</version.jackson-jax-rs>
 
                 <vendors.enabled>JERSEY,JERSEY_HK2,RESTEASY</vendors.enabled>
             </properties>
