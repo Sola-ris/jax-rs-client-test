@@ -125,7 +125,7 @@
         <!-- Quarkus -->
         <dependency>
             <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-junit5</artifactId>
+            <artifactId>quarkus-junit</artifactId>
             <version>${version.quarkus}</version>
             <scope>test</scope>
             <exclusions>
