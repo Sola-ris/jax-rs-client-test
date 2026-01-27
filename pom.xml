@@ -570,7 +570,7 @@
             <properties>
                 <version.jax-rs>4.0.0</version.jax-rs>
 
-                <version.jersey>4.0.0</version.jersey>
+                <version.jersey>4.0.1</version.jersey>
                 <version.resteasy>7.0.0.Final</version.resteasy>
 
                 <version.jackson-jax-rs>2.21.0</version.jackson-jax-rs>
