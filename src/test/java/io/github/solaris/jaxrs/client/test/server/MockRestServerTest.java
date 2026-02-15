@@ -9,7 +9,6 @@ import static io.github.solaris.jaxrs.client.test.response.MockResponseCreators.
 import static io.github.solaris.jaxrs.client.test.response.MockResponseCreators.withSuccess;
 import static io.github.solaris.jaxrs.client.test.server.RequestOrder.STRICT;
 import static io.github.solaris.jaxrs.client.test.server.RequestOrder.UNORDERED;
-import static io.github.solaris.jaxrs.client.test.util.extension.vendor.JaxRsVendor.CXF;
 import static jakarta.ws.rs.core.Response.Status.OK;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
@@ -60,7 +59,7 @@ class MockRestServerTest {
                     .hasMessage("Tried to access the RequestExpectationManager but found a " + String.class.getName() + " instead.");
         }
 
-        @JaxRsVendorTest(skipFor = CXF)// https://issues.apache.org/jira/browse/CXF-9185
+        @JaxRsVendorTest
         void testRequestExpectationManagerMissing_null(FilterExceptionAssert filterExceptionAssert) {
             MockRestServer server = MockRestServer.bindTo(client).build();
 
