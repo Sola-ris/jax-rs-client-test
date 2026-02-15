@@ -29,8 +29,10 @@ import jakarta.ws.rs.core.GenericEntity;
 import jakarta.ws.rs.core.GenericType;
 import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.ext.RuntimeDelegate;
 
 import org.junit.jupiter.api.AutoClose;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -311,107 +313,123 @@ class EntityConverterTest {
     @SuppressWarnings("DataFlowIssue")
     class ArgumentValidation {
 
-        @AutoClose
-        private final Client validationClient = ClientBuilder.newClient();
+        @Nested
+        class VendorSpecific {
 
-        @Test
-        void testFromRequestContext_converterUnobtainable() {
-            MockRestServer validationServer = MockRestServer.bindTo(validationClient).build();
+            @AutoClose
+            private final Client validationClient = ClientBuilder.newClient();
 
-            validationServer.expect(request -> {
-                request.setProperty(EntityConverter.class.getName(), "hello");
-                EntityConverter.fromRequestContext(request);
-            });
+            @JaxRsVendorTest
+            void testConvertEntity_type_requestNull(FilterExceptionAssert filterExceptionAssert) {
+                RequestMatcher matcher = request -> {
+                    EntityConverter converter = EntityConverter.fromRequestContext(request);
+                    converter.convertEntity(null, String.class);
+                };
+                validateArguments(validationClient, filterExceptionAssert, matcher, "'requestContext' must not be null.");
+            }
 
-            new DefaultFilterExceptionAssert().assertThatThrownBy(() -> validationClient.target("").request().get().close())
-                    .isInstanceOf(IllegalStateException.class)
-                    .hasMessage("Unable to obtain EntityConverter from RequestContext.");
+            @JaxRsVendorTest
+            void testConvertEntity_type_typeNull(FilterExceptionAssert filterExceptionAssert) {
+                RequestMatcher matcher = request -> {
+                    EntityConverter converter = EntityConverter.fromRequestContext(request);
+                    converter.convertEntity(request, (Class<?>) null);
+                };
+                validateArguments(validationClient, filterExceptionAssert, matcher, "'type' must not be null.");
+            }
+
+            @JaxRsVendorTest
+            void testConvertEntity_genericType_requestNull(FilterExceptionAssert filterExceptionAssert) {
+                RequestMatcher matcher = request -> {
+                    EntityConverter converter = EntityConverter.fromRequestContext(request);
+                    converter.convertEntity(null, new GenericType<>() {});
+                };
+                validateArguments(validationClient, filterExceptionAssert, matcher, "'requestContext' must not be null.");
+            }
+
+            @JaxRsVendorTest
+            void testConvertEntity_genericType_genericTypeNull(FilterExceptionAssert filterExceptionAssert) {
+                RequestMatcher matcher = request -> {
+                    EntityConverter converter = EntityConverter.fromRequestContext(request);
+                    converter.convertEntity(request, (GenericType<?>) null);
+                };
+                validateArguments(validationClient, filterExceptionAssert, matcher, "'genericType' must not be null.");
+            }
         }
 
-        @Test
-        void testFromRequestContext_requestNull() {
-            RequestMatcher matcher = _ -> EntityConverter.fromRequestContext(null);
-            validateArguments(new DefaultFilterExceptionAssert(), matcher, "'requestContext' must not be null.");
+        @Nested
+        class VendorUnspecific {
+
+            @AutoClose
+            private static final Client VALIDATION_CLIENT = ClientBuilder.newClient();
+
+            @BeforeAll
+            static void reset() {
+                RuntimeDelegate.setInstance(null);
+            }
+
+            @Test
+            void testFromRequestContext_converterUnobtainable() {
+                MockRestServer validationServer = MockRestServer.bindTo(VALIDATION_CLIENT).build();
+
+                validationServer.expect(request -> {
+                    request.setProperty(EntityConverter.class.getName(), "hello");
+                    EntityConverter.fromRequestContext(request);
+                });
+
+                new DefaultFilterExceptionAssert().assertThatThrownBy(() -> VALIDATION_CLIENT.target("").request().get().close())
+                        .isInstanceOf(IllegalStateException.class)
+                        .hasMessage("Unable to obtain EntityConverter from RequestContext.");
+            }
+
+            @Test
+            void testFromRequestContext_requestNull() {
+                RequestMatcher matcher = _ -> EntityConverter.fromRequestContext(null);
+                validateArguments(VALIDATION_CLIENT, new DefaultFilterExceptionAssert(), matcher, "'requestContext' must not be null.");
+            }
+
+            @Test
+            void testBufferExpectedMultipart_null() {
+                RequestMatcher matcher = request -> {
+                    EntityConverter converter = EntityConverter.fromRequestContext(request);
+                    converter.bufferExpectedMultipart(null);
+                };
+                validateArguments(VALIDATION_CLIENT, new DefaultFilterExceptionAssert(), matcher, "'expectedParts' must not be null.");
+            }
+
+            @Test
+            void testBufferExpectedMultipart_empty() {
+                MockRestServer validationServer = MockRestServer.bindTo(VALIDATION_CLIENT).build();
+                validationServer.expect(request -> {
+                    EntityConverter converter = EntityConverter.fromRequestContext(request);
+
+                    List<EntityPart> parts = new ArrayList<>();
+                    List<EntityPart> bufferedParts = converter.bufferExpectedMultipart(parts);
+
+                    assertThat(parts)
+                            .isSameAs(bufferedParts)
+                            .isEmpty();
+                }).andRespond(withSuccess());
+
+                assertThatCode(() -> VALIDATION_CLIENT.target("").request().get().close())
+                        .doesNotThrowAnyException();
+            }
+
+            @Test
+            void testBufferMultipartRequest_null() {
+                RequestMatcher matcher = request -> {
+                    EntityConverter converter = EntityConverter.fromRequestContext(request);
+                    converter.bufferMultipartRequest(null);
+                };
+                validateArguments(VALIDATION_CLIENT, new DefaultFilterExceptionAssert(), matcher, "'requestContext' must not be null.");
+            }
         }
 
-        @JaxRsVendorTest
-        void testConvertEntity_type_requestNull(FilterExceptionAssert filterExceptionAssert) {
-            RequestMatcher matcher = request -> {
-                EntityConverter converter = EntityConverter.fromRequestContext(request);
-                converter.convertEntity(null, String.class);
-            };
-            validateArguments(filterExceptionAssert, matcher, "'requestContext' must not be null.");
-        }
-
-        @JaxRsVendorTest
-        void testConvertEntity_type_typeNull(FilterExceptionAssert filterExceptionAssert) {
-            RequestMatcher matcher = request -> {
-                EntityConverter converter = EntityConverter.fromRequestContext(request);
-                converter.convertEntity(request, (Class<?>) null);
-            };
-            validateArguments(filterExceptionAssert, matcher, "'type' must not be null.");
-        }
-
-        @JaxRsVendorTest
-        void testConvertEntity_genericType_requestNull(FilterExceptionAssert filterExceptionAssert) {
-            RequestMatcher matcher = request -> {
-                EntityConverter converter = EntityConverter.fromRequestContext(request);
-                converter.convertEntity(null, new GenericType<>() {});
-            };
-            validateArguments(filterExceptionAssert, matcher, "'requestContext' must not be null.");
-        }
-
-        @JaxRsVendorTest
-        void testConvertEntity_genericType_genericTypeNull(FilterExceptionAssert filterExceptionAssert) {
-            RequestMatcher matcher = request -> {
-                EntityConverter converter = EntityConverter.fromRequestContext(request);
-                converter.convertEntity(request, (GenericType<?>) null);
-            };
-            validateArguments(filterExceptionAssert, matcher, "'genericType' must not be null.");
-        }
-
-        @Test
-        void testBufferExpectedMultipart_null() {
-            RequestMatcher matcher = request -> {
-                EntityConverter converter = EntityConverter.fromRequestContext(request);
-                converter.bufferExpectedMultipart(null);
-            };
-            validateArguments(new DefaultFilterExceptionAssert(), matcher, "'expectedParts' must not be null.");
-        }
-
-        @Test
-        void testBufferExpectedMultipart_empty() {
-            MockRestServer validationServer = MockRestServer.bindTo(validationClient).build();
-            validationServer.expect(request -> {
-                EntityConverter converter = EntityConverter.fromRequestContext(request);
-
-                List<EntityPart> parts = new ArrayList<>();
-                List<EntityPart> bufferedParts = converter.bufferExpectedMultipart(parts);
-
-                assertThat(parts)
-                        .isSameAs(bufferedParts)
-                        .isEmpty();
-            }).andRespond(withSuccess());
-
-            assertThatCode(() -> validationClient.target("").request().get().close())
-                    .doesNotThrowAnyException();
-        }
-
-        @Test
-        void testBufferMultipartRequest_null() {
-            RequestMatcher matcher = request -> {
-                EntityConverter converter = EntityConverter.fromRequestContext(request);
-                converter.bufferMultipartRequest(null);
-            };
-            validateArguments(new DefaultFilterExceptionAssert(), matcher, "'requestContext' must not be null.");
-        }
-
-        private void validateArguments(FilterExceptionAssert filterExceptionAssert, RequestMatcher matcher, String exceptionMessage) {
-            MockRestServer validationServer = MockRestServer.bindTo(validationClient).build();
+        private void validateArguments(Client client, FilterExceptionAssert filterExceptionAssert, RequestMatcher matcher, String exceptionMessage) {
+            MockRestServer validationServer = MockRestServer.bindTo(client).build();
 
             validationServer.expect(matcher);
 
-            filterExceptionAssert.assertThatThrownBy(() -> validationClient.target("").request().get().close())
+            filterExceptionAssert.assertThatThrownBy(() -> client.target("").request().get().close())
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage(exceptionMessage);
         }
