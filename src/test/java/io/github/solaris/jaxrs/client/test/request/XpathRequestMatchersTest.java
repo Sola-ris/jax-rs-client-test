@@ -420,7 +420,7 @@ class XpathRequestMatchersTest {
     }
 
     @JaxRsVendorTest
-    void testSecureProcessionLimits(FilterExceptionAssert filterExceptionAssert) throws XPathExpressionException {
+    void testSecureProcessingLimits(FilterExceptionAssert filterExceptionAssert) throws XPathExpressionException {
         String emlementName = "A".repeat(1001);
         String elementWithNameOverLimit = "<%s>hello</%s>".formatted(emlementName, emlementName);
 
@@ -432,8 +432,7 @@ class XpathRequestMatchersTest {
                 .isInstanceOf(SAXParseException.class)
                 .hasMessageEndingWith(
                         "The length of entity \"[xml]\" is \"1,001\" that exceeds the \"1,000\" limit set by \"jaxp.properties\"."
-                )
-        ;
+                );
     }
 
     @ParameterizedTest
