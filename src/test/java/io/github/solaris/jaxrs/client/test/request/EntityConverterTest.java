@@ -3,22 +3,28 @@ package io.github.solaris.jaxrs.client.test.request;
 import static io.github.solaris.jaxrs.client.test.response.MockResponseCreators.withSuccess;
 import static io.github.solaris.jaxrs.client.test.util.MultiParts.LIST_CONTENT;
 import static io.github.solaris.jaxrs.client.test.util.MultiParts.PLAIN_CONTENT;
+import static io.github.solaris.jaxrs.client.test.util.MultiParts.imagePart;
 import static io.github.solaris.jaxrs.client.test.util.MultiParts.jsonPart;
 import static io.github.solaris.jaxrs.client.test.util.MultiParts.listPart;
 import static io.github.solaris.jaxrs.client.test.util.MultiParts.plainPart;
+import static io.github.solaris.jaxrs.client.test.util.MultiParts.toMultiPartEntity;
 import static io.github.solaris.jaxrs.client.test.util.extension.vendor.JaxRsVendor.JERSEY;
 import static io.github.solaris.jaxrs.client.test.util.extension.vendor.JaxRsVendor.RESTEASY_REACTIVE;
+import static jakarta.ws.rs.core.HttpHeaders.CONTENT_LENGTH;
 import static jakarta.ws.rs.core.HttpHeaders.CONTENT_TYPE;
 import static jakarta.ws.rs.core.MediaType.APPLICATION_FORM_URLENCODED_TYPE;
+import static jakarta.ws.rs.core.MediaType.CHARSET_PARAMETER;
 import static jakarta.ws.rs.core.MediaType.MULTIPART_FORM_DATA;
-import static jakarta.ws.rs.core.MediaType.MULTIPART_FORM_DATA_TYPE;
 import static jakarta.ws.rs.core.MediaType.TEXT_HTML_TYPE;
 import static jakarta.ws.rs.core.Response.Status.OK;
+import static java.nio.charset.StandardCharsets.US_ASCII;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.ClientBuilder;
@@ -27,6 +33,7 @@ import jakarta.ws.rs.core.EntityPart;
 import jakarta.ws.rs.core.Form;
 import jakarta.ws.rs.core.GenericEntity;
 import jakarta.ws.rs.core.GenericType;
+import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.RuntimeDelegate;
@@ -211,7 +218,7 @@ class EntityConverterTest {
         assertThatCode(
                 () -> client.target("/hello")
                         .request()
-                        .post(Entity.entity(new GenericEntity<>(List.of(plainPart())) {}, MULTIPART_FORM_DATA_TYPE))
+                        .post(toMultiPartEntity(List.of(plainPart())))
                         .close())
                 .doesNotThrowAnyException();
     }
@@ -230,7 +237,7 @@ class EntityConverterTest {
         assertThatCode(
                 () -> client.target("/hello")
                         .request()
-                        .post(Entity.entity(new GenericEntity<>(List.of(jsonPart())) {}, MULTIPART_FORM_DATA_TYPE))
+                        .post(toMultiPartEntity(List.of(jsonPart())))
                         .close())
                 .doesNotThrowAnyException();
     }
@@ -249,7 +256,7 @@ class EntityConverterTest {
         assertThatCode(
                 () -> client.target("/hello")
                         .request()
-                        .post(Entity.entity(new GenericEntity<>(List.of(listPart())) {}, MULTIPART_FORM_DATA_TYPE))
+                        .post(toMultiPartEntity(List.of(listPart())))
                         .close())
                 .doesNotThrowAnyException();
     }
@@ -269,7 +276,7 @@ class EntityConverterTest {
         assertThatCode(
                 () -> client.target("/hello")
                         .request()
-                        .post(Entity.entity(new GenericEntity<>(List.of(plainPart())) {}, MULTIPART_FORM_DATA_TYPE))
+                        .post(toMultiPartEntity(List.of(plainPart())))
                         .close())
                 .doesNotThrowAnyException();
     }
@@ -292,7 +299,7 @@ class EntityConverterTest {
         assertThatCode(
                 () -> client.target("/hello")
                         .request()
-                        .post(Entity.entity(new GenericEntity<>(List.of(plainPart())) {}, MULTIPART_FORM_DATA_TYPE))
+                        .post(toMultiPartEntity(List.of(plainPart())))
                         .close())
                 .doesNotThrowAnyException();
     }
@@ -309,9 +316,69 @@ class EntityConverterTest {
                 .hasMessage("MediaType must be %s", MULTIPART_FORM_DATA);
     }
 
+    @JaxRsVendorTest(skipFor = {JERSEY, RESTEASY_REACTIVE})
+    void testBufferedMultipart_consistentHashCode() {
+        server.expect(request -> {
+            EntityConverter converter = EntityConverter.fromRequestContext(request);
+            List<EntityPart> fromRequest = converter.bufferMultipartRequest(request);
+            List<EntityPart> expectedParts = converter.bufferExpectedMultipart(List.of(jsonPart(), plainPart(), listPart(), imagePart()));
+
+            for (int i = 0; i < fromRequest.size(); i++) {
+                assertThat(fromRequest.get(i)).hasSameHashCodeAs(expectedParts.get(i));
+            }
+        }).andRespond(withSuccess());
+
+        assertThatCode(
+                () -> client.target("/hello")
+                        .request()
+                        .post(toMultiPartEntity(List.of(jsonPart(), plainPart(), listPart(), imagePart())))
+                        .close())
+                .doesNotThrowAnyException();
+    }
+
+    @JaxRsVendorTest(skipFor = {JERSEY, RESTEASY_REACTIVE})
+    void testBufferedMultipart_nonCharsetParameterOnContentTypeRetained() throws IOException {
+        server.expect(request -> {
+            EntityConverter converter = EntityConverter.fromRequestContext(request);
+            List<EntityPart> fromRequest = converter.bufferMultipartRequest(request);
+
+            MediaType expectedMediaType = new MediaType("text", "plain", Map.of("X-Custom-Param", "hello"));
+            assertThat(fromRequest)
+                    .singleElement()
+                    .satisfies(part -> assertThat(part.getHeaders()).containsEntry(CONTENT_TYPE, List.of(expectedMediaType.toString())));
+        }).andRespond(withSuccess());
+
+        MediaType mediaType = new MediaType(
+                "text", "plain", Map.of("X-Custom-Param", "hello", CHARSET_PARAMETER, US_ASCII.displayName())
+        );
+        EntityPart entityPart = EntityPart.withName("plainWithCustomParam")
+                .content(PLAIN_CONTENT)
+                .mediaType(mediaType)
+                .header(CONTENT_TYPE, mediaType.toString()) // CXF doesn't copy the Content-Type header into the headers Map
+                .header(CONTENT_LENGTH, String.valueOf(PLAIN_CONTENT.length()))
+                .build();
+
+        assertThatCode(
+                () -> client.target("/hello")
+                        .request()
+                        .post(toMultiPartEntity(List.of(entityPart)))
+                        .close())
+                .doesNotThrowAnyException();
+    }
+
     @Nested
     @SuppressWarnings("DataFlowIssue")
     class ArgumentValidation {
+
+        private void validateArguments(Client client, FilterExceptionAssert filterExceptionAssert, RequestMatcher matcher, String exceptionMessage) {
+            MockRestServer validationServer = MockRestServer.bindTo(client).build();
+
+            validationServer.expect(matcher);
+
+            filterExceptionAssert.assertThatThrownBy(() -> client.target("").request().get().close())
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessage(exceptionMessage);
+        }
 
         @Nested
         class VendorSpecific {
@@ -422,16 +489,6 @@ class EntityConverterTest {
                 };
                 validateArguments(VALIDATION_CLIENT, new DefaultFilterExceptionAssert(), matcher, "'requestContext' must not be null.");
             }
-        }
-
-        private void validateArguments(Client client, FilterExceptionAssert filterExceptionAssert, RequestMatcher matcher, String exceptionMessage) {
-            MockRestServer validationServer = MockRestServer.bindTo(client).build();
-
-            validationServer.expect(matcher);
-
-            filterExceptionAssert.assertThatThrownBy(() -> client.target("").request().get().close())
-                    .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessage(exceptionMessage);
         }
     }
 }

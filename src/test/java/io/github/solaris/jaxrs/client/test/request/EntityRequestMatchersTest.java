@@ -5,6 +5,7 @@ import static io.github.solaris.jaxrs.client.test.util.MultiParts.imagePart;
 import static io.github.solaris.jaxrs.client.test.util.MultiParts.jsonPart;
 import static io.github.solaris.jaxrs.client.test.util.MultiParts.partsBufferMatcher;
 import static io.github.solaris.jaxrs.client.test.util.MultiParts.plainPart;
+import static io.github.solaris.jaxrs.client.test.util.MultiParts.toMultiPartEntity;
 import static io.github.solaris.jaxrs.client.test.util.extension.vendor.JaxRsVendor.JERSEY;
 import static io.github.solaris.jaxrs.client.test.util.extension.vendor.JaxRsVendor.RESTEASY_REACTIVE;
 import static jakarta.ws.rs.core.MediaType.APPLICATION_ATOM_XML;
@@ -13,7 +14,6 @@ import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
 import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON_TYPE;
 import static jakarta.ws.rs.core.MediaType.APPLICATION_OCTET_STREAM;
 import static jakarta.ws.rs.core.MediaType.APPLICATION_OCTET_STREAM_TYPE;
-import static jakarta.ws.rs.core.MediaType.MULTIPART_FORM_DATA_TYPE;
 import static jakarta.ws.rs.core.MediaType.TEXT_PLAIN_TYPE;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -28,7 +28,6 @@ import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.core.Form;
-import jakarta.ws.rs.core.GenericEntity;
 import jakarta.ws.rs.core.MediaType;
 
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
@@ -345,7 +344,7 @@ class EntityRequestMatchersTest {
             assertThatCode(
                     () -> client.target("/hello")
                             .request()
-                            .post(Entity.entity(new GenericEntity<>(List.of(plainPart(), imagePart(), jsonPart())) {}, MULTIPART_FORM_DATA_TYPE))
+                            .post(toMultiPartEntity(List.of(plainPart(), imagePart(), jsonPart())))
                             .close())
                     .doesNotThrowAnyException();
         }
@@ -358,7 +357,7 @@ class EntityRequestMatchersTest {
 
             filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello")
                             .request()
-                            .post(Entity.entity(new GenericEntity<>(List.of(plainPart(), imagePart(), jsonPart())) {}, MULTIPART_FORM_DATA_TYPE))
+                            .post(toMultiPartEntity(List.of(plainPart(), imagePart(), jsonPart())))
                             .close())
                     .isInstanceOf(AssertionError.class)
                     .hasMessage("Multipart Form expected: <%s> but was: <%s>", partsBuffer.get().expected(), partsBuffer.get().actual());
@@ -372,7 +371,7 @@ class EntityRequestMatchersTest {
 
             filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello")
                             .request()
-                            .post(Entity.entity(new GenericEntity<>(List.of(plainPart(), imagePart(), jsonPart())) {}, MULTIPART_FORM_DATA_TYPE))
+                            .post(toMultiPartEntity(List.of(plainPart(), imagePart(), jsonPart())))
                             .close())
                     .isInstanceOf(AssertionError.class)
                     .hasMessage("Multipart Form expected: <%s> but was: <%s>", partsBuffer.get().expected(), partsBuffer.get().actual());
@@ -385,7 +384,7 @@ class EntityRequestMatchersTest {
             assertThatCode(
                     () -> client.target("/hello")
                             .request()
-                            .post(Entity.entity(new GenericEntity<>(List.of(plainPart(), imagePart(), jsonPart())) {}, MULTIPART_FORM_DATA_TYPE))
+                            .post(toMultiPartEntity(List.of(plainPart(), imagePart(), jsonPart())))
                             .close())
                     .doesNotThrowAnyException();
         }
@@ -399,7 +398,8 @@ class EntityRequestMatchersTest {
 
             filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello")
                             .request()
-                            .post(Entity.entity(new GenericEntity<>(List.of(plainPart(), imagePart())) {}, MULTIPART_FORM_DATA_TYPE)).close())
+                            .post(toMultiPartEntity(List.of(plainPart(), imagePart())))
+                            .close())
                     .isInstanceOf(AssertionError.class)
                     .hasMessage("Expected %s to be smaller or the same size as %s", partsBuffer.get().expected(), partsBuffer.get().actual());
         }
@@ -412,7 +412,8 @@ class EntityRequestMatchersTest {
 
             filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello")
                             .request()
-                            .post(Entity.entity(new GenericEntity<>(List.of(plainPart(), imagePart())) {}, MULTIPART_FORM_DATA_TYPE)).close())
+                            .post(toMultiPartEntity(List.of(plainPart(), imagePart())))
+                            .close())
                     .isInstanceOf(AssertionError.class)
                     .hasMessage("Expected %s to contain all of %s", partsBuffer.get().actual(), partsBuffer.get().expected());
         }
