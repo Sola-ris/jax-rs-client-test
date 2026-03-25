@@ -54,8 +54,6 @@
         <version.quarkus>3.34.0</version.quarkus>
         <version.resteasy>6.2.15.Final</version.resteasy>
 
-        <version.jackson-jax-rs>2.18.6</version.jackson-jax-rs>
-
         <vendors.enabled>JERSEY,JERSEY_HK2,RESTEASY,CXF,RESTEASY_REACTIVE</vendors.enabled>
     </properties>
 
@@ -151,6 +149,14 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- Jackson JAX-RS -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.jakarta.rs</groupId>
+            <artifactId>jackson-jakarta-rs-json-provider</artifactId>
+            <version>2.21.2</version>
+            <scope>test</scope>
+        </dependency>
+
         <!-- JAX-RS Vendors -->
         <dependency>
             <groupId>org.glassfish.jersey.core</groupId>
@@ -175,6 +181,17 @@
             <artifactId>jersey-media-json-jackson</artifactId>
             <version>${version.jersey}</version>
             <scope>test</scope>
+            <exclusions>
+                <!-- Exclude outdated Jackson dependencies -->
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.module</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.glassfish.jersey.media</groupId>
@@ -222,6 +239,25 @@
             <artifactId>resteasy-jackson2-provider</artifactId>
             <version>${version.resteasy}</version>
             <scope>test</scope>
+            <exclusions>
+                <!-- Exclude outdated Jackson dependencies -->
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.module</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.datatype</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.jakarta.rs</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
@@ -258,12 +294,6 @@
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-rs-mp-client</artifactId>
             <version>${version.cxf}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.jakarta.rs</groupId>
-            <artifactId>jackson-jakarta-rs-json-provider</artifactId>
-            <version>${version.jackson-jax-rs}</version>
             <scope>test</scope>
         </dependency>
 
@@ -575,8 +605,6 @@
                 <version.cxf>4.2.0</version.cxf>
                 <version.jersey>4.0.1</version.jersey>
                 <version.resteasy>7.0.1.Final</version.resteasy>
-
-                <version.jackson-jax-rs>2.21.2</version.jackson-jax-rs>
 
                 <vendors.enabled>JERSEY,JERSEY_HK2,RESTEASY,CXF</vendors.enabled>
             </properties>
