@@ -344,7 +344,7 @@ class EntityRequestMatchersTest {
             assertThatCode(
                     () -> client.target("/hello")
                             .request()
-                            .post(toMultiPartEntity(List.of(plainPart(), imagePart(), jsonPart())))
+                            .post(toMultiPartEntity(plainPart(), imagePart(), jsonPart()))
                             .close())
                     .doesNotThrowAnyException();
         }
@@ -352,12 +352,12 @@ class EntityRequestMatchersTest {
         @JaxRsVendorTest(skipFor = {JERSEY, RESTEASY_REACTIVE})
         void testMultipartForm_noMatch(FilterExceptionAssert filterExceptionAssert) throws IOException {
             AtomicReference<PartsBuffer> partsBuffer = new AtomicReference<>();
-            server.expect(partsBufferMatcher(List.of(plainPart()), partsBuffer))
+            server.expect(partsBufferMatcher(partsBuffer, plainPart()))
                     .andExpect(RequestMatchers.entity().multipartForm(List.of(plainPart()))).andRespond(withSuccess());
 
             filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello")
                             .request()
-                            .post(toMultiPartEntity(List.of(plainPart(), imagePart(), jsonPart())))
+                            .post(toMultiPartEntity(plainPart(), imagePart(), jsonPart()))
                             .close())
                     .isInstanceOf(AssertionError.class)
                     .hasMessage("Multipart Form expected: <%s> but was: <%s>", partsBuffer.get().expected(), partsBuffer.get().actual());
@@ -366,12 +366,12 @@ class EntityRequestMatchersTest {
         @JaxRsVendorTest(skipFor = {JERSEY, RESTEASY_REACTIVE})
         void testMultipartForm_noMatch_wrongOrder(FilterExceptionAssert filterExceptionAssert) throws IOException {
             AtomicReference<PartsBuffer> partsBuffer = new AtomicReference<>();
-            server.expect(partsBufferMatcher(List.of(jsonPart(), imagePart(), plainPart()), partsBuffer))
+            server.expect(partsBufferMatcher(partsBuffer, jsonPart(), imagePart(), plainPart()))
                     .andExpect(RequestMatchers.entity().multipartForm(List.of(jsonPart(), imagePart(), plainPart()))).andRespond(withSuccess());
 
             filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello")
                             .request()
-                            .post(toMultiPartEntity(List.of(plainPart(), imagePart(), jsonPart())))
+                            .post(toMultiPartEntity(plainPart(), imagePart(), jsonPart()))
                             .close())
                     .isInstanceOf(AssertionError.class)
                     .hasMessage("Multipart Form expected: <%s> but was: <%s>", partsBuffer.get().expected(), partsBuffer.get().actual());
@@ -384,7 +384,7 @@ class EntityRequestMatchersTest {
             assertThatCode(
                     () -> client.target("/hello")
                             .request()
-                            .post(toMultiPartEntity(List.of(plainPart(), imagePart(), jsonPart())))
+                            .post(toMultiPartEntity(plainPart(), imagePart(), jsonPart()))
                             .close())
                     .doesNotThrowAnyException();
         }
@@ -392,13 +392,13 @@ class EntityRequestMatchersTest {
         @JaxRsVendorTest(skipFor = {JERSEY, RESTEASY_REACTIVE})
         void testMultipartFormContains_subsetIsLarger(FilterExceptionAssert filterExceptionAssert) throws IOException {
             AtomicReference<PartsBuffer> partsBuffer = new AtomicReference<>();
-            server.expect(partsBufferMatcher(List.of(jsonPart(), imagePart(), plainPart()), partsBuffer))
+            server.expect(partsBufferMatcher(partsBuffer, jsonPart(), imagePart(), plainPart()))
                     .andExpect(RequestMatchers.entity().multipartFormContains(List.of(jsonPart(), imagePart(), plainPart())))
                     .andRespond(withSuccess());
 
             filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello")
                             .request()
-                            .post(toMultiPartEntity(List.of(plainPart(), imagePart())))
+                            .post(toMultiPartEntity(plainPart(), imagePart()))
                             .close())
                     .isInstanceOf(AssertionError.class)
                     .hasMessage("Expected %s to be smaller or the same size as %s", partsBuffer.get().expected(), partsBuffer.get().actual());
@@ -407,12 +407,12 @@ class EntityRequestMatchersTest {
         @JaxRsVendorTest(skipFor = {JERSEY, RESTEASY_REACTIVE})
         void testMultipartFormContains_noMatch(FilterExceptionAssert filterExceptionAssert) throws IOException {
             AtomicReference<PartsBuffer> partsBuffer = new AtomicReference<>();
-            server.expect(partsBufferMatcher(List.of(jsonPart()), partsBuffer))
+            server.expect(partsBufferMatcher(partsBuffer, jsonPart()))
                     .andExpect(RequestMatchers.entity().multipartFormContains(List.of(jsonPart()))).andRespond(withSuccess());
 
             filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello")
                             .request()
-                            .post(toMultiPartEntity(List.of(plainPart(), imagePart())))
+                            .post(toMultiPartEntity(plainPart(), imagePart()))
                             .close())
                     .isInstanceOf(AssertionError.class)
                     .hasMessage("Expected %s to contain all of %s", partsBuffer.get().actual(), partsBuffer.get().expected());

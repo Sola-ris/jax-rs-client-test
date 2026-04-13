@@ -218,7 +218,7 @@ class EntityConverterTest {
         assertThatCode(
                 () -> client.target("/hello")
                         .request()
-                        .post(toMultiPartEntity(List.of(plainPart())))
+                        .post(toMultiPartEntity(plainPart()))
                         .close())
                 .doesNotThrowAnyException();
     }
@@ -237,7 +237,7 @@ class EntityConverterTest {
         assertThatCode(
                 () -> client.target("/hello")
                         .request()
-                        .post(toMultiPartEntity(List.of(jsonPart())))
+                        .post(toMultiPartEntity(jsonPart()))
                         .close())
                 .doesNotThrowAnyException();
     }
@@ -256,7 +256,7 @@ class EntityConverterTest {
         assertThatCode(
                 () -> client.target("/hello")
                         .request()
-                        .post(toMultiPartEntity(List.of(listPart())))
+                        .post(toMultiPartEntity(listPart()))
                         .close())
                 .doesNotThrowAnyException();
     }
@@ -276,7 +276,7 @@ class EntityConverterTest {
         assertThatCode(
                 () -> client.target("/hello")
                         .request()
-                        .post(toMultiPartEntity(List.of(plainPart())))
+                        .post(toMultiPartEntity(plainPart()))
                         .close())
                 .doesNotThrowAnyException();
     }
@@ -299,7 +299,7 @@ class EntityConverterTest {
         assertThatCode(
                 () -> client.target("/hello")
                         .request()
-                        .post(toMultiPartEntity(List.of(plainPart())))
+                        .post(toMultiPartEntity(plainPart()))
                         .close())
                 .doesNotThrowAnyException();
     }
@@ -331,7 +331,7 @@ class EntityConverterTest {
         assertThatCode(
                 () -> client.target("/hello")
                         .request()
-                        .post(toMultiPartEntity(List.of(jsonPart(), plainPart(), listPart(), imagePart())))
+                        .post(toMultiPartEntity(jsonPart(), plainPart(), listPart(), imagePart()))
                         .close())
                 .doesNotThrowAnyException();
     }
@@ -361,7 +361,7 @@ class EntityConverterTest {
         assertThatCode(
                 () -> client.target("/hello")
                         .request()
-                        .post(toMultiPartEntity(List.of(entityPart)))
+                        .post(toMultiPartEntity(entityPart))
                         .close())
                 .doesNotThrowAnyException();
     }

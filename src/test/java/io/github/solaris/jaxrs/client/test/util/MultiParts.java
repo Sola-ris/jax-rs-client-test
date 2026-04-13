@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -87,18 +88,18 @@ public final class MultiParts {
                 .build();
     }
 
-    public static RequestMatcher partsBufferMatcher(List<EntityPart> expected, AtomicReference<PartsBuffer> target) {
+    public static RequestMatcher partsBufferMatcher(AtomicReference<PartsBuffer> target, EntityPart... expected) {
         return request -> {
             EntityConverter converter = EntityConverter.fromRequestContext(request);
             target.set(new PartsBuffer(
-                    converter.bufferExpectedMultipart(expected),
+                    converter.bufferExpectedMultipart(Arrays.asList(expected)),
                     converter.bufferMultipartRequest(request)
             ));
         };
     }
 
-    public static Entity<GenericEntity<List<EntityPart>>> toMultiPartEntity(List<EntityPart> parts) {
-        return Entity.entity(new GenericEntity<>(parts) {}, MULTIPART_FORM_DATA_TYPE);
+    public static Entity<GenericEntity<List<EntityPart>>> toMultiPartEntity(EntityPart... parts) {
+        return Entity.entity(new GenericEntity<>(Arrays.asList(parts)) {}, MULTIPART_FORM_DATA_TYPE);
     }
 
     public record PartsBuffer(List<EntityPart> expected, List<EntityPart> actual) {}
