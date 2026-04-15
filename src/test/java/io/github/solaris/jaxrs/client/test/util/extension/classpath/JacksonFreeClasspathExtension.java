@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.InvocationInterceptor;
 import org.junit.jupiter.api.extension.ReflectiveInvocationContext;
@@ -55,7 +56,7 @@ class JacksonFreeClasspathExtension implements InvocationInterceptor {
 
     @Override
     public void interceptTestMethod(
-            Invocation<Void> invocation,
+            Invocation<@Nullable Void> invocation,
             ReflectiveInvocationContext<Method> invocationContext,
             ExtensionContext extensionContext
     ) throws Throwable {

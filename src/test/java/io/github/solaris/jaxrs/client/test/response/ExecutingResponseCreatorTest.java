@@ -38,6 +38,7 @@ import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 
 import io.github.solaris.jaxrs.client.test.server.MockRestServer;
+import io.github.solaris.jaxrs.client.test.util.extension.vendor.EnableJackson3;
 import io.github.solaris.jaxrs.client.test.util.extension.vendor.JaxRsVendorTest;
 
 @NullUnmarked
@@ -79,11 +80,13 @@ class ExecutingResponseCreatorTest {
         httpServer.stop(0);
     }
 
+    @EnableJackson3
     @JaxRsVendorTest
     void testDefaultClient() {
         testResponseCreator(new ExecutingResponseCreator());
     }
 
+    @EnableJackson3
     @JaxRsVendorTest
     void testCustomClient() {
         try (Client customClient = ClientBuilder.newClient()) {

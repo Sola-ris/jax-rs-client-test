@@ -27,6 +27,7 @@ import org.junit.jupiter.api.Nested;
 
 import io.github.solaris.jaxrs.client.test.util.Dto;
 import io.github.solaris.jaxrs.client.test.util.GreetingSendoffClient;
+import io.github.solaris.jaxrs.client.test.util.extension.vendor.EnableJackson3;
 import io.github.solaris.jaxrs.client.test.util.extension.vendor.JaxRsVendorTest;
 import io.github.solaris.jaxrs.client.test.util.extension.vendor.RunInQuarkus;
 
@@ -66,6 +67,7 @@ class AsyncRequestTest {
                 .withMessage(EXCEPTION_MESSAGE);
     }
 
+    @EnableJackson3
     @JaxRsVendorTest
     void testInvokeAsyncWithCallback_success() {
         server.expect(method(GET)).andRespond(withSuccess(BODY, APPLICATION_JSON_TYPE));

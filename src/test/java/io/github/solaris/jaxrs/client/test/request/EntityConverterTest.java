@@ -48,6 +48,7 @@ import io.github.solaris.jaxrs.client.test.util.Dto;
 import io.github.solaris.jaxrs.client.test.util.EntityConverterAssert;
 import io.github.solaris.jaxrs.client.test.util.FilterExceptionAssert;
 import io.github.solaris.jaxrs.client.test.util.FilterExceptionAssert.DefaultFilterExceptionAssert;
+import io.github.solaris.jaxrs.client.test.util.extension.vendor.EnableJackson3;
 import io.github.solaris.jaxrs.client.test.util.extension.vendor.JaxRsVendorTest;
 
 class EntityConverterTest {
@@ -175,21 +176,6 @@ class EntityConverterTest {
     }
 
     @JaxRsVendorTest(skipFor = {JERSEY, RESTEASY_REACTIVE})
-    void testBufferExpectedMultipart_repeatedTypedReads() {
-        server.expect(request -> {
-            EntityConverter converter = EntityConverter.fromRequestContext(request);
-            EntityPart jsonPart = converter.bufferExpectedMultipart(List.of(jsonPart())).getFirst();
-
-            assertThat(jsonPart).isInstanceOf(BufferedEntityPart.class);
-            assertThat(jsonPart.getContent(Dto.class)).isEqualTo(new Dto(false));
-            assertThat(jsonPart.getContent(Dto.class)).isEqualTo(new Dto(false));
-        }).andRespond(withSuccess());
-
-        assertThatCode(() -> client.target("/hello").request().get().close())
-                .doesNotThrowAnyException();
-    }
-
-    @JaxRsVendorTest(skipFor = {JERSEY, RESTEASY_REACTIVE})
     void testBufferExpectedMultipart_repeatedGenericReads() {
         server.expect(request -> {
             EntityConverter converter = EntityConverter.fromRequestContext(request);
@@ -219,25 +205,6 @@ class EntityConverterTest {
                 () -> client.target("/hello")
                         .request()
                         .post(toMultiPartEntity(plainPart()))
-                        .close())
-                .doesNotThrowAnyException();
-    }
-
-    @JaxRsVendorTest(skipFor = {JERSEY, RESTEASY_REACTIVE})
-    void testBufferMultipartRequest_repeatedTypedReads() {
-        server.expect(request -> {
-            EntityConverter converter = EntityConverter.fromRequestContext(request);
-            EntityPart jsonPart = converter.bufferMultipartRequest(request).getFirst();
-
-            assertThat(jsonPart).isInstanceOf(BufferedEntityPart.class);
-            assertThat(jsonPart.getContent(Dto.class)).isEqualTo(new Dto(false));
-            assertThat(jsonPart.getContent(Dto.class)).isEqualTo(new Dto(false));
-        }).andRespond(withSuccess());
-
-        assertThatCode(
-                () -> client.target("/hello")
-                        .request()
-                        .post(toMultiPartEntity(jsonPart()))
                         .close())
                 .doesNotThrowAnyException();
     }
@@ -317,26 +284,6 @@ class EntityConverterTest {
     }
 
     @JaxRsVendorTest(skipFor = {JERSEY, RESTEASY_REACTIVE})
-    void testBufferedMultipart_consistentHashCode() {
-        server.expect(request -> {
-            EntityConverter converter = EntityConverter.fromRequestContext(request);
-            List<EntityPart> fromRequest = converter.bufferMultipartRequest(request);
-            List<EntityPart> expectedParts = converter.bufferExpectedMultipart(List.of(jsonPart(), plainPart(), listPart(), imagePart()));
-
-            for (int i = 0; i < fromRequest.size(); i++) {
-                assertThat(fromRequest.get(i)).hasSameHashCodeAs(expectedParts.get(i));
-            }
-        }).andRespond(withSuccess());
-
-        assertThatCode(
-                () -> client.target("/hello")
-                        .request()
-                        .post(toMultiPartEntity(jsonPart(), plainPart(), listPart(), imagePart()))
-                        .close())
-                .doesNotThrowAnyException();
-    }
-
-    @JaxRsVendorTest(skipFor = {JERSEY, RESTEASY_REACTIVE})
     void testBufferedMultipart_nonCharsetParameterOnContentTypeRetained() throws IOException {
         server.expect(request -> {
             EntityConverter converter = EntityConverter.fromRequestContext(request);
@@ -364,6 +311,70 @@ class EntityConverterTest {
                         .post(toMultiPartEntity(entityPart))
                         .close())
                 .doesNotThrowAnyException();
+    }
+
+    @Nested
+    @EnableJackson3
+    class WithJson {
+
+        @AutoClose
+        private final Client jsonClient = ClientBuilder.newClient();
+
+        private final MockRestServer jsonServer = MockRestServer.bindTo(jsonClient).build();
+
+        @JaxRsVendorTest(skipFor = {JERSEY, RESTEASY_REACTIVE})
+        void testBufferExpectedMultipart_repeatedTypedReads() {
+            jsonServer.expect(request -> {
+                EntityConverter converter = EntityConverter.fromRequestContext(request);
+                EntityPart jsonPart = converter.bufferExpectedMultipart(List.of(jsonPart())).getFirst();
+
+                assertThat(jsonPart).isInstanceOf(BufferedEntityPart.class);
+                assertThat(jsonPart.getContent(Dto.class)).isEqualTo(new Dto(false));
+                assertThat(jsonPart.getContent(Dto.class)).isEqualTo(new Dto(false));
+            }).andRespond(withSuccess());
+
+            assertThatCode(() -> jsonClient.target("/hello").request().get().close())
+                    .doesNotThrowAnyException();
+        }
+
+        @JaxRsVendorTest(skipFor = {JERSEY, RESTEASY_REACTIVE})
+        void testBufferMultipartRequest_repeatedTypedReads() {
+            jsonServer.expect(request -> {
+                EntityConverter converter = EntityConverter.fromRequestContext(request);
+                EntityPart jsonPart = converter.bufferMultipartRequest(request).getFirst();
+
+                assertThat(jsonPart).isInstanceOf(BufferedEntityPart.class);
+                assertThat(jsonPart.getContent(Dto.class)).isEqualTo(new Dto(false));
+                assertThat(jsonPart.getContent(Dto.class)).isEqualTo(new Dto(false));
+            }).andRespond(withSuccess());
+
+            assertThatCode(
+                    () -> jsonClient.target("/hello")
+                            .request()
+                            .post(toMultiPartEntity(jsonPart()))
+                            .close())
+                    .doesNotThrowAnyException();
+        }
+
+        @JaxRsVendorTest(skipFor = {JERSEY, RESTEASY_REACTIVE})
+        void testBufferedMultipart_consistentHashCode() {
+            jsonServer.expect(request -> {
+                EntityConverter converter = EntityConverter.fromRequestContext(request);
+                List<EntityPart> fromRequest = converter.bufferMultipartRequest(request);
+                List<EntityPart> expectedParts = converter.bufferExpectedMultipart(List.of(jsonPart(), plainPart(), listPart(), imagePart()));
+
+                for (int i = 0; i < fromRequest.size(); i++) {
+                    assertThat(fromRequest.get(i)).hasSameHashCodeAs(expectedParts.get(i));
+                }
+            }).andRespond(withSuccess());
+
+            assertThatCode(
+                    () -> jsonClient.target("/hello")
+                            .request()
+                            .post(toMultiPartEntity(jsonPart(), plainPart(), listPart(), imagePart()))
+                            .close())
+                    .doesNotThrowAnyException();
+        }
     }
 
     @Nested
