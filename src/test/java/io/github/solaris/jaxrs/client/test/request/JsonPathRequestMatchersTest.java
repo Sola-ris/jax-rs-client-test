@@ -440,7 +440,18 @@ class JsonPathRequestMatchersTest {
     }
 
     @JaxRsVendorTest
-    void testsValueSatisfies() {
+    void testValueSatisfies() {
+        server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).valueSatisfies(value -> assertThat(value).isNotNull().contains("ell"), String.class))
+                .andRespond(withSuccess());
+
+        Dto dto = new Dto("hello");
+
+        assertThatCode(() -> client.target("/hello").request().post(Entity.json(dto)).close())
+                .doesNotThrowAnyException();
+    }
+
+    @JaxRsVendorTest
+    void testValueSatisfies_record() {
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).valueSatisfies(value -> assertThat(value)
                                 .isNotNull()
                                 .extracting(Dto::something, STRING)
@@ -455,8 +466,8 @@ class JsonPathRequestMatchersTest {
     }
 
     @JaxRsVendorTest
-    void testsValueSatisfies_null() {
-        server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).valueSatisfies(value -> assertThat(value).isNull(), Dto.class))
+    void testValueSatisfies_null() {
+        server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).valueSatisfies(value -> assertThat(value).isNull(), String.class))
                 .andRespond(withSuccess());
 
         Dto dto = new Dto(null);
@@ -466,7 +477,7 @@ class JsonPathRequestMatchersTest {
     }
 
     @JaxRsVendorTest
-    void testsValueSatisfies_doesNot(FilterExceptionAssert filterExceptionAssert) {
+    void testValueSatisfies_doesNot(FilterExceptionAssert filterExceptionAssert) {
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).valueSatisfies(value -> assertThat(value)
                                 .isNotNull()
                                 .contains("bye"),
@@ -481,22 +492,22 @@ class JsonPathRequestMatchersTest {
     }
 
     @JaxRsVendorTest
-    void testsValueSatisfies_incompatibleType(FilterExceptionAssert filterExceptionAssert) {
-        server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).valueSatisfies(_ -> {}, Dto.class)).andRespond(withSuccess());
+    void testValueSatisfies_incompatibleType(FilterExceptionAssert filterExceptionAssert) {
+        server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).valueSatisfies(_ -> {}, Integer.class)).andRespond(withSuccess());
 
         Dto dto = new Dto("hello");
 
         filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.json(dto)).close())
                 .isInstanceOf(AssertionError.class)
-                .hasMessage("Failed to evaluate JSON path \"%s\" with type %s", DEFINITE_PATH, Dto.class.toString());
+                .hasMessage("Failed to evaluate JSON path \"%s\" with type %s", DEFINITE_PATH, Integer.class.toString());
     }
 
     @JaxRsVendorTest
-    void testsValueSatisfies_exceptionInMatcher(FilterExceptionAssert filterExceptionAssert) {
-        server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).valueSatisfies(_ -> throwIoException(), Dto.class))
+    void testValueSatisfies_exceptionInMatcher(FilterExceptionAssert filterExceptionAssert) {
+        server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).valueSatisfies(_ -> throwIoException(), String.class))
                 .andRespond(withSuccess());
 
-        Dto dto = new Dto(new Dto("hello"));
+        Dto dto = new Dto("hello");
 
         filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.json(dto)).close())
                 .isInstanceOf(AssertionError.class)
@@ -506,7 +517,7 @@ class JsonPathRequestMatchersTest {
     }
 
     @JacksonFreeTest
-    void testsValueSatisfies_record_jacksonUnavailable() {
+    void testValueSatisfies_record_jacksonUnavailable() {
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).valueSatisfies(_ -> {}, Dto.class)).andRespond(withSuccess());
 
         Dto dto = new Dto(new Dto("hello"));
@@ -521,7 +532,7 @@ class JsonPathRequestMatchersTest {
     }
 
     @JaxRsVendorTest
-    void testsValueSatisfies_genericType() {
+    void testValueSatisfies_genericType() {
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).valueSatisfies(value -> assertThat(value)
                                 .isNotNull()
                                 .hasSize(2)
@@ -539,7 +550,7 @@ class JsonPathRequestMatchersTest {
     }
 
     @JaxRsVendorTest
-    void testsValueSatisfies_genericType_null() {
+    void testValueSatisfies_genericType_null() {
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).valueSatisfies(value -> assertThat(value).isNull(), new GenericType<List<Dto>>() {}))
                 .andRespond(withSuccess());
 
@@ -550,7 +561,7 @@ class JsonPathRequestMatchersTest {
     }
 
     @JaxRsVendorTest
-    void testsValueSatisfies_genericType_doesNot(FilterExceptionAssert filterExceptionAssert) {
+    void testValueSatisfies_genericType_doesNot(FilterExceptionAssert filterExceptionAssert) {
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).valueSatisfies(value -> assertThat(value)
                                 .isNotNull()
                                 .hasSize(2)
@@ -578,7 +589,7 @@ class JsonPathRequestMatchersTest {
     }
 
     @JaxRsVendorTest
-    void testsValueSatisfies_genericType_incompatibleType(FilterExceptionAssert filterExceptionAssert) {
+    void testValueSatisfies_genericType_incompatibleType(FilterExceptionAssert filterExceptionAssert) {
         GenericType<Map<String, Dto>> type = new GenericType<>() {};
 
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).valueSatisfies(_ -> {}, type))
@@ -592,7 +603,7 @@ class JsonPathRequestMatchersTest {
     }
 
     @JaxRsVendorTest
-    void testsValueSatisfies_genericType_exceptionInMatcher(FilterExceptionAssert filterExceptionAssert) {
+    void testValueSatisfies_genericType_exceptionInMatcher(FilterExceptionAssert filterExceptionAssert) {
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).valueSatisfies(_ -> throwIoException(), new GenericType<List<Dto>>() {}))
                 .andRespond(withSuccess());
 
@@ -606,7 +617,7 @@ class JsonPathRequestMatchersTest {
     }
 
     @JacksonFreeTest
-    void testsValueSatisfies_genericType_record_jacksonUnavailable() {
+    void testValueSatisfies_genericType_record_jacksonUnavailable() {
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).valueSatisfies(_ -> {}, new GenericType<List<Dto>>() {}))
                 .andRespond(withSuccess());
 
