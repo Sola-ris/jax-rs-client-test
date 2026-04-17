@@ -610,7 +610,7 @@
 
                 <version.cxf>4.2.0</version.cxf>
                 <version.jersey>4.0.1</version.jersey>
-                <version.resteasy>7.0.1.Final</version.resteasy>
+                <version.resteasy>7.0.2.Final</version.resteasy>
 
                 <vendors.enabled>JERSEY,JERSEY_HK2,RESTEASY,CXF,CXF_JACKSON3</vendors.enabled>
             </properties>
