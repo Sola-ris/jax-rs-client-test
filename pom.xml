@@ -517,13 +517,7 @@
                             <goal>copy</goal>
                         </goals>
                         <configuration>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>com.jayway.jsonpath</groupId>
-                                    <artifactId>json-path</artifactId>
-                                    <version>${version.json-path-2}</version>
-                                </artifactItem>
-                            </artifactItems>
+                            <artifact>com.jayway.jsonpath:json-path:${version.json-path-2}</artifact>
                         </configuration>
                     </execution>
                 </executions>
