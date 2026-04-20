@@ -25,11 +25,15 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import com.jayway.jsonpath.JsonPathException;
+import com.jayway.jsonpath.spi.mapper.Jackson3MappingProvider;
+import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
 
 import io.github.solaris.jaxrs.client.test.server.MockRestServer;
 import io.github.solaris.jaxrs.client.test.util.Dto;
 import io.github.solaris.jaxrs.client.test.util.FilterExceptionAssert;
+import io.github.solaris.jaxrs.client.test.util.extension.classpath.Jackson3Test;
 import io.github.solaris.jaxrs.client.test.util.extension.classpath.JacksonFreeTest;
+import io.github.solaris.jaxrs.client.test.util.extension.classpath.JsonPath2Test;
 import io.github.solaris.jaxrs.client.test.util.extension.vendor.EnableJackson3;
 import io.github.solaris.jaxrs.client.test.util.extension.vendor.JaxRsVendorTest;
 import io.github.solaris.jaxrs.client.test.util.extension.vendor.RunInQuarkus;
@@ -87,6 +91,20 @@ class JsonPathRequestMatchersTest {
 
     @JaxRsVendorTest
     void testValue_record() {
+        runTestValue_record();
+    }
+
+    @JsonPath2Test
+    void testValue_record_jsonPath2() {
+        runTestValue_record();
+    }
+
+    @Jackson3Test
+    void testValue_record_jackson3() {
+        runTestValue_record();
+    }
+
+    private void runTestValue_record() {
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).value(new Dto("hello"))).andRespond(withSuccess());
 
         Dto dto = new Dto(new Dto("hello"));
@@ -452,6 +470,20 @@ class JsonPathRequestMatchersTest {
 
     @JaxRsVendorTest
     void testValueSatisfies_record() {
+        runTestValueSatisfies_record();
+    }
+
+    @JsonPath2Test
+    void testValueSatisfies_record_jsonPath2() {
+        runTestValueSatisfies_record();
+    }
+
+    @Jackson3Test
+    void testValueSatisfies_record_jackson3() {
+        runTestValueSatisfies_record();
+    }
+
+    private void runTestValueSatisfies_record() {
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).valueSatisfies(value -> assertThat(value)
                                 .isNotNull()
                                 .extracting(Dto::something, STRING)
@@ -533,6 +565,20 @@ class JsonPathRequestMatchersTest {
 
     @JaxRsVendorTest
     void testValueSatisfies_genericType() {
+        runTestValueSatisfies_genericType();
+    }
+
+    @JsonPath2Test
+    void testValueSatisfies_genericType_jsonPath2() {
+        runTestValueSatisfies_genericType();
+    }
+
+    @Jackson3Test
+    void testValueSatisfies_genericType_jackson3() {
+        runTestValueSatisfies_genericType();
+    }
+
+    private void runTestValueSatisfies_genericType() {
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).valueSatisfies(value -> assertThat(value)
                                 .isNotNull()
                                 .hasSize(2)
@@ -551,6 +597,15 @@ class JsonPathRequestMatchersTest {
 
     @JaxRsVendorTest
     void testValueSatisfies_genericType_null() {
+        runTestValueSatisfies_genericType_null();
+    }
+
+    @Jackson3Test
+    void testValueSatisfies_genericType_null_jackson3() {
+        runTestValueSatisfies_genericType_null();
+    }
+
+    private void runTestValueSatisfies_genericType_null() {
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).valueSatisfies(value -> assertThat(value).isNull(), new GenericType<List<Dto>>() {}))
                 .andRespond(withSuccess());
 
@@ -562,6 +617,20 @@ class JsonPathRequestMatchersTest {
 
     @JaxRsVendorTest
     void testValueSatisfies_genericType_doesNot(FilterExceptionAssert filterExceptionAssert) {
+        runTestValueSatisfies_genericType_doesNot(filterExceptionAssert);
+    }
+
+    @JsonPath2Test
+    void testValueSatisfies_genericType_doesNot_jsonPath2(FilterExceptionAssert filterExceptionAssert) {
+        runTestValueSatisfies_genericType_doesNot(filterExceptionAssert);
+    }
+
+    @Jackson3Test
+    void testValueSatisfies_genericType_doesNot_jackson3(FilterExceptionAssert filterExceptionAssert) {
+        runTestValueSatisfies_genericType_doesNot(filterExceptionAssert);
+    }
+
+    private void runTestValueSatisfies_genericType_doesNot(FilterExceptionAssert filterExceptionAssert) {
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).valueSatisfies(value -> assertThat(value)
                                 .isNotNull()
                                 .hasSize(2)
@@ -590,6 +659,20 @@ class JsonPathRequestMatchersTest {
 
     @JaxRsVendorTest
     void testValueSatisfies_genericType_incompatibleType(FilterExceptionAssert filterExceptionAssert) {
+        runTestValueSatisfies_genericType_incompatibleType(filterExceptionAssert);
+    }
+
+    @JsonPath2Test
+    void testValueSatisfies_genericType_incompatibleType_jsonPath2(FilterExceptionAssert filterExceptionAssert) {
+        runTestValueSatisfies_genericType_incompatibleType(filterExceptionAssert);
+    }
+
+    @Jackson3Test
+    void testValueSatisfies_genericType_incompatibleType_jackson3(FilterExceptionAssert filterExceptionAssert) {
+        runTestValueSatisfies_genericType_incompatibleType(filterExceptionAssert);
+    }
+
+    private void runTestValueSatisfies_genericType_incompatibleType(FilterExceptionAssert filterExceptionAssert) {
         GenericType<Map<String, Dto>> type = new GenericType<>() {};
 
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).valueSatisfies(_ -> {}, type))
@@ -604,6 +687,20 @@ class JsonPathRequestMatchersTest {
 
     @JaxRsVendorTest
     void testValueSatisfies_genericType_exceptionInMatcher(FilterExceptionAssert filterExceptionAssert) {
+        runTestValueSatisfies_genericType_exceptionInMatcher(filterExceptionAssert);
+    }
+
+    @JsonPath2Test
+    void testValueSatisfies_genericType_exceptionInMatcher_jsonPath2(FilterExceptionAssert filterExceptionAssert) {
+        runTestValueSatisfies_genericType_exceptionInMatcher(filterExceptionAssert);
+    }
+
+    @Jackson3Test
+    void testValueSatisfies_genericType_exceptionInMatcher_jackson3(FilterExceptionAssert filterExceptionAssert) {
+        runTestValueSatisfies_genericType_exceptionInMatcher(filterExceptionAssert);
+    }
+
+    private void runTestValueSatisfies_genericType_exceptionInMatcher(FilterExceptionAssert filterExceptionAssert) {
         server.expect(RequestMatchers.jsonPath(DEFINITE_PATH).valueSatisfies(_ -> throwIoException(), new GenericType<List<Dto>>() {}))
                 .andRespond(withSuccess());
 
@@ -639,6 +736,33 @@ class JsonPathRequestMatchersTest {
         filterExceptionAssert.assertThatThrownBy(() -> client.target("/hello").request().post(Entity.json("<dto></dto>")).close())
                 .isInstanceOf(JsonPathException.class)
                 .hasMessageContaining("This is not a json object according to the JsonProvider:");
+    }
+
+    @JacksonFreeTest
+    void testJacksonFreeClassLoader() {
+        assertThat(getClass().getClassLoader().getName()).isEqualTo(JacksonFreeTest.CLASS_LOADER_NAME);
+    }
+
+    @JsonPath2Test
+    void testJsonPath2ClassLoader() {
+        assertThat(getClass().getClassLoader().getName()).isEqualTo(JsonPath2Test.CLASS_LOADER_NAME);
+    }
+
+    @Jackson3Test
+    void testJackson3ClassLoader() {
+        assertThat(getClass().getClassLoader().getName()).isEqualTo(Jackson3Test.CLASS_LOADER_NAME);
+    }
+
+    @JsonPath2Test
+    void testJackson3MappingProviderUnavailableUnderJsonPath2() {
+        assertThatThrownBy(Jackson3Helper::loadMappingProvider)
+                .isInstanceOf(NoClassDefFoundError.class);
+    }
+
+    @Jackson3Test
+    void testJackson2UnavailableUnderJsonPath3() {
+        assertThatThrownBy(JacksonMappingProvider::new)
+                .isInstanceOf(NoClassDefFoundError.class);
     }
 
     @ParameterizedTest
@@ -682,5 +806,11 @@ class JsonPathRequestMatchersTest {
 
     private static void throwIoException() throws IOException {
         throw new IOException("I/O Error");
+    }
+
+    private static final class Jackson3Helper {
+        private static void loadMappingProvider() {
+            new Jackson3MappingProvider();
+        }
     }
 }
