@@ -398,7 +398,7 @@
                                     -XepOpt:NullAway:JSpecifyMode=true \
                                     -XepOpt:NullAway:OnlyNullMarked=true \
                                     -XepOpt:NullAway:CheckContracts=true \
-                                    -XepOpt:NullAway:WarnOnGenericInferenceFailure \
+                                    -XepOpt:NullAway:WarnOnGenericInferenceFailure=true \
                                     -Xep:RequireExplicitNullMarking:ERROR
                                 </arg>
                                 <arg>--should-stop=ifError=FLOW</arg>
