@@ -52,7 +52,7 @@
         <version.json-path-2>2.10.0</version.json-path-2>
 
         <version.cxf>4.1.7</version.cxf>
-        <version.jersey>3.1.11</version.jersey>
+        <version.jersey>3.1.12</version.jersey>
         <version.quarkus>3.36.2</version.quarkus>
         <version.resteasy>6.2.16.Final</version.resteasy>
 
