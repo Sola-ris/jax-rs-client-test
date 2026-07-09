@@ -4,6 +4,11 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    groups:
+      qodeql:
+        patterns:
+          - "github/codeql-action*"
+
   - package-ecosystem: maven
     directory: /
     open-pull-requests-limit: 10
