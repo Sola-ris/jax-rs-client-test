@@ -20,6 +20,8 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.MultivaluedHashMap;
 import jakarta.ws.rs.core.MultivaluedMap;
 
+import org.jspecify.annotations.Nullable;
+
 class BufferedEntityPart implements EntityPart {
     private final EntityPart actualPart;
     private final EntityConverter converter;
@@ -101,7 +103,7 @@ class BufferedEntityPart implements EntityPart {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (this == o) {
             return true;
         }
