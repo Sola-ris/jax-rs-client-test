@@ -627,8 +627,17 @@
                 <version.jersey>4.0.3</version.jersey>
                 <version.resteasy>7.0.5.Final</version.resteasy>
 
-                <vendors.enabled>JERSEY,JERSEY_HK2,RESTEASY,CXF,CXF_JACKSON3</vendors.enabled>
+                <vendors.enabled>JERSEY,JERSEY_JACKSON3,JERSEY_HK2,JERSEY_HK2_JACKSON3,RESTEASY,CXF,CXF_JACKSON3</vendors.enabled>
             </properties>
+
+            <dependencies>
+                <dependency>
+                    <groupId>org.glassfish.jersey.media</groupId>
+                    <artifactId>jersey-media-json-jackson3</artifactId>
+                    <version>${version.jersey}</version>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
         </profile>
 
         <profile>

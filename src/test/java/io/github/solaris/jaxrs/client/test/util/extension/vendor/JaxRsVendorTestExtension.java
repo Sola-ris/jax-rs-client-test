@@ -1,6 +1,7 @@
 package io.github.solaris.jaxrs.client.test.util.extension.vendor;
 
 import static io.github.solaris.jaxrs.client.test.util.extension.vendor.JaxRsVendor.JERSEY;
+import static io.github.solaris.jaxrs.client.test.util.extension.vendor.JaxRsVendor.JERSEY_JACKSON3;
 import static org.apache.cxf.BusFactory.BUS_FACTORY_PROPERTY_NAME;
 
 import jakarta.ws.rs.ext.RuntimeDelegate;
@@ -76,7 +77,7 @@ class JaxRsVendorTestExtension implements ParameterResolver, TestInstancePreCons
             }
             return new DefaultFilterExceptionAssert();
         } else if (EntityConverterAssert.class.isAssignableFrom(parameterContext.getParameter().getType())) {
-            if (vendor == JERSEY) {
+            if (vendor == JERSEY || vendor == JERSEY_JACKSON3) {
                 return new ClientEntityConverterAssert();
             }
             return new ProvidersEntityConverterAssert();

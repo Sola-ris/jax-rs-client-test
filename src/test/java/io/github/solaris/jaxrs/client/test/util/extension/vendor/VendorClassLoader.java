@@ -12,7 +12,7 @@ import java.util.Map;
 
 class VendorClassLoader extends ClassLoader {
     private final JaxRsVendor vendor;
-    private final Map<Class<?>, List<URL>> serviceCache = new HashMap<>(4);
+    private final Map<Class<?>, List<URL>> serviceCache = new HashMap<>(6);
 
     VendorClassLoader(JaxRsVendor vendor) {
         super(vendor.name(), VendorClassLoader.class.getClassLoader());
@@ -28,7 +28,8 @@ class VendorClassLoader extends ClassLoader {
                     getService(vendor.getRestClientBuilderResolverClass());
             case "META-INF/services/org.glassfish.jersey.internal.inject.InjectionManagerFactory" ->
                     getService(vendor.getInjectionManagerFactoryClass());
-            case "META-INF/services/org.glassfish.jersey.internal.spi.ForcedAutoDiscoverable" -> filterGson(name);
+            case "META-INF/services/org.glassfish.jersey.internal.spi.AutoDiscoverable",
+                 "META-INF/services/org.glassfish.jersey.internal.spi.ForcedAutoDiscoverable" -> filterComponent(name);
             default -> super.getResources(name);
         };
     }
@@ -48,10 +49,10 @@ class VendorClassLoader extends ClassLoader {
         return Collections.enumeration(urls);
     }
 
-    private Enumeration<URL> filterGson(String name) throws IOException {
+    private Enumeration<URL> filterComponent(String name) throws IOException {
         List<URL> filtered = Collections.list(super.getResources(name))
                 .stream()
-                .filter(url -> !url.toString().contains("gson"))
+                .filter(url -> vendor.getFilteredComponents().stream().noneMatch(provider -> url.toString().contains(provider)))
                 .toList();
         return Collections.enumeration(filtered);
     }

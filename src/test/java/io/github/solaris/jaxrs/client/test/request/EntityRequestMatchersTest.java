@@ -7,6 +7,7 @@ import static io.github.solaris.jaxrs.client.test.util.MultiParts.partsBufferMat
 import static io.github.solaris.jaxrs.client.test.util.MultiParts.plainPart;
 import static io.github.solaris.jaxrs.client.test.util.MultiParts.toMultiPartEntity;
 import static io.github.solaris.jaxrs.client.test.util.extension.vendor.JaxRsVendor.JERSEY;
+import static io.github.solaris.jaxrs.client.test.util.extension.vendor.JaxRsVendor.JERSEY_JACKSON3;
 import static io.github.solaris.jaxrs.client.test.util.extension.vendor.JaxRsVendor.RESTEASY_REACTIVE;
 import static jakarta.ws.rs.core.MediaType.APPLICATION_ATOM_XML;
 import static jakarta.ws.rs.core.MediaType.APPLICATION_ATOM_XML_TYPE;
@@ -351,7 +352,7 @@ class EntityRequestMatchersTest {
 
             private final MockRestServer server = MockRestServer.bindTo(client).build();
 
-            @JaxRsVendorTest(skipFor = {JERSEY, RESTEASY_REACTIVE})
+            @JaxRsVendorTest(skipFor = {JERSEY, JERSEY_JACKSON3, RESTEASY_REACTIVE})
             void testMultipartForm() throws IOException {
                 server.expect(RequestMatchers.entity().multipartForm(List.of(plainPart(), imagePart(), jsonPart()))).andRespond(withSuccess());
 
@@ -363,7 +364,7 @@ class EntityRequestMatchersTest {
                         .doesNotThrowAnyException();
             }
 
-            @JaxRsVendorTest(skipFor = {JERSEY, RESTEASY_REACTIVE})
+            @JaxRsVendorTest(skipFor = {JERSEY, JERSEY_JACKSON3, RESTEASY_REACTIVE})
             void testMultipartForm_noMatch(FilterExceptionAssert filterExceptionAssert) throws IOException {
                 AtomicReference<PartsBuffer> partsBuffer = new AtomicReference<>();
                 server.expect(partsBufferMatcher(partsBuffer, plainPart()))
@@ -377,7 +378,7 @@ class EntityRequestMatchersTest {
                         .hasMessage("Multipart Form expected: <%s> but was: <%s>", partsBuffer.get().expected(), partsBuffer.get().actual());
             }
 
-            @JaxRsVendorTest(skipFor = {JERSEY, RESTEASY_REACTIVE})
+            @JaxRsVendorTest(skipFor = {JERSEY, JERSEY_JACKSON3, RESTEASY_REACTIVE})
             void testMultipartForm_noMatch_wrongOrder(FilterExceptionAssert filterExceptionAssert) throws IOException {
                 AtomicReference<PartsBuffer> partsBuffer = new AtomicReference<>();
                 server.expect(partsBufferMatcher(partsBuffer, jsonPart(), imagePart(), plainPart()))
@@ -391,7 +392,7 @@ class EntityRequestMatchersTest {
                         .hasMessage("Multipart Form expected: <%s> but was: <%s>", partsBuffer.get().expected(), partsBuffer.get().actual());
             }
 
-            @JaxRsVendorTest(skipFor = {JERSEY, RESTEASY_REACTIVE})
+            @JaxRsVendorTest(skipFor = {JERSEY, JERSEY_JACKSON3, RESTEASY_REACTIVE})
             void testMultipartFormContains() throws IOException {
                 server.expect(RequestMatchers.entity().multipartFormContains(List.of(plainPart(), jsonPart()))).andRespond(withSuccess());
 
@@ -403,7 +404,7 @@ class EntityRequestMatchersTest {
                         .doesNotThrowAnyException();
             }
 
-            @JaxRsVendorTest(skipFor = {JERSEY, RESTEASY_REACTIVE})
+            @JaxRsVendorTest(skipFor = {JERSEY, JERSEY_JACKSON3, RESTEASY_REACTIVE})
             void testMultipartFormContains_subsetIsLarger(FilterExceptionAssert filterExceptionAssert) throws IOException {
                 AtomicReference<PartsBuffer> partsBuffer = new AtomicReference<>();
                 server.expect(partsBufferMatcher(partsBuffer, jsonPart(), imagePart(), plainPart()))
@@ -418,7 +419,7 @@ class EntityRequestMatchersTest {
                         .hasMessage("Expected %s to be smaller or the same size as %s", partsBuffer.get().expected(), partsBuffer.get().actual());
             }
 
-            @JaxRsVendorTest(skipFor = {JERSEY, RESTEASY_REACTIVE})
+            @JaxRsVendorTest(skipFor = {JERSEY, JERSEY_JACKSON3, RESTEASY_REACTIVE})
             void testMultipartFormContains_noMatch(FilterExceptionAssert filterExceptionAssert) throws IOException {
                 AtomicReference<PartsBuffer> partsBuffer = new AtomicReference<>();
                 server.expect(partsBufferMatcher(partsBuffer, jsonPart()))

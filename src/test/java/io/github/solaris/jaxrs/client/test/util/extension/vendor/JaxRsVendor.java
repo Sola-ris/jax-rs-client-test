@@ -1,5 +1,7 @@
 package io.github.solaris.jaxrs.client.test.util.extension.vendor;
 
+import static java.util.Collections.emptyList;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
@@ -27,38 +29,60 @@ public enum JaxRsVendor {
             JerseyClientBuilder.class,
             JerseyRestClientBuilderResolver.class,
             NonInjectionManagerFactory.class,
-            null
+            null,
+            List.of("gson", "/jersey-media-json-jackson3/")
+    ),
+    JERSEY_JACKSON3(
+            org.glassfish.jersey.internal.RuntimeDelegateImpl.class,
+            JerseyClientBuilder.class,
+            JerseyRestClientBuilderResolver.class,
+            NonInjectionManagerFactory.class,
+            null,
+            List.of("gson", "/jersey-media-json-jackson/")
     ),
     JERSEY_HK2(
             org.glassfish.jersey.internal.RuntimeDelegateImpl.class,
             JerseyClientBuilder.class,
             JerseyRestClientBuilderResolver.class,
             Hk2InjectionManagerFactory.class,
-            null
+            null,
+            List.of("gson", "/jersey-media-json-jackson3/")
+    ),
+    JERSEY_HK2_JACKSON3(
+            org.glassfish.jersey.internal.RuntimeDelegateImpl.class,
+            JerseyClientBuilder.class,
+            JerseyRestClientBuilderResolver.class,
+            Hk2InjectionManagerFactory.class,
+            null,
+            List.of("gson", "/jersey-media-json-jackson/")
     ),
     RESTEASY(
             ResteasyProviderFactoryImpl.class,
             ResteasyClientBuilderImpl.class,
-            org.jboss.resteasy.microprofile.client.BuilderResolver.class
+            org.jboss.resteasy.microprofile.client.BuilderResolver.class,
+            emptyList()
     ),
     CXF(
             org.apache.cxf.jaxrs.impl.RuntimeDelegateImpl.class,
             org.apache.cxf.jaxrs.client.spec.ClientBuilderImpl.class,
             CxfRestClientBuilderResolver.class,
             null,
-            Jackson2BusFactory.class
+            Jackson2BusFactory.class,
+            emptyList()
     ),
     CXF_JACKSON3(
             org.apache.cxf.jaxrs.impl.RuntimeDelegateImpl.class,
             org.apache.cxf.jaxrs.client.spec.ClientBuilderImpl.class,
             CxfRestClientBuilderResolver.class,
             null,
-            Jackson3BusFactory.class
+            Jackson3BusFactory.class,
+            emptyList()
     ),
     RESTEASY_REACTIVE(
             org.jboss.resteasy.reactive.common.jaxrs.RuntimeDelegateImpl.class,
             org.jboss.resteasy.reactive.client.impl.ClientBuilderImpl.class,
-            io.quarkus.rest.client.reactive.runtime.BuilderResolver.class
+            io.quarkus.rest.client.reactive.runtime.BuilderResolver.class,
+            emptyList()
     );
 
     static final List<JaxRsVendor> VENDORS = Stream.of(values())
@@ -71,15 +95,17 @@ public enum JaxRsVendor {
 
     private final Class<? extends InjectionManagerFactory> injectionManagerFactoryClass;
     private final Class<? extends BusFactory> busFactoryClass;
+    private final List<String> filteredComponents;
 
     private final ClassLoader vendorClassLoader;
 
     JaxRsVendor(
             Class<? extends RuntimeDelegate> runtimeDelegateClass,
             Class<? extends ClientBuilder> clientBuilderClass,
-            Class<? extends RestClientBuilderResolver> restClientBuilderResolverClass
+            Class<? extends RestClientBuilderResolver> restClientBuilderResolverClass,
+            List<String> filteredComponents
     ) {
-        this(runtimeDelegateClass, clientBuilderClass, restClientBuilderResolverClass, null, null);
+        this(runtimeDelegateClass, clientBuilderClass, restClientBuilderResolverClass, null, null, filteredComponents);
     }
 
     JaxRsVendor(
@@ -87,13 +113,15 @@ public enum JaxRsVendor {
             Class<? extends ClientBuilder> clientBuilderClass,
             Class<? extends RestClientBuilderResolver> restClientBuilderResolverClass,
             Class<? extends InjectionManagerFactory> injectionManagerFactoryClass,
-            Class<? extends BusFactory> busFactoryClass
+            Class<? extends BusFactory> busFactoryClass,
+            List<String> filteredComponents
     ) {
         this.runtimeDelegateClass = runtimeDelegateClass;
         this.clientBuilderClass = clientBuilderClass;
         this.restClientBuilderResolverClass = restClientBuilderResolverClass;
         this.injectionManagerFactoryClass = injectionManagerFactoryClass;
         this.busFactoryClass = busFactoryClass;
+        this.filteredComponents = filteredComponents;
 
         this.vendorClassLoader = new VendorClassLoader(this);
     }
@@ -118,11 +146,21 @@ public enum JaxRsVendor {
         return busFactoryClass;
     }
 
+    List<String> getFilteredComponents() {
+        return filteredComponents;
+    }
+
     ClassLoader getVendorClassLoader() {
         return vendorClassLoader;
     }
 
     boolean isCxf() {
         return this == CXF || this == CXF_JACKSON3;
+    }
+
+    boolean isJackson3() {
+        return this == JERSEY_JACKSON3
+                || this == JERSEY_HK2_JACKSON3
+                || this == CXF_JACKSON3;
     }
 }

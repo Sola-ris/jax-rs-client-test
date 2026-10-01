@@ -9,6 +9,7 @@ import static io.github.solaris.jaxrs.client.test.util.MultiParts.listPart;
 import static io.github.solaris.jaxrs.client.test.util.MultiParts.plainPart;
 import static io.github.solaris.jaxrs.client.test.util.MultiParts.toMultiPartEntity;
 import static io.github.solaris.jaxrs.client.test.util.extension.vendor.JaxRsVendor.JERSEY;
+import static io.github.solaris.jaxrs.client.test.util.extension.vendor.JaxRsVendor.JERSEY_JACKSON3;
 import static io.github.solaris.jaxrs.client.test.util.extension.vendor.JaxRsVendor.RESTEASY_REACTIVE;
 import static jakarta.ws.rs.core.HttpHeaders.CONTENT_LENGTH;
 import static jakarta.ws.rs.core.HttpHeaders.CONTENT_TYPE;
@@ -322,7 +323,7 @@ class EntityConverterTest {
 
         private final MockRestServer jsonServer = MockRestServer.bindTo(jsonClient).build();
 
-        @JaxRsVendorTest(skipFor = {JERSEY, RESTEASY_REACTIVE})
+        @JaxRsVendorTest(skipFor = {JERSEY, JERSEY_JACKSON3, RESTEASY_REACTIVE})
         void testBufferExpectedMultipart_repeatedTypedReads() {
             jsonServer.expect(request -> {
                 EntityConverter converter = EntityConverter.fromRequestContext(request);
@@ -337,7 +338,7 @@ class EntityConverterTest {
                     .doesNotThrowAnyException();
         }
 
-        @JaxRsVendorTest(skipFor = {JERSEY, RESTEASY_REACTIVE})
+        @JaxRsVendorTest(skipFor = {JERSEY, JERSEY_JACKSON3, RESTEASY_REACTIVE})
         void testBufferMultipartRequest_repeatedTypedReads() {
             jsonServer.expect(request -> {
                 EntityConverter converter = EntityConverter.fromRequestContext(request);
@@ -356,7 +357,7 @@ class EntityConverterTest {
                     .doesNotThrowAnyException();
         }
 
-        @JaxRsVendorTest(skipFor = {JERSEY, RESTEASY_REACTIVE})
+        @JaxRsVendorTest(skipFor = {JERSEY, JERSEY_JACKSON3, RESTEASY_REACTIVE})
         void testBufferedMultipart_consistentHashCode() {
             jsonServer.expect(request -> {
                 EntityConverter converter = EntityConverter.fromRequestContext(request);
