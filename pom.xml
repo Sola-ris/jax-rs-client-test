@@ -624,7 +624,7 @@
                 <version.jax-rs>4.0.0</version.jax-rs>
 
                 <version.cxf>4.2.3</version.cxf>
-                <version.jersey>4.0.1</version.jersey>
+                <version.jersey>4.0.3</version.jersey>
                 <version.resteasy>7.0.5.Final</version.resteasy>
 
                 <vendors.enabled>JERSEY,JERSEY_HK2,RESTEASY,CXF,CXF_JACKSON3</vendors.enabled>
