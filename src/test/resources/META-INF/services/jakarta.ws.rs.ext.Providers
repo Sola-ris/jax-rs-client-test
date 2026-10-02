@@ -1,0 +1,4 @@
+# The RestEasy client does not discover jakarta.ws.rs.core.Feature via ServiceLoader
+# and instead uses ist own mechanism via jakarta.ws.rs.ext.Providers.
+# RestEasy's Jackson 3 module does not provide the required service, so this "fixes" that.
+dev.resteasy.providers.jackson.JacksonFeature

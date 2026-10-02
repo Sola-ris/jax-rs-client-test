@@ -28,7 +28,8 @@ class VendorClassLoader extends ClassLoader {
                     getService(vendor.getRestClientBuilderResolverClass());
             case "META-INF/services/org.glassfish.jersey.internal.inject.InjectionManagerFactory" ->
                     getService(vendor.getInjectionManagerFactoryClass());
-            case "META-INF/services/org.glassfish.jersey.internal.spi.AutoDiscoverable",
+            case "META-INF/services/jakarta.ws.rs.ext.Providers",
+                 "META-INF/services/org.glassfish.jersey.internal.spi.AutoDiscoverable",
                  "META-INF/services/org.glassfish.jersey.internal.spi.ForcedAutoDiscoverable" -> filterComponent(name);
             default -> super.getResources(name);
         };

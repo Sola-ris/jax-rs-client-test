@@ -1,15 +1,19 @@
 package io.github.solaris.jaxrs.client.test.util.extension.vendor;
 
 import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
+import static org.apache.cxf.BusFactory.BUS_FACTORY_PROPERTY_NAME;
+import static org.glassfish.jersey.CommonProperties.ALLOW_SYSTEM_PROPERTIES_PROVIDER;
+import static org.glassfish.jersey.CommonProperties.JAXRS_SERVICE_LOADING_ENABLE;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
 
 import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.ext.RuntimeDelegate;
 
-import org.apache.cxf.BusFactory;
 import org.apache.cxf.microprofile.client.spi.CxfRestClientBuilderResolver;
 import org.eclipse.microprofile.rest.client.spi.RestClientBuilderResolver;
 import org.glassfish.jersey.client.JerseyClientBuilder;
@@ -29,7 +33,10 @@ public enum JaxRsVendor {
             JerseyClientBuilder.class,
             JerseyRestClientBuilderResolver.class,
             NonInjectionManagerFactory.class,
-            null,
+            Map.of(
+                    JAXRS_SERVICE_LOADING_ENABLE, "false",
+                    ALLOW_SYSTEM_PROPERTIES_PROVIDER, "true"
+            ),
             List.of("gson", "/jersey-media-json-jackson3/")
     ),
     JERSEY_JACKSON3(
@@ -37,7 +44,10 @@ public enum JaxRsVendor {
             JerseyClientBuilder.class,
             JerseyRestClientBuilderResolver.class,
             NonInjectionManagerFactory.class,
-            null,
+            Map.of(
+                    JAXRS_SERVICE_LOADING_ENABLE, "false",
+                    ALLOW_SYSTEM_PROPERTIES_PROVIDER, "true"
+            ),
             List.of("gson", "/jersey-media-json-jackson/")
     ),
     JERSEY_HK2(
@@ -45,7 +55,10 @@ public enum JaxRsVendor {
             JerseyClientBuilder.class,
             JerseyRestClientBuilderResolver.class,
             Hk2InjectionManagerFactory.class,
-            null,
+            Map.of(
+                    JAXRS_SERVICE_LOADING_ENABLE, "false",
+                    ALLOW_SYSTEM_PROPERTIES_PROVIDER, "true"
+            ),
             List.of("gson", "/jersey-media-json-jackson3/")
     ),
     JERSEY_HK2_JACKSON3(
@@ -53,21 +66,30 @@ public enum JaxRsVendor {
             JerseyClientBuilder.class,
             JerseyRestClientBuilderResolver.class,
             Hk2InjectionManagerFactory.class,
-            null,
+            Map.of(
+                    JAXRS_SERVICE_LOADING_ENABLE, "false",
+                    ALLOW_SYSTEM_PROPERTIES_PROVIDER, "true"
+            ),
             List.of("gson", "/jersey-media-json-jackson/")
     ),
     RESTEASY(
             ResteasyProviderFactoryImpl.class,
             ResteasyClientBuilderImpl.class,
             org.jboss.resteasy.microprofile.client.BuilderResolver.class,
-            emptyList()
+            List.of("jax-rs-client-test")
+    ),
+    RESTEASY_JACKSON3(
+            ResteasyProviderFactoryImpl.class,
+            ResteasyClientBuilderImpl.class,
+            org.jboss.resteasy.microprofile.client.BuilderResolver.class,
+            List.of("resteasy-jackson2-provider")
     ),
     CXF(
             org.apache.cxf.jaxrs.impl.RuntimeDelegateImpl.class,
             org.apache.cxf.jaxrs.client.spec.ClientBuilderImpl.class,
             CxfRestClientBuilderResolver.class,
             null,
-            Jackson2BusFactory.class,
+            Map.of(BUS_FACTORY_PROPERTY_NAME, Jackson2BusFactory.class.getName()),
             emptyList()
     ),
     CXF_JACKSON3(
@@ -75,7 +97,7 @@ public enum JaxRsVendor {
             org.apache.cxf.jaxrs.client.spec.ClientBuilderImpl.class,
             CxfRestClientBuilderResolver.class,
             null,
-            Jackson3BusFactory.class,
+            Map.of(BUS_FACTORY_PROPERTY_NAME, Jackson3BusFactory.class.getName()),
             emptyList()
     ),
     RESTEASY_REACTIVE(
@@ -94,7 +116,7 @@ public enum JaxRsVendor {
     private final Class<? extends RestClientBuilderResolver> restClientBuilderResolverClass;
 
     private final Class<? extends InjectionManagerFactory> injectionManagerFactoryClass;
-    private final Class<? extends BusFactory> busFactoryClass;
+    private final Map<String, String> systemProperties;
     private final List<String> filteredComponents;
 
     private final ClassLoader vendorClassLoader;
@@ -105,7 +127,7 @@ public enum JaxRsVendor {
             Class<? extends RestClientBuilderResolver> restClientBuilderResolverClass,
             List<String> filteredComponents
     ) {
-        this(runtimeDelegateClass, clientBuilderClass, restClientBuilderResolverClass, null, null, filteredComponents);
+        this(runtimeDelegateClass, clientBuilderClass, restClientBuilderResolverClass, null, emptyMap(), filteredComponents);
     }
 
     JaxRsVendor(
@@ -113,14 +135,14 @@ public enum JaxRsVendor {
             Class<? extends ClientBuilder> clientBuilderClass,
             Class<? extends RestClientBuilderResolver> restClientBuilderResolverClass,
             Class<? extends InjectionManagerFactory> injectionManagerFactoryClass,
-            Class<? extends BusFactory> busFactoryClass,
+            Map<String, String> systemProperties,
             List<String> filteredComponents
     ) {
         this.runtimeDelegateClass = runtimeDelegateClass;
         this.clientBuilderClass = clientBuilderClass;
         this.restClientBuilderResolverClass = restClientBuilderResolverClass;
         this.injectionManagerFactoryClass = injectionManagerFactoryClass;
-        this.busFactoryClass = busFactoryClass;
+        this.systemProperties = systemProperties;
         this.filteredComponents = filteredComponents;
 
         this.vendorClassLoader = new VendorClassLoader(this);
@@ -142,8 +164,8 @@ public enum JaxRsVendor {
         return injectionManagerFactoryClass;
     }
 
-    Class<? extends BusFactory> getBusFactoryClass() {
-        return busFactoryClass;
+    Map<String, String> getSystemProperties() {
+        return systemProperties;
     }
 
     List<String> getFilteredComponents() {
@@ -154,13 +176,10 @@ public enum JaxRsVendor {
         return vendorClassLoader;
     }
 
-    boolean isCxf() {
-        return this == CXF || this == CXF_JACKSON3;
-    }
-
     boolean isJackson3() {
         return this == JERSEY_JACKSON3
                 || this == JERSEY_HK2_JACKSON3
+                || this == RESTEASY_JACKSON3
                 || this == CXF_JACKSON3;
     }
 }

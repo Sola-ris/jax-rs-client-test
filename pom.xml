@@ -56,7 +56,7 @@
         <version.quarkus>3.40.1</version.quarkus>
         <version.resteasy>6.2.19.Final</version.resteasy>
 
-        <vendors.enabled>JERSEY,JERSEY_HK2,RESTEASY,CXF,CXF_JACKSON3,RESTEASY_REACTIVE</vendors.enabled>
+        <vendors.enabled>JERSEY,JERSEY_HK2,RESTEASY,RESTEASY_JACKSON3,CXF,CXF_JACKSON3,RESTEASY_REACTIVE</vendors.enabled>
     </properties>
 
     <dependencyManagement>
@@ -264,6 +264,17 @@
                 <exclusion>
                     <groupId>com.fasterxml.jackson.jakarta.rs</groupId>
                     <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>dev.resteasy.providers</groupId>
+            <artifactId>resteasy-jackson-provider</artifactId>
+            <version>1.0.0.Beta1</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.jboss.resteasy</groupId>
+                    <artifactId>resteasy-core</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -627,7 +638,7 @@
                 <version.jersey>4.0.3</version.jersey>
                 <version.resteasy>7.0.5.Final</version.resteasy>
 
-                <vendors.enabled>JERSEY,JERSEY_JACKSON3,JERSEY_HK2,JERSEY_HK2_JACKSON3,RESTEASY,CXF,CXF_JACKSON3</vendors.enabled>
+                <vendors.enabled>JERSEY,JERSEY_JACKSON3,JERSEY_HK2,JERSEY_HK2_JACKSON3,RESTEASY,RESTEASY_JACKSON3,CXF,CXF_JACKSON3</vendors.enabled>
             </properties>
 
             <dependencies>

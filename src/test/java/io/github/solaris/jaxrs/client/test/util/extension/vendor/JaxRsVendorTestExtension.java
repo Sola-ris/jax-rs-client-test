@@ -1,12 +1,12 @@
 package io.github.solaris.jaxrs.client.test.util.extension.vendor;
 
+import static io.github.solaris.jaxrs.client.test.util.extension.vendor.JaxRsVendor.CXF;
+import static io.github.solaris.jaxrs.client.test.util.extension.vendor.JaxRsVendor.CXF_JACKSON3;
 import static io.github.solaris.jaxrs.client.test.util.extension.vendor.JaxRsVendor.JERSEY;
 import static io.github.solaris.jaxrs.client.test.util.extension.vendor.JaxRsVendor.JERSEY_JACKSON3;
-import static org.apache.cxf.BusFactory.BUS_FACTORY_PROPERTY_NAME;
 
 import jakarta.ws.rs.ext.RuntimeDelegate;
 
-import org.apache.cxf.BusFactory;
 import org.eclipse.microprofile.rest.client.spi.RestClientBuilderResolver;
 import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.extension.ExtensionContext;
@@ -43,10 +43,7 @@ class JaxRsVendorTestExtension implements ParameterResolver, TestInstancePreCons
         RuntimeDelegate.setInstance(null);
         RestClientBuilderResolver.setInstance(null);
 
-        if (vendor.isCxf()) {
-            BusFactory.setDefaultBus(null);
-            System.setProperty(BUS_FACTORY_PROPERTY_NAME, vendor.getBusFactoryClass().getName());
-        }
+        vendor.getSystemProperties().forEach(System::setProperty);
 
         Thread.currentThread().setContextClassLoader(vendor.getVendorClassLoader());
     }
@@ -55,9 +52,7 @@ class JaxRsVendorTestExtension implements ParameterResolver, TestInstancePreCons
     public void preDestroyTestInstance(ExtensionContext context) {
         Thread.currentThread().setContextClassLoader(context.getStore(NAMESPACE).get(ClassLoader.class, ClassLoader.class));
 
-        if (vendor.isCxf()) {
-            System.clearProperty(BUS_FACTORY_PROPERTY_NAME);
-        }
+        vendor.getSystemProperties().keySet().forEach(System::clearProperty);
     }
 
     @Override
@@ -69,7 +64,7 @@ class JaxRsVendorTestExtension implements ParameterResolver, TestInstancePreCons
     @Override
     public Object resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
         if (FilterExceptionAssert.class.isAssignableFrom(parameterContext.getParameter().getType())) {
-            if (vendor.isCxf()) {
+            if (vendor == CXF ||vendor == CXF_JACKSON3) {
                 if (extensionContext.getRequiredTestClass().getName().contains("MicroProfile")) {
                     return new CxfMicroProfileFilterExceptionAssert();
                 }
