@@ -411,7 +411,8 @@
                                     -XepOpt:NullAway:CheckContracts=true \
                                     -XepOpt:NullAway:JSpecifyExperimental=true \
                                     -XepOpt:NullAway:WarnOnGenericInferenceFailure=true \
-                                    -Xep:RequireExplicitNullMarking:ERROR
+                                    -Xep:RequireExplicitNullMarking:ERROR \
+                                    -Xep:JSpecifyUnrecognizedAnnotationLocation:ERROR
                                 </arg>
                                 <arg>--should-stop=ifError=FLOW</arg>
                             </compilerArgs>
@@ -424,7 +425,7 @@
                                 <path>
                                     <groupId>com.uber.nullaway</groupId>
                                     <artifactId>nullaway</artifactId>
-                                    <version>0.14.1</version>
+                                    <version>0.14.2</version>
                                 </path>
                             </annotationProcessorPaths>
                         </configuration>
