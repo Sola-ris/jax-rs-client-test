@@ -635,7 +635,7 @@
             <properties>
                 <version.jax-rs>4.0.0</version.jax-rs>
 
-                <version.cxf>4.2.3</version.cxf>
+                <version.cxf>4.2.4</version.cxf>
                 <version.jersey>4.0.3</version.jersey>
                 <version.resteasy>7.0.5.Final</version.resteasy>
 
