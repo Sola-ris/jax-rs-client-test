@@ -270,7 +270,7 @@
         <dependency>
             <groupId>dev.resteasy.providers</groupId>
             <artifactId>resteasy-jackson-provider</artifactId>
-            <version>1.0.0.Final</version>
+            <version>1.0.1.Final</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.jboss.resteasy</groupId>
